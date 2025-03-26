@@ -1,3 +1,5 @@
+import 'package:finsta_mac/components/KeyValueModel.dart';
+
 class MemberDetailsResponse {
   int? ploanscount;
   int? pContactdId;
@@ -136,5 +138,11 @@ class MemberDetailsResponse {
     data['pbranchname'] = this.pbranchname;
     data['pbranchid'] = this.pbranchid;
     return data;
+  }
+
+  static List<KeyValueModel> memberDetailsToKeyValueList(List<MemberDetailsResponse> list) {
+    return list.map((member) {
+      return KeyValueModel(id: member.pmemberid.toString(), name: member.pmemberid.toString());
+    }).toList();
   }
 }

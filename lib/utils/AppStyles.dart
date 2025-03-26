@@ -15,12 +15,13 @@ class AppStyles{
  static Color shadowColor =  const Color(0xffd4b6ae);
  static Color colorGreen = const Color(0xFF35c371);
  static Color colorOrange =  Colors.deepOrange;
+ static Color lightGreenColor = Color(0xFFd5ffcf);
 
  static TextStyle smallLabelText=const TextStyle(fontSize: 13,color: Colors.white);
  static TextStyle headerLargeText= GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 40);
  static TextStyle headerMediumText= GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 22);
  static TextStyle customTextStyle({double? fontSize, Color? color}) => GoogleFonts.poppins(color: color, fontWeight: FontWeight.w600, fontSize: fontSize);
- static TextStyle statusTextStyle({double? fontSize}) => GoogleFonts.poppins(color: colorOrange, fontWeight: FontWeight.w600, fontSize: fontSize);
+ static TextStyle statusTextStyle({double? fontSize}) => GoogleFonts.poppins(color: Colors.amber.shade900, fontWeight: FontWeight.w600, fontSize: fontSize);
  static TextStyle smallLabelTextBlack=const TextStyle(fontSize: 12,color: Colors.black);
  static TextStyle headerTextBlack=const TextStyle(color: Colors.black,fontWeight: FontWeight.bold);
  static TextStyle highLightText= TextStyle(color: AppStyles.btnColor,fontWeight: FontWeight.bold,fontSize: 13);

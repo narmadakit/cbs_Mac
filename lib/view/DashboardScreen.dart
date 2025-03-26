@@ -1,5 +1,6 @@
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:finsta_mac/Calculator/EmiCalculatorScreen.dart';
 import 'package:finsta_mac/Home/bloc/HomeBloc.dart';
 import 'package:finsta_mac/Home/bloc/HomeEvent.dart';
 import 'package:finsta_mac/Home/model/LoanDataResponse.dart';
@@ -8,7 +9,6 @@ import 'package:finsta_mac/network/Repository.dart';
 import 'package:finsta_mac/utils/AppStyles.dart';
 import 'package:finsta_mac/view/MyDepositeScreen.dart';
 import 'package:finsta_mac/view/MyLoansScreen.dart';
-import 'package:finsta_mac/view/MyShares.dart';
 import 'package:finsta_mac/view/TotalDuesScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -49,6 +49,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   getMemberDetails() async {
     memberName = await SharedPrefs.getString(SharedPrefs.memberName);
   }
+
+  Future<void> refresh() async {
+    // buildContext?.read<ExistHomeBloc>().add(GetContactData());
+    Navigator.push(context, MaterialPageRoute(builder: (builder)=>const DashboardScreen()));
+  }
+
+  final List<String> imageUrls = [
+    'https://graphicsfamily.com/wp-content/uploads/2020/06/Bank-Service-Web-Banner-1180x664.jpg',
+    'https://graphicsfamily.com/wp-content/uploads/2020/06/Bank-Service-Web-Banner-1180x664.jpg',
+    'https://graphicsfamily.com/wp-content/uploads/2020/06/Bank-Service-Web-Banner-1180x664.jpg',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +144,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     backgroundColor: AppStyles.btnColor,
     type: BottomNavigationBarType.fixed,
     currentIndex: _selectedIndex,
-    unselectedLabelStyle: const TextStyle(color: Colors.grey,fontSize: 12),
+    unselectedLabelStyle: const TextStyle(color: Colors.grey,fontSize: 11),
     unselectedItemColor: Colors.white,
     selectedItemColor: Colors.white,
     showUnselectedLabels: true,
@@ -162,8 +173,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Navigator.push(
     context,
     MaterialPageRoute(
-    builder: (context) => const ProfileScreen(
+    builder: (context) => const EmiCalculatorScreen(
     )));
+    }
+    if(_selectedIndex == 4){
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const ProfileScreen(
+              )));
     }
     });
     },
@@ -181,6 +199,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     icon: Icon(Icons.savings_outlined,size: 20),
     label: deposits,
     ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.calculate_outlined,size: 20),
+        label: calculator,
+      ),
     BottomNavigationBarItem(
     icon: Icon(Icons.account_circle_outlined,size: 20),
     label: profile,
@@ -189,105 +211,151 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ),
     )
     ),
-      body: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: ListView(
-            children: [
-              CarouselSlider.builder(
-                carouselController: _controller,
-                itemCount: savingLoan?.length,
-                itemBuilder: (context, index, realIndex) {
-                  Savingslist savingData=savingLoan![index];
-                  return buildCaruselCard(savingData);
-                },
-                options: CarouselOptions(
-                    autoPlay: false,
-                    enlargeCenterPage: true,
-                    aspectRatio: 1.9,
-                    viewportFraction: 1,
-                    enableInfiniteScroll: false,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _current = index;
-                      });
-                    }),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: savingLoan!.asMap().entries.map((entry) {
-                  return GestureDetector(
-                    onTap: () => _controller.animateToPage(entry.key),
-                    child: Container(
-                      width: 20.0,
-                      height: 2.0,
-                      margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          color: (Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white
-                              : AppStyles.imageBgColor)
-                              .withOpacity(_current == entry.key ? 0.9 : 0.4)),
-                    ),
-                  );
-                }).toList(),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: buildGrids(myLoans,"assets/icons/loan.png",(){
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => MyLoansScreen(
-                                        loanData.loanslist
-                                    )));
-                          }),
-                        ),
-                        const SizedBox(width: 20,),
-                        Expanded(
-                          child: buildGrids(myDeposits,"assets/images/deposit1.png",(){
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => MyDepositsScreen(
-                                      loanData.rdlist,loanData.fdslist,
-                                    )));
-                          }),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: buildGrids(applyLoan,"assets/icons/newLoan.png",(){
-                            showSnackBar(context, 'Coming Soon!');
-                          }),
-                        ),
-                        const SizedBox(width: 20,),
-                        Expanded(child: buildGrids(myShares,"assets/images/shares.png",(){
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => MySharesScreen(
-                                      loanData.shareslist
-                                  )));
-                        })),
-                      ],
-                    ),
-                    const SizedBox(height: 20,),
-                   duesLoadingVisibility?CircularProgressIndicator(color: AppStyles.btnColor,): totalDueContainer(),
-                  ],
+      body:
+      RefreshIndicator(
+        onRefresh: refresh,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 0.0,vertical: 5),
+          child: ListView(
+              children: [
+                CarouselSlider.builder(
+                  carouselController: _controller,
+                  itemCount: imageUrls.length,
+                  itemBuilder: (context, index, realIndex) {
+                    // Savingslist savingData=savingLoan![index];
+                    return buildCaruselBanner(index);
+                  },
+                  options: CarouselOptions(
+                      autoPlay: true,
+                      enlargeCenterPage: true,
+                      aspectRatio: 2.4,
+                      viewportFraction: 1.0,
+                      enableInfiniteScroll: false,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _current = index;
+                        });
+                      }),
                 ),
-              ),
-            ]
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: imageUrls.asMap().entries.map((entry) {
+                    return GestureDetector(
+                      onTap: () => _controller.animateToPage(entry.key),
+                      child: Container(
+                        width: (_current == entry.key)? 15.0:6.0,
+                        height: 5.0,
+                        margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color:(_current == entry.key)? Colors.black : AppStyles.shadowColor ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0,vertical: 5),
+                  child: Column(
+                    children: [
+                      CarouselSlider.builder(
+                        carouselController: _controller,
+                        itemCount: savingLoan?.length,
+                        itemBuilder: (context, index, realIndex) {
+                          Savingslist savingData=savingLoan![index];
+                          return buildCaruselCard(savingData);
+                        },
+                        options: CarouselOptions(
+                            autoPlay: false,
+                            enlargeCenterPage: true,
+                            aspectRatio: 2.1,
+                            viewportFraction: 1,
+                            enableInfiniteScroll: false,
+                            onPageChanged: (index, reason) {
+                              setState(() {
+                                _current = index;
+                              });
+                            }),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: savingLoan!.asMap().entries.map((entry) {
+                          return GestureDetector(
+                            onTap: () => _controller.animateToPage(entry.key),
+                            child: Container(
+                              width: 20.0,
+                              height: 2.0,
+                              margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.rectangle,
+                                  color: (Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.white
+                                      : AppStyles.imageBgColor)
+                                      .withOpacity(_current == entry.key ? 0.9 : 0.4)),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(0.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: buildGrids(myLoans,"assets/icons/loan.png",(){
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => MyLoansScreen(
+                                                loanData.loanslist
+                                            )));
+                                  }),
+                                ),
+                                const SizedBox(width: 20,),
+                                Expanded(
+                                  child: buildGrids(myDeposits,"assets/images/deposit1.png",(){
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => MyDepositsScreen(
+                                              loanData.rdlist,loanData.fdslist,
+                                            )));
+                                  }),
+                                ),
+                              ],
+                            ),
+                            // const SizedBox(height: 20,),
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            //   children: [
+                            //     Expanded(
+                            //       child: buildGrids(applyLoan,"assets/icons/newLoan.png",(){
+                            //         showSnackBar(context, 'Coming Soon!');
+                            //       }),
+                            //     ),
+                            //     const SizedBox(width: 20,),
+                            //     Expanded(child: buildGrids(myShares,"assets/images/shares.png",(){
+                            //       Navigator.push(
+                            //           context,
+                            //           MaterialPageRoute(
+                            //               builder: (context) => MySharesScreen(
+                            //                   loanData.shareslist
+                            //               )));
+                            //     })),
+                            //   ],
+                            // ),
+                            const SizedBox(height: 20,),
+                            duesLoadingVisibility?CircularProgressIndicator(color: AppStyles.btnColor,): totalDueContainer(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              ]
+          ),
         ),
       ),
     );
@@ -309,7 +377,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 )));
       },
       child: Container(
-                height: 90,
+                height: 80,
                 decoration: BoxDecoration(
                     color: AppStyles.gridColor,
                     borderRadius: AppStyles.borderRadiusCircular,
@@ -332,7 +400,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Row(
                                   children: [
                                     getRuppeText(fontSize: 15),
-                                    Text('${convertToCurrencyFormat(totalDuesListAmt)}',style: TextStyle(fontWeight: FontWeight.w600),),
+                                    Text('${convertToCurrencyFormat(totalDuesListAmt)}',style: const TextStyle(fontWeight: FontWeight.w600),),
                                   ],
                                 ),
                               ],
@@ -380,8 +448,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Row(
                       children: [
                         Text(savingData.pSavingaccountno??"",style: const TextStyle(color: Colors.white,letterSpacing: 6, fontWeight: FontWeight.bold),),
-
-                     IconButton(
+                        IconButton(
                        padding: EdgeInsets.all(0),
                        onPressed: () {
                          Clipboard.setData(ClipboardData(text: savingData.pSavingaccountno.toString())).then((_) {
@@ -415,13 +482,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Text(savingData.pAccountstatus??"",style: AppStyles.customTextStyle(color: AppStyles.colorOrange)),
+                Text(savingData.pAccountstatus??"",style: AppStyles.customTextStyle(color: Colors.amber.shade800)),
                 Image.asset("assets/images/bank2.png",height: 40,color: Colors.white,),
               ],
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget buildCaruselBanner(int index) {
+    return ClipRRect(
+        borderRadius: BorderRadius.circular(0),
+        // child: Image.asset("assets/images/banner.jpeg",fit: BoxFit.cover,
+        //   width: double.infinity)
+        child: Image.network(imageUrls[index],
+        fit: BoxFit.cover,
+          width: double.infinity)
     );
   }
 

@@ -4,13 +4,14 @@ import 'dart:typed_data';
 
 import 'package:finsta_mac/Home/model/MemberDetailsResponse.dart';
 import 'package:finsta_mac/Login/LoginScreen.dart';
+import 'package:finsta_mac/components/CustomDropdown.dart';
 import 'package:finsta_mac/components/CustomMainBackground.dart';
 import 'package:finsta_mac/utils/AppStyles.dart';
 import 'package:finsta_mac/utils/SharedPrefs.dart';
-import 'package:finsta_mac/view/DashboardScreen.dart';
 import 'package:finsta_mac/view/MembersScreen.dart';
 import 'package:flutter/material.dart';
 import '../components/AppWidgets.dart';
+import '../components/KeyValueModel.dart';
 import '../utils/AppText.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -23,6 +24,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   MemberDetailsResponse responseData = MemberDetailsResponse();
   List<MemberDetailsResponse> listData=[];
+  List<KeyValueModel> listDataKyValue=[];
   String _selectedValue = "";
   String memberId="";
 
@@ -30,6 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   var data = await SharedPrefs.readData(SharedPrefs.memberDetails);
   memberId = await SharedPrefs.getString(SharedPrefs.memberId);
   listData=MemberDetailsResponse.fromJsonList(data);
+  listDataKyValue=MemberDetailsResponse.memberDetailsToKeyValueList(listData);
   List<MemberDetailsResponse> filteredList = listData.where((item) => item.pmemberid.toString() == memberId).toList();
   setState(() {
    responseData = filteredList[0];
@@ -130,7 +133,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: 5,),
+              const SizedBox(height: 5,),
+          CustomDropdown(context: context,selectedValue: _selectedValue,
+            onChanged: (value) {
+            setState(() {
+              _selectedValue = value;
+            });
+            Navigator.pop(context);
+            },
+            hint: "",items: listDataKyValue,icon: Icons.arrow_downward,labelText: '', ),
+
               // Padding(
               //   padding: const EdgeInsets.symmetric(horizontal: 15.0),
               //   child: Row(
@@ -212,6 +224,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
    logoutAlert(BuildContext context) {
     showDialog(
         context: context,
@@ -266,4 +279,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+
 }
+
+

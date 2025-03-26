@@ -81,41 +81,42 @@ class _MyLoansScreenState extends State<MyLoansScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: AppStyles.shadowColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(11.0), // Top left corner radius
-                  topRight: Radius.circular(11.0), // Top right corner radius
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                if(widget.loansList![i].isVisibleDetails == false) {
+                  widget.loansList![i].isVisibleDetails = true;
+                } else{
+                  widget.loansList![i].isVisibleDetails = false;
+                }
+              });
+            },
+            child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: AppStyles.shadowColor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(11.0), // Top left corner radius
+                    topRight: Radius.circular(11.0), // Top right corner radius
+                  ),
                 ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(listData.pLoantype.toString(),style: AppStyles.customTextStyle(fontSize: 13),),
-                    Spacer(),
-                  GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          if(widget.loansList![i].isVisibleDetails == false) {
-                            widget.loansList![i].isVisibleDetails = true;
-                          } else{
-                            widget.loansList![i].isVisibleDetails = false;
-                          }
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Icon((widget.loansList![i].isVisibleDetails == false)? Icons.keyboard_arrow_down:Icons.keyboard_arrow_up),
-                      ))
-                  ],
-                ),
-              )),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(listData.pLoantype.toString(),style: AppStyles.customTextStyle(fontSize: 13),),
+                      Spacer(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Icon((widget.loansList![i].isVisibleDetails == false)? Icons.keyboard_arrow_down:Icons.keyboard_arrow_up),
+                    )
+                    ],
+                  ),
+                )),
+          ),
           Padding(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -125,12 +126,12 @@ class _MyLoansScreenState extends State<MyLoansScreen> {
                     Text(listData.pVchapplicationID.toString(),style: const TextStyle(color: Colors.black,letterSpacing: 6, fontWeight: FontWeight.bold),),
                     Container(
                       decoration: BoxDecoration(
-                          color: AppStyles.bgColor3,
+                          color: Colors.transparent,
                           borderRadius: BorderRadius.all(Radius.circular(18))
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 3),
-                        child: Text(listData.ploanstatus.toString().toUpperCase(),style: AppStyles.statusTextStyle(fontSize: 12),),
+                        child: Text('(${listData.ploanstatus.toString().toUpperCase()})',style: AppStyles.statusTextStyle(fontSize: 14),),
                       ),
                     ),
                   ],
@@ -147,7 +148,7 @@ class _MyLoansScreenState extends State<MyLoansScreen> {
                     Expanded(
                         flex: flex,
                         child:getRowText(
-                            rupeeSymbol: "",
+                            rupeeSymbol: "₹",
                             text: convertToCurrencyFormat(listData.paccountdue)
                         )
                     ),

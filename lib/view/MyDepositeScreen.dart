@@ -43,8 +43,7 @@ class _MyDepositsScreenState extends State<MyDepositsScreen> {
       length: 2,
       child: CustomMainBackground(
           title: myDeposits,
-          tabBar:
-          TabBar(
+          tabBar: TabBar(
             splashBorderRadius: BorderRadius.circular(
               25.0,
             ),
