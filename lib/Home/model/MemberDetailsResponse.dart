@@ -1,36 +1,37 @@
 import 'package:finsta_mac/components/KeyValueModel.dart';
 
 class MemberDetailsResponse {
-  int? ploanscount;
-  int? pContactdId;
-  String? pContactType;
-  String? pRefNo;
+  dynamic ploanscount;
+  dynamic pContactdId;
+  dynamic pContactType;
+  dynamic pRefNo;
   dynamic ploanucic;
-  String? pContactName;
-  String? pFatherName;
-  String? pFatherLastName;
-  String? pContactNumber;
-  String? pContactEmail;
-  String? pImagePath;
+  dynamic pContactName;
+  dynamic pFatherName;
+  dynamic pFatherLastName;
+  dynamic pContactNumber;
+  dynamic pContactEmail;
+  dynamic pImagePath;
   dynamic pImage;
-  String? pAddresDetails;
+  dynamic pAddresDetails;
   bool? pissupplier;
   bool? pisadvocate;
   bool? pisemployee;
   bool? pisreferral;
   dynamic subscribercount;
-  String? pGender;
+  dynamic pGender;
   dynamic pContactimagepath;
-  String? pAadhar;
-  String? pPan;
-  String? pmembercode;
+  dynamic pAadhar;
+  dynamic pPan;
+  dynamic pmembercode;
   dynamic pmembername;
   dynamic pReferralName;
-  int? pmemberid;
-  int? pmembertypeid;
+  dynamic pmemberid;
+  dynamic pmembertypeid;
   dynamic pmembertype;
-  String? pbranchname;
-  int? pbranchid;
+  dynamic pbranchname;
+  dynamic pbranchid;
+  dynamic papplicanttype;
 
   MemberDetailsResponse(
       {this.ploanscount,
@@ -62,7 +63,9 @@ class MemberDetailsResponse {
         this.pmembertypeid,
         this.pmembertype,
         this.pbranchname,
-        this.pbranchid});
+        this.pbranchid,
+        this.papplicanttype
+      });
 
   MemberDetailsResponse.fromJson(Map<String, dynamic> json) {
     ploanscount = json['ploanscount'];
@@ -95,6 +98,7 @@ class MemberDetailsResponse {
     pmembertype = json['pmembertype'];
     pbranchname = json['pbranchname'];
     pbranchid = json['pbranchid'];
+    papplicanttype = json['papplicanttype'];
   }
 
   //API returns JSON array not json object so that is List not Map.
@@ -137,6 +141,7 @@ class MemberDetailsResponse {
     data['pmembertype'] = this.pmembertype;
     data['pbranchname'] = this.pbranchname;
     data['pbranchid'] = this.pbranchid;
+    data['papplicanttype'] = this.papplicanttype;
     return data;
   }
 

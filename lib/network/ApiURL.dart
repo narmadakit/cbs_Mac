@@ -8,6 +8,7 @@ class ApiURL{
   static String getCompanyDetails= "${BASE_URL}api/Settings/GetcompanyNameandaddressDetails";
 
   //Emi calculator
-  static String getDepositTypes(String formName,applicantType,memberType) => "${BASE_URL}api/Banking/GetAllTransactionsSchemes?FormName=$formName&ApplicantType=$applicantType&MemberType=ALL";
+  static String getAllTransactionsSchemes(String formName,applicantType,memberType) => "${BASE_URL}api/Banking/GetAllTransactionsSchemes?FormName=$formName&ApplicantType=$applicantType&MemberType=$memberType";
+  static String getFdTenureModes(String fdName,applicantType,memberType) => "${BASE_URL}api/Banking/GetFdSchemeTenureModes?Fdname=$fdName&ApplicantType=$applicantType&MemberType=$memberType";
 
 }

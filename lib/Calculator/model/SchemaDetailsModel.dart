@@ -1,21 +1,21 @@
 import '../../Home/model/MemberDetailsResponse.dart';
 import '../../components/KeyValueModel.dart';
 
-class DepositTypesModel {
+class SchemaDetailsModel {
   int? pshcemeConfigId;
   String? pSchemename;
   String? pSchemecode;
   String? pSchemenameCode;
   String? pSchemeCalculationmode;
 
-  DepositTypesModel(
+  SchemaDetailsModel(
       {this.pshcemeConfigId,
         this.pSchemename,
         this.pSchemecode,
         this.pSchemenameCode,
         this.pSchemeCalculationmode});
 
-  DepositTypesModel.fromJson(Map<String, dynamic> json) {
+  SchemaDetailsModel.fromJson(Map<String, dynamic> json) {
     pshcemeConfigId = json['pshcemeConfigId'];
     pSchemename = json['pSchemename'];
     pSchemecode = json['pSchemecode'];
@@ -33,7 +33,12 @@ class DepositTypesModel {
     return data;
   }
 
-  static List<KeyValueModel> depositTypesKeyValueList(List<DepositTypesModel> list) {
+  //API returns JSON array not json object so that is List not Map.
+  static List<SchemaDetailsModel> fromJsonList(List list) {
+    return list.map((item) => SchemaDetailsModel.fromJson(item)).toList();
+  }
+
+  static List<KeyValueModel> depositTypesKeyValueList(List<SchemaDetailsModel> list) {
     return list.map((member) {
       return KeyValueModel(id: member.pSchemename.toString(), name: member.pshcemeConfigId.toString());
     }).toList();

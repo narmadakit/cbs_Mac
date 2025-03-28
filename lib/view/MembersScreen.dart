@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:finsta_mac/Login/LoginScreen.dart';
@@ -31,13 +32,6 @@ class _MembersScreenState extends State<MembersScreen> {
   bool loadingVisibility =true;
   List<MemberDetailsResponse> listResponnseData=[];
   List<CompanyDetailsModel> companyResponseData=[];
-
-  getCompanyData() async {
-    var data = await SharedPrefs.readData(SharedPrefs.companyDetails);
-     data = await SharedPrefs.readData(SharedPrefs.memberDetails);
-    // memberId = await SharedPrefs.getString(SharedPrefs.memberId);
-
-  }
 
   @override
   Widget build(BuildContext context) {

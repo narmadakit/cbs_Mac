@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:finsta_mac/Home/model/MemberDetailsResponse.dart';
@@ -134,14 +135,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 5,),
-          CustomDropdown(context: context,selectedValue: _selectedValue,
-            onChanged: (value) {
-            setState(() {
-              _selectedValue = value;
-            });
-            Navigator.pop(context);
-            },
-            hint: "",items: listDataKyValue,icon: Icons.arrow_downward,labelText: '', ),
+          // CustomDropdown(context: context,selectedValue: _selectedValue,
+          //   onChanged: (value) {
+          //   setState(() {
+          //     _selectedValue = value;
+          //   });
+          //   Navigator.pop(context);
+          //   },
+          //   hint: "",items: listDataKyValue,icon: Icons.arrow_downward,labelText: '', ),
 
               // Padding(
               //   padding: const EdgeInsets.symmetric(horizontal: 15.0),

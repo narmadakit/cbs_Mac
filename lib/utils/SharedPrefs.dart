@@ -8,6 +8,7 @@ class SharedPrefs{
   static const companyDetails = "COMPANY_DETAILS";
   static const isLogin = "isLogin";
   static const mobileNo = "MOBILE_NO";
+  static const depositSchemaDetails = "DEPOSIT_SCHEMA_DETAILS";
 
 
   static saveData(String key, value) async {
