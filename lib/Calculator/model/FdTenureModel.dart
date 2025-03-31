@@ -1,3 +1,6 @@
+import '../../components/KeyValueModel.dart';
+import 'SchemaDetailsModel.dart';
+
 class FdTenureModel {
   dynamic pTenurename;
   dynamic pSortorder;
@@ -14,5 +17,11 @@ class FdTenureModel {
     data['pTenurename'] = this.pTenurename;
     data['pSortorder'] = this.pSortorder;
     return data;
+  }
+
+  static List<KeyValueModel> keyValueList(List<FdTenureModel> list) {
+    return list.map((member) {
+      return KeyValueModel(id: member.pSortorder.toString(), name: member.pTenurename.toString());
+    }).toList();
   }
 }

@@ -8,4 +8,8 @@ class KeyValueModel {
   String toString() {
     return name; // Use this property to display in the dropdown
   }
+
+  List<String> toList() {
+    return [name, id];  // Return a list of strings
+  }
 }

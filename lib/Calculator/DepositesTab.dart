@@ -1,15 +1,6 @@
-import 'dart:developer';
-
 import 'package:finsta_mac/Calculator/FDTab.dart';
-import 'package:finsta_mac/Calculator/bloc/FdBloc/FDBloc.dart';
-import 'package:finsta_mac/Calculator/bloc/FdBloc/FDEvent.dart';
-import 'package:finsta_mac/Calculator/bloc/FdBloc/FDState.dart';
 import 'package:finsta_mac/components/KeyValueModel.dart';
-import 'package:finsta_mac/network/Repository.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../components/CustomDropdown.dart';
 
 class DepositesTab extends StatefulWidget {
   const DepositesTab({
@@ -27,6 +18,8 @@ class _DepositesTabState extends State<DepositesTab> {
     KeyValueModel(id: "1", name: "FIXED DEPOSIT"),
     KeyValueModel(id: "2", name: "RECURRING DEPOSIT"),
   ];
+  bool isFDVisible=false;
+  bool isRDVisible=false;
   @override
   Widget build(BuildContext context) {
     return  Padding(
@@ -51,7 +44,8 @@ class _DepositesTabState extends State<DepositesTab> {
                       setState(() {
                         selectedRadioValue = value;
                         _selectedValue = "FIXED DEPOSIT";
-                        const FDTab();
+                        isFDVisible = true;
+                        // context.read<FDBloc>().add(FDInitEvent(_selectedValue.toString()));
                       });
                     },
                   ),
@@ -71,6 +65,8 @@ class _DepositesTabState extends State<DepositesTab> {
                       setState(() {
                         selectedRadioValue = value;
                         _selectedValue = "RECURRING DEPOSIT";
+                        isRDVisible = true;
+                        // context.read<FDBloc>().add(FDInitEvent(_selectedValue.toString()));
                       });
                     },
                   ),
@@ -78,9 +74,13 @@ class _DepositesTabState extends State<DepositesTab> {
               ),
             ],
           ),
+          Visibility(
+              visible: isFDVisible,
+              child: const FDTabWidget()),
 
         ],
-      ),
+      )
     );
   }
 }
+

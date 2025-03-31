@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:finsta_mac/Calculator/model/FdTenureModel.dart';
+import 'package:finsta_mac/Calculator/model/FDInterestDetailsModel.dart';
 import 'package:finsta_mac/Calculator/model/SchemaDetailsModel.dart';
 import 'package:finsta_mac/Home/model/LoanDataResponse.dart';
 import 'package:finsta_mac/Home/model/MemberDetailsResponse.dart';
 import 'package:finsta_mac/Login/model/GetOtpModel.dart';
 import 'package:finsta_mac/network/ApiURL.dart';
-import 'package:finsta_mac/utils/AppText.dart';
 import 'package:finsta_mac/utils/SharedPrefs.dart';
 import 'package:http/http.dart' as http;
+import '../Calculator/model/FdTenureModel.dart';
 import '../Home/model/MembersAllDuesModel.dart';
 import '../Login/model/CompanyDetailsModel.dart';
 
@@ -133,59 +133,77 @@ class Repository{
   }
 
   //DEPOSITS
-  Future<List<SchemaDetailsModel>> getAllTransactionsSchemes(String formName) async{
+  Future<List<SchemaDetailsModel>> getAllTransactionsSchemesRepo(String formName) async{
     TAG = 'getAllTransactionsSchemes';
    String applicantType="";
    String memberType="";
    List<SchemaDetailsModel> listData=[];
+    List<MemberDetailsResponse> data = await memberData();
+    applicantType= data[0].papplicanttype;
+    memberType = data[0].pmembertype;
     try{
-      memberData().then((value) async {
-        applicantType= value[0].papplicanttype;
-        memberType = value[0].pmembertype;
-
         String url = ApiURL.getAllTransactionsSchemes(formName, applicantType, memberType);
         Uri apiUrl = Uri.parse(url);
         log("URL $TAG  --------$apiUrl");
         var response = await http.get(apiUrl,headers: loginHeader);
         List body = json.decode(response.body);
         listData= body.map((e) => SchemaDetailsModel.fromJson(e)).toList();
-        log('==$TAG ${jsonEncode(listData)}');
+        log('==$TAG ${listData.length}');
         SharedPrefs.saveData(SharedPrefs.depositSchemaDetails, listData);
         return listData;
-      });
     }
     catch(e){
       log("$TAG error $e");
       throw Exception(e);
     }
-    return listData;
 }
 
-  // Future<List<FdTenureModel>> getFdTenureModesRepo(String fdName) async{
-  //   TAG = 'getFdTenureModesRepo';
-  //   String applicantType="";
-  //   String memberType="";
-  //   List<SchemaDetailsModel> listData=[];
-  //   try{
-  //     memberData().then((value) async {
-  //       applicantType= value[0].papplicanttype;
-  //       memberType = value[0].pmembertype;
-  //
-  //       String url = ApiURL.getFdTenureModes(fdName, applicantType, memberType);
-  //       Uri apiUrl = Uri.parse(url);
-  //       log("URL $TAG  --------$apiUrl");
-  //       var response = await http.get(apiUrl,headers: loginHeader);
-  //       List body = json.decode(response.body);
-  //       listData= body.map((e) => SchemaDetailsModel.fromJson(e)).toList();
-  //       log('==$TAG ${jsonEncode(listData)}');
-  //       return listData;
-  //     });
-  //   }
-  //   catch(e){
-  //     log("$TAG error $e");
-  //     throw Exception(e);
-  //   }
-  //   return listData;
-  // }
+  Future<List<FdTenureModel>> getFDTenureTypeRepo(String fdName) async{
+    TAG = 'getTenureTypeRepo';
+    String applicantType="";
+    String memberType="";
+    List<MemberDetailsResponse> data = await memberData();
+    applicantType= data[0].papplicanttype;
+    memberType = data[0].pmembertype;
+    List<FdTenureModel> listData=[];
+    try{
+      String url = ApiURL.getFdTenureModesApi(fdName, applicantType, memberType);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+      List body = json.decode(response.body);
+      listData= body.map((e) => FdTenureModel.fromJson(e)).toList();
+      log('==$TAG ${listData.length}');
+      return listData;
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<List<FDInterestDetailsModel>> getFDInterestDetailsRepo(String fdConfigID,fdName,tenure,tenureMode,depositAmount) async{
+    TAG = 'getFDInterestDetailsRepo';
+    String applicantType="";
+    String memberType="";
+    List<MemberDetailsResponse> data = await memberData();
+    applicantType= data[0].papplicanttype;
+    memberType = data[0].pmembertype;
+    List<FDInterestDetailsModel> listData=[];
+    try{
+      String url = ApiURL.getFdInterestDetailsApi(applicantType, memberType,fdConfigID,fdName,tenure,tenureMode,depositAmount);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+      List body = json.decode(response.body);
+      listData= body.map((e) => FDInterestDetailsModel.fromJson(e)).toList();
+      log('==$TAG ${listData.length}');
+      return listData;
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
 
 }

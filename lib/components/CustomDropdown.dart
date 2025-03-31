@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:finsta_mac/utils/AppStyles.dart';
 import 'package:flutter/material.dart';
 
 import 'KeyValueModel.dart';
@@ -14,6 +17,7 @@ class CustomDropdown<T> extends StatelessWidget {
   final Color borderColor;
 
   const CustomDropdown({
+    super.key,
     required this.context,
     required this.selectedValue,
     required this.items,
@@ -30,7 +34,7 @@ class CustomDropdown<T> extends StatelessWidget {
     return GestureDetector(
       onTap: () => _showBottomSheet(context,onChanged,items), // Open BottomSheet when tapped
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        padding: const EdgeInsets.only(left: 6, bottom: 12,top: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.grey),
@@ -38,8 +42,8 @@ class CustomDropdown<T> extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(selectedValue!),
-            Icon(Icons.arrow_drop_down),
+            Text(selectedValue!,style: AppStyles.boldTextBlack,),
+            const Icon(Icons.arrow_drop_down),
           ],
         ),
       ),
@@ -64,12 +68,11 @@ class CustomDropdownBottomSheet extends StatelessWidget {
 
   const CustomDropdownBottomSheet({super.key, required this.items, required this.onItemSelected});
 
-
   @override
   Widget build(BuildContext context,) {
     return Container(
       height: 300,
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       child: ListView.builder(
         itemCount: items.length,
         itemBuilder: (context, index) {

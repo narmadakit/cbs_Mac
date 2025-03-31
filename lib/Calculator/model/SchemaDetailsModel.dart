@@ -38,9 +38,9 @@ class SchemaDetailsModel {
     return list.map((item) => SchemaDetailsModel.fromJson(item)).toList();
   }
 
-  static List<KeyValueModel> depositTypesKeyValueList(List<SchemaDetailsModel> list) {
-    return list.map((member) {
-      return KeyValueModel(id: member.pSchemename.toString(), name: member.pshcemeConfigId.toString());
-    }).toList();
-  }
+    static List<KeyValueModel> keyValueList(List<SchemaDetailsModel> list) {
+      return list.map((member) {
+        return KeyValueModel(id: member.pshcemeConfigId.toString(), name: member.pSchemename.toString());
+      }).toList();
+    }
 }
