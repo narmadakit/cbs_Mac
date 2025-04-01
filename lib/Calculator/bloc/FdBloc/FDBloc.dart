@@ -1,12 +1,13 @@
-import 'dart:developer';
 
 import 'package:finsta_mac/Calculator/bloc/FdBloc/FDEvent.dart';
 import 'package:finsta_mac/Calculator/bloc/FdBloc/FDState.dart';
-import 'package:finsta_mac/Calculator/model/FDInterestDetailsModel.dart';
+import 'package:finsta_mac/Calculator/model/FDInterestRateModel.dart';
 import 'package:finsta_mac/Calculator/model/FdTenureModel.dart';
 import 'package:finsta_mac/Calculator/model/SchemaDetailsModel.dart';
 import 'package:finsta_mac/network/Repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../model/FDInterestDetailsModel.dart';
 
 class FDBloc extends Bloc<FDEvent,FDStates>{
   Repository repo;
@@ -14,6 +15,7 @@ class FDBloc extends Bloc<FDEvent,FDStates>{
     on<FDInitEvent>(getTransactionSchemesBloc);
     on<FDGetTenureEvent>(getFDTenureListBloc);
     on<GetFDInterestDetailsEvent>(getFDInterestDetailsBloc);
+    on<GetFDInterestRateEvent>(getFDInterestRateBloc);
   }
 
   getTransactionSchemesBloc(FDInitEvent event, Emitter<FDStates> emit) async {
@@ -41,8 +43,19 @@ class FDBloc extends Bloc<FDEvent,FDStates>{
   getFDInterestDetailsBloc(GetFDInterestDetailsEvent event, Emitter<FDStates> emit) async {
     emit(FDTenureLoadingState());
     try{
-      List<FDInterestDetailsModel> listData= await repo.getFDInterestDetailsRepo(event.fdConfigID,event.fdName,event.tenure,event.tenureMode,event.depositAmount);
-      emit(FDInterestDetailsSuccessState(listData));
+      FDInterestDetailsModel responseData = await repo.getFDInterestDetailsRepo(event.fdConfigID,event.fdName,event.tenure,event.tenureMode,event.depositAmount);
+       emit(FDInterestDetailsSuccessState(responseData));
+    }
+    catch(e){
+      emit(FDErrorState(e.toString()));
+    }
+  }
+
+  getFDInterestRateBloc(GetFDInterestRateEvent event, Emitter<FDStates> emit) async {
+    emit(FDTenureLoadingState());
+    try{
+      FDInterestRateModel responseData = await repo.getFDInterestTRateRepo(event.fdName,event.tenure,event.tenureMode,event.depositAmount,event.interestPayout);
+      emit(FDInterestRateSuccessState(responseData));
     }
     catch(e){
       emit(FDErrorState(e.toString()));

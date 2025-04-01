@@ -11,5 +11,6 @@ class ApiURL{
   static String getAllTransactionsSchemes(String formName,applicantType,memberType) => "${BASE_URL}api/Banking/GetAllTransactionsSchemes?FormName=$formName&ApplicantType=$applicantType&MemberType=$memberType";
   static String getFdTenureModesApi(String fdName,applicantType,memberType) => "${BASE_URL}api/Banking/GetFdSchemeTenureModes?Fdname=$fdName&ApplicantType=$applicantType&MemberType=$memberType";
   static String getFdInterestDetailsApi(String applicantType,memberType,fdConfigID,fdName,tenure,tenureMode,depositAmount) => "${BASE_URL}api/Banking/GetFdSchemeDetails?ApplicantType=$applicantType&MemberType=$memberType&FdconfigID=$fdConfigID&Fdname=$fdName&Tenure=$tenure&Tenuremode=$tenureMode&Depositamount=$depositAmount";
+  static String getFdInterestRateApi(String applicantType,memberType,fdName,tenure,tenureMode,depositAmount,interestPayout) => "${BASE_URL}api/Banking/GetTenureandMininterestRateofInterestRate?Fdname=$fdName&Depositamount=$depositAmount&Tenure=$tenure&TenureMode=$tenureMode&InterestPayout=$interestPayout&MemberType=$memberType&papplicanttype=$applicantType";
 
 }

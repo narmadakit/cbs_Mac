@@ -11,6 +11,7 @@ class CustomTextField<T> extends StatelessWidget {
   final Color borderColor;
   final double? boxHeight;
   final TextInputType textInputType;
+  final Function()? onTap;
 
   const CustomTextField({
     super.key,
@@ -22,7 +23,8 @@ class CustomTextField<T> extends StatelessWidget {
     this.textStyle = const TextStyle(fontSize: 16),
     this.borderColor = Colors.blue,
     this.boxHeight = 40,
-    required this.textInputType
+    required this.textInputType,
+    this.onTap
   });
 
   @override
@@ -32,6 +34,7 @@ class CustomTextField<T> extends StatelessWidget {
         height: boxHeight,
         child: TextFormField(
           keyboardType: textInputType,
+          onTap: onTap,
           textAlignVertical: TextAlignVertical.center,
           controller: controller,
           decoration: InputDecoration(

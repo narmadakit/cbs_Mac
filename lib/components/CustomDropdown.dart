@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'KeyValueModel.dart';
 
 class CustomDropdown<T> extends StatelessWidget {
-  final String? selectedValue;
+  final KeyValueModel selectedValue;
   final BuildContext context;
   final List<KeyValueModel> items;
   final ValueChanged onChanged;
@@ -42,7 +42,7 @@ class CustomDropdown<T> extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(selectedValue!,style: AppStyles.boldTextBlack,),
+            Text(selectedValue.name,style: AppStyles.boldTextBlack,),
             const Icon(Icons.arrow_drop_down),
           ],
         ),
@@ -63,7 +63,7 @@ class CustomDropdown<T> extends StatelessWidget {
 }
 
 class CustomDropdownBottomSheet extends StatelessWidget {
-  final Function(String) onItemSelected;
+  final Function(KeyValueModel) onItemSelected;
   final List<KeyValueModel> items;
 
   const CustomDropdownBottomSheet({super.key, required this.items, required this.onItemSelected});
@@ -79,7 +79,7 @@ class CustomDropdownBottomSheet extends StatelessWidget {
           return ListTile(
             title: Text(items[index].name),
             onTap: () {
-              onItemSelected(items[index].name);
+              onItemSelected(items[index]);
             },
           );
         },

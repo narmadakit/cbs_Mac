@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
   _navigateToHome() {
     if (_isNavigating) return; // Prevent duplicate navigation
     _isNavigating = true;
-    Timer(const Duration(seconds: 3), () {
+    Timer(const Duration(seconds: 1), () {
       WidgetsBinding.instance.addPostFrameCallback((_) {
       if(mounted){
         // Navigator.pushReplacement(

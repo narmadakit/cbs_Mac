@@ -23,3 +23,11 @@ class GetFDInterestDetailsEvent extends FDEvent{
   @override
   List<Object?> get props => [fdConfigID,fdName,tenure,tenureMode,depositAmount];
 }
+
+class GetFDInterestRateEvent extends FDEvent{
+  final String fdName,tenure,tenureMode,depositAmount,interestPayout;
+
+  GetFDInterestRateEvent(this.fdName,this.tenure,this.tenureMode,this.depositAmount,this.interestPayout);
+  @override
+  List<Object?> get props => [fdName,tenure,tenureMode,depositAmount,interestPayout];
+}

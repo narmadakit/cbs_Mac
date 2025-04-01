@@ -8,6 +8,7 @@ import 'package:finsta_mac/Login/model/GetOtpModel.dart';
 import 'package:finsta_mac/network/ApiURL.dart';
 import 'package:finsta_mac/utils/SharedPrefs.dart';
 import 'package:http/http.dart' as http;
+import '../Calculator/model/FDInterestRateModel.dart';
 import '../Calculator/model/FdTenureModel.dart';
 import '../Home/model/MembersAllDuesModel.dart';
 import '../Login/model/CompanyDetailsModel.dart';
@@ -182,28 +183,51 @@ class Repository{
     }
   }
 
-  Future<List<FDInterestDetailsModel>> getFDInterestDetailsRepo(String fdConfigID,fdName,tenure,tenureMode,depositAmount) async{
+  Future<FDInterestDetailsModel> getFDInterestDetailsRepo(String fdConfigID,fdName,tenure,tenureMode,depositAmount) async{
     TAG = 'getFDInterestDetailsRepo';
     String applicantType="";
     String memberType="";
     List<MemberDetailsResponse> data = await memberData();
     applicantType= data[0].papplicanttype;
     memberType = data[0].pmembertype;
-    List<FDInterestDetailsModel> listData=[];
     try{
       String url = ApiURL.getFdInterestDetailsApi(applicantType, memberType,fdConfigID,fdName,tenure,tenureMode,depositAmount);
       Uri apiUrl = Uri.parse(url);
       log("URL $TAG  --------$apiUrl");
       var response = await http.get(apiUrl,headers: loginHeader);
-      List body = json.decode(response.body);
-      listData= body.map((e) => FDInterestDetailsModel.fromJson(e)).toList();
-      log('==$TAG ${listData.length}');
-      return listData;
+
+      final FDInterestDetailsModel responseData = FDInterestDetailsModel.fromJson(jsonDecode(response.body));
+      log('RESPONSE $TAG >>>> ${jsonEncode(responseData)}');
+      return responseData;
     }
     catch(e){
       log("$TAG error $e");
       throw Exception(e);
     }
   }
+
+  Future<FDInterestRateModel> getFDInterestTRateRepo(String fdName,tenure,tenureMode,depositAmount,interestPayout) async{
+    TAG = 'getFDInterestDetailsRepo';
+    String applicantType="";
+    String memberType="";
+    List<MemberDetailsResponse> data = await memberData();
+    applicantType= data[0].papplicanttype;
+    memberType = data[0].pmembertype;
+    try{
+      String url = ApiURL.getFdInterestRateApi(fdName,depositAmount,tenure,tenureMode,interestPayout,memberType, applicantType);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+
+      final FDInterestRateModel responseData = FDInterestRateModel.fromJson(jsonDecode(response.body));
+      log('RESPONSE $TAG >>>> ${jsonEncode(responseData)}');
+      return responseData;
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
 
 }
