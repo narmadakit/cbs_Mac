@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:finsta_mac/Calculator/model/FDInterestDetailsModel.dart';
+import 'package:finsta_mac/Calculator/model/FDSchemeDescModel.dart';
 import 'package:finsta_mac/Calculator/model/FdTenureModel.dart';
 
 import '../../model/FDInterestRateModel.dart';
@@ -58,6 +59,13 @@ class FDInterestDetailsSuccessState extends FDStates{
 class FDInterestRateSuccessState extends FDStates{
   final FDInterestRateModel responseModel;
   FDInterestRateSuccessState(this.responseModel);
+  @override
+  List<Object?> get props => [responseModel];
+}
+
+class FDSchemeDescrSuccessState extends FDStates{
+  final List<FDSchemeDescrModel> responseModel;
+  FDSchemeDescrSuccessState(this.responseModel);
   @override
   List<Object?> get props => [responseModel];
 }

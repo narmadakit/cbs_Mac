@@ -1,5 +1,5 @@
 class ApiURL{
-  static String BASE_URL ="http://13.201.200.0:8390/";
+  static String BASE_URL ="http://13.201.200.0:8386/";
   static String getMemberDataByMobile(String mobile) => "${BASE_URL}api/MobileAPP/Getmemberdatabymobileno?pmobileno=$mobile";
   static String getMembersSummaryByMemberId(String memberId) => "${BASE_URL}api/MobileAPP/GetMembersummarybymemberid?pmemberid=$memberId";
   static String getLoginOtp ="${BASE_URL}api/MobileAPP/SaveLoginOTPDetails";
@@ -11,6 +11,7 @@ class ApiURL{
   static String getAllTransactionsSchemes(String formName,applicantType,memberType) => "${BASE_URL}api/Banking/GetAllTransactionsSchemes?FormName=$formName&ApplicantType=$applicantType&MemberType=$memberType";
   static String getFdTenureModesApi(String fdName,applicantType,memberType) => "${BASE_URL}api/Banking/GetFdSchemeTenureModes?Fdname=$fdName&ApplicantType=$applicantType&MemberType=$memberType";
   static String getFdInterestDetailsApi(String applicantType,memberType,fdConfigID,fdName,tenure,tenureMode,depositAmount) => "${BASE_URL}api/Banking/GetFdSchemeDetails?ApplicantType=$applicantType&MemberType=$memberType&FdconfigID=$fdConfigID&Fdname=$fdName&Tenure=$tenure&Tenuremode=$tenureMode&Depositamount=$depositAmount";
-  static String getFdInterestRateApi(String applicantType,memberType,fdName,tenure,tenureMode,depositAmount,interestPayout) => "${BASE_URL}api/Banking/GetTenureandMininterestRateofInterestRate?Fdname=$fdName&Depositamount=$depositAmount&Tenure=$tenure&TenureMode=$tenureMode&InterestPayout=$interestPayout&MemberType=$memberType&papplicanttype=$applicantType";
+  static String getFdInterestRateApi(String fdName,depositAmount,tenure,tenureMode,interestPayout,memberType,applicantType) => "${BASE_URL}api/Banking/GetTenureandMininterestRateofInterestRate?Fdname=$fdName&Depositamount=$depositAmount&Tenure=$tenure&TenureMode=$tenureMode&InterestPayout=$interestPayout&MemberType=$memberType&papplicanttype=$applicantType";
+  static String getFdSchemeDescriptionApi(String fdName,memberType,applicantType) => "${BASE_URL}api/Banking/GetFdSchemeDetailsforGrid?Fdname=$fdName&ApplicantType=$applicantType&MemberType=$memberType";
 
 }

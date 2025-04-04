@@ -22,12 +22,13 @@ class AppStyles{
  static TextStyle headerMediumText= GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 22);
  static TextStyle customTextStyle({double? fontSize, Color? color}) => GoogleFonts.poppins(color: color, fontWeight: FontWeight.w600, fontSize: fontSize);
  static TextStyle statusTextStyle({double? fontSize}) => GoogleFonts.poppins(color: Colors.amber.shade900, fontWeight: FontWeight.w600, fontSize: fontSize);
- static TextStyle smallLabelTextBlack=const TextStyle(fontSize: 12,color: Colors.black);
+ static TextStyle smallLabelTextBlack=const TextStyle(fontSize: 11,color: Colors.black);
+ static TextStyle smallLabelTextBold=const TextStyle(fontSize: 11,color: Colors.black,fontWeight: FontWeight.w600);
  static TextStyle headerTextBlack=const TextStyle(color: Colors.black,fontWeight: FontWeight.bold);
  static TextStyle highLightText= TextStyle(color: AppStyles.btnColor,fontWeight: FontWeight.bold,fontSize: 13);
  static TextStyle boldTextBlack= TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 12);
  static TextStyle headerTextWhite=const TextStyle(color: Colors.white,fontWeight: FontWeight.bold);
  static BorderRadius borderRadiusCircular=const BorderRadius.all(Radius.circular(12));
- static BorderRadius borderRadiusCircularColor=const BorderRadius.all(Radius.circular(12));
+ static BorderRadius borderRadiusCircularColor=const BorderRadius.all(Radius.circular(8));
  static BorderRadius imageBorderRadiusCircular=const BorderRadius.all(Radius.circular(25));
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:finsta_mac/Calculator/model/FDInterestDetailsModel.dart';
+import 'package:finsta_mac/Calculator/model/FDSchemeDescModel.dart';
 import 'package:finsta_mac/Calculator/model/SchemaDetailsModel.dart';
 import 'package:finsta_mac/Home/model/LoanDataResponse.dart';
 import 'package:finsta_mac/Home/model/MemberDetailsResponse.dart';
@@ -206,7 +207,7 @@ class Repository{
     }
   }
 
-  Future<FDInterestRateModel> getFDInterestTRateRepo(String fdName,tenure,tenureMode,depositAmount,interestPayout) async{
+  Future<FDInterestRateModel> getFDInterestTRateRepo(String fdName,depositAmount,tenure,tenureMode,interestPayout) async{
     TAG = 'getFDInterestDetailsRepo';
     String applicantType="";
     String memberType="";
@@ -214,7 +215,7 @@ class Repository{
     applicantType= data[0].papplicanttype;
     memberType = data[0].pmembertype;
     try{
-      String url = ApiURL.getFdInterestRateApi(fdName,depositAmount,tenure,tenureMode,interestPayout,memberType, applicantType);
+      String url = ApiURL.getFdInterestRateApi(fdName,depositAmount,tenure,tenureMode,interestPayout,memberType,applicantType);
       Uri apiUrl = Uri.parse(url);
       log("URL $TAG  --------$apiUrl");
       var response = await http.get(apiUrl,headers: loginHeader);
@@ -222,6 +223,29 @@ class Repository{
       final FDInterestRateModel responseData = FDInterestRateModel.fromJson(jsonDecode(response.body));
       log('RESPONSE $TAG >>>> ${jsonEncode(responseData)}');
       return responseData;
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<List<FDSchemeDescrModel>> getFDSchemeDescrRepo(String fdName) async{
+    TAG = 'getFDSchemeDescrRepo';
+    String applicantType="";
+    String memberType="";
+    List<MemberDetailsResponse> data = await memberData();
+    applicantType= data[0].papplicanttype;
+    memberType = data[0].pmembertype;
+    try{
+      String url = ApiURL.getFdSchemeDescriptionApi(fdName,memberType,applicantType);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+      log('RESPONSE $TAG >>>> ${jsonDecode(response.body)}');
+
+      List body= json.decode(response.body);
+      return body.map((e) => FDSchemeDescrModel.fromJson(e)).toList();
     }
     catch(e){
       log("$TAG error $e");

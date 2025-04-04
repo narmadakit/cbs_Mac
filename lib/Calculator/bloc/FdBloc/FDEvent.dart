@@ -25,9 +25,16 @@ class GetFDInterestDetailsEvent extends FDEvent{
 }
 
 class GetFDInterestRateEvent extends FDEvent{
-  final String fdName,tenure,tenureMode,depositAmount,interestPayout;
+  final String fdName,depositAmount,tenure,tenureMode,interestPayout;
 
-  GetFDInterestRateEvent(this.fdName,this.tenure,this.tenureMode,this.depositAmount,this.interestPayout);
+  GetFDInterestRateEvent(this.fdName,this.depositAmount,this.tenure,this.tenureMode,this.interestPayout);
   @override
-  List<Object?> get props => [fdName,tenure,tenureMode,depositAmount,interestPayout];
+  List<Object?> get props => [fdName,depositAmount,tenure,tenureMode,interestPayout];
+}
+
+class GetFDSchemeDescrEvent extends FDEvent{
+  final String fdName;
+  GetFDSchemeDescrEvent(this.fdName);
+  @override
+  List<Object?> get props => [fdName];
 }

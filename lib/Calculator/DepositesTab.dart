@@ -24,61 +24,63 @@ class _DepositesTabState extends State<DepositesTab> {
   Widget build(BuildContext context) {
     return  Padding(
       padding: const EdgeInsets.all(15.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Select Deposit Type'),
-          Row(
-            children: [
-              Expanded(
-                child: ListTile(
-                  title: const Text('Fixed Deposit'),
-                  contentPadding: const EdgeInsets.all(0.0),
-                  dense: true,
-                  horizontalTitleGap: 0,
-                  titleTextStyle: const TextStyle(fontSize: 12,color: Colors.black),
-                  leading: Radio<int>(
-                    value: 1,
-                    groupValue: selectedRadioValue,
-                    onChanged: (int? value) {
-                      setState(() {
-                        selectedRadioValue = value;
-                        _selectedValue = "FIXED DEPOSIT";
-                        isFDVisible = true;
-                        // context.read<FDBloc>().add(FDInitEvent(_selectedValue.toString()));
-                      });
-                    },
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Select Deposit Type'),
+            Row(
+              children: [
+                Expanded(
+                  child: ListTile(
+                    title: const Text('Fixed Deposit'),
+                    contentPadding: const EdgeInsets.all(0.0),
+                    dense: true,
+                    horizontalTitleGap: 0,
+                    titleTextStyle: const TextStyle(fontSize: 12,color: Colors.black),
+                    leading: Radio<int>(
+                      value: 1,
+                      groupValue: selectedRadioValue,
+                      onChanged: (int? value) {
+                        setState(() {
+                          selectedRadioValue = value;
+                          _selectedValue = "FIXED DEPOSIT";
+                          isFDVisible = true;
+                          // context.read<FDBloc>().add(FDInitEvent(_selectedValue.toString()));
+                        });
+                      },
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: ListTile(
-                  title: const Text('Recurring Deposit'),
-                  contentPadding: const EdgeInsets.all(0.0),
-                  dense: true,
-                  horizontalTitleGap: 0,
-                  titleTextStyle: const TextStyle(fontSize: 12,color: Colors.black),
-                  leading: Radio<int>(
-                    value: 2,
-                    groupValue: selectedRadioValue,
-                    onChanged: (int? value) {
-                      setState(() {
-                        selectedRadioValue = value;
-                        _selectedValue = "RECURRING DEPOSIT";
-                        isRDVisible = true;
-                        // context.read<FDBloc>().add(FDInitEvent(_selectedValue.toString()));
-                      });
-                    },
+                Expanded(
+                  child: ListTile(
+                    title: const Text('Recurring Deposit'),
+                    contentPadding: const EdgeInsets.all(0.0),
+                    dense: true,
+                    horizontalTitleGap: 0,
+                    titleTextStyle: const TextStyle(fontSize: 12,color: Colors.black),
+                    leading: Radio<int>(
+                      value: 2,
+                      groupValue: selectedRadioValue,
+                      onChanged: (int? value) {
+                        setState(() {
+                          selectedRadioValue = value;
+                          _selectedValue = "RECURRING DEPOSIT";
+                          isRDVisible = true;
+                          // context.read<FDBloc>().add(FDInitEvent(_selectedValue.toString()));
+                        });
+                      },
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          Visibility(
-              visible: isFDVisible,
-              child: const FDTabWidget()),
-
-        ],
+              ],
+            ),
+            Visibility(
+                visible: isFDVisible,
+                child: const FDTabWidget()),
+        
+          ],
+        ),
       )
     );
   }
