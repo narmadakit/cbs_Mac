@@ -1,12 +1,11 @@
 
-import 'dart:developer';
-
-import 'package:finsta_mac/Calculator/bloc/FdBloc/FDEvent.dart';
-import 'package:finsta_mac/Calculator/bloc/FdBloc/FDState.dart';
-import 'package:finsta_mac/Calculator/model/FDInterestRateModel.dart';
-import 'package:finsta_mac/Calculator/model/FdTenureModel.dart';
+import 'package:finsta_mac/Calculator/bloc/FD/FDEvent.dart';
+import 'package:finsta_mac/Calculator/bloc/FD/FDState.dart';
+import 'package:finsta_mac/Calculator/model/DepositInterestRateModel.dart';
+import 'package:finsta_mac/Calculator/model/DepositTenureModel.dart';
+import 'package:finsta_mac/Calculator/model/FDMaturityModel.dart';
 import 'package:finsta_mac/Calculator/model/SchemaDetailsModel.dart';
-import 'package:finsta_mac/Calculator/model/FDSchemeDescModel.dart';
+import 'package:finsta_mac/Calculator/model/FDDescriptionModel.dart';
 import 'package:finsta_mac/network/Repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -20,13 +19,14 @@ class FDBloc extends Bloc<FDEvent,FDStates>{
     on<GetFDInterestDetailsEvent>(getFDInterestDetailsBloc);
     on<GetFDInterestRateEvent>(getFDInterestRateBloc);
     on<GetFDSchemeDescrEvent>(getFDSchemeDescriptionBloc);
+    on<GetFDMaturityEvent>(getFDMaturityAmountBloc);
   }
 
   getTransactionSchemesBloc(FDInitEvent event, Emitter<FDStates> emit) async {
     emit(FDLoadingState());
     try{
       List<SchemaDetailsModel> listData= await repo.getAllTransactionsSchemesRepo(event.formName);
-       emit(FDGetTransactionSuccessState(listData));
+       emit(GetTransactionSuccessState(listData));
     }
     catch(e){
       emit(FDErrorState(e.toString()));
@@ -36,7 +36,7 @@ class FDBloc extends Bloc<FDEvent,FDStates>{
   getFDTenureListBloc(FDGetTenureEvent event, Emitter<FDStates> emit) async {
     emit(FDTenureLoadingState());
     try{
-      List<FdTenureModel> listData= await repo.getFDTenureTypeRepo(event.fdName);
+      List<DepositeTenureModel> listData= await repo.getFDTenureTypeRepo(event.fdName);
       emit(FDGetTenureSuccessState(listData));
     }
     catch(e){
@@ -58,7 +58,7 @@ class FDBloc extends Bloc<FDEvent,FDStates>{
   getFDInterestRateBloc(GetFDInterestRateEvent event, Emitter<FDStates> emit) async {
     emit(FDTenureLoadingState());
     try{
-      FDInterestRateModel responseData = await repo.getFDInterestTRateRepo(event.fdName,event.depositAmount,event.tenure,event.tenureMode,event.interestPayout);
+      DepositInterestRateModel responseData = await repo.getFDInterestTRateRepo(event.fdName,event.depositAmount,event.tenure,event.tenureMode,event.interestPayout);
       emit(FDInterestRateSuccessState(responseData));
     }
     catch(e){
@@ -69,11 +69,24 @@ class FDBloc extends Bloc<FDEvent,FDStates>{
   getFDSchemeDescriptionBloc(GetFDSchemeDescrEvent event, Emitter<FDStates> emit) async {
     emit(FDTenureLoadingState());
     try{
-      List<FDSchemeDescrModel> responseData = await repo.getFDSchemeDescrRepo(event.fdName);
+      List<FDDescriptionModel> responseData = await repo.getFDSchemeDescrRepo(event.fdName);
       emit(FDSchemeDescrSuccessState(responseData));
     }
     catch(e){
       emit(FDErrorState(e.toString()));
     }
   }
+
+  getFDMaturityAmountBloc(GetFDMaturityEvent event, Emitter<FDStates> emit) async {
+    emit(FDTenureLoadingState());
+    try{
+      List<FDMaturityModel> responseData = await repo.getFDMaturityAmountRepo(event.interestMode,event.tenure,event.enterAmount,
+          event.interestPayout,event.compoundSimpleInterestType,event.interestRate,event.calTyPe,event.compoundType);
+      emit(FDMaturitySuccessState(responseData));
+    }
+    catch(e){
+      emit(FDErrorState(e.toString()));
+    }
+  }
+
 }

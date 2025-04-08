@@ -4,6 +4,7 @@ import '../components/AppWidgets.dart';
 import '../components/CustomMainBackground.dart';
 import '../utils/AppStyles.dart';
 import 'DepositesTab.dart';
+import 'LoansTab.dart';
 
 class EmiCalculatorScreen extends StatefulWidget {
   const EmiCalculatorScreen({super.key});
@@ -27,15 +28,17 @@ class _EmiCalculatorScreenState extends State<EmiCalculatorScreen> {
             dividerColor: Colors.transparent,
             indicator:colorButtonDecoration(AppStyles.cardColor),
             automaticIndicatorColorAdjustment: true,
-            unselectedLabelStyle: TextStyle(fontSize: 12,color: AppStyles.btnColor),
-            labelStyle: const TextStyle(fontSize: 12,color: Colors.white),
+            unselectedLabelStyle: AppStyles.customTextStyle(color: AppStyles.btnColor),
+            labelStyle: AppStyles.customTextStyle(color: Colors.white),
             indicatorPadding: const EdgeInsets.all(0),
             tabs: [
               Container(
+                height: 40,
                   width: double.infinity,
                   decoration: borderButtonDecoration(AppStyles.cardColor),
-                  child: const Tab(text: "LOANS")),
+                  child: const Tab(text: "LOANS",)),
               Container(
+                  height: 40,
                   width: double.infinity,
                   decoration: borderButtonDecoration(AppStyles.cardColor),
                   child: const Tab( text: "DEPOSITS")),
@@ -49,9 +52,8 @@ class _EmiCalculatorScreenState extends State<EmiCalculatorScreen> {
   Widget buildBody(BuildContext context) {
     return const TabBarView(
       children: [
+        LoansTab(),
         DepositesTab(),
-        DepositesTab(),
-
       ],
     );
   }

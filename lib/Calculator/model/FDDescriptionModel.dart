@@ -1,4 +1,4 @@
-class FDSchemeDescrModel {
+class FDDescriptionModel {
   String? pFdCalculationmode;
   String? pcompoundinteresttype;
   dynamic pMinDepositAmount;
@@ -31,7 +31,7 @@ class FDSchemeDescrModel {
   dynamic pmincommissionvalue;
   dynamic pmaxcommissionvalue;
 
-  FDSchemeDescrModel(
+  FDDescriptionModel(
       {this.pFdCalculationmode,
         this.pcompoundinteresttype,
         this.pMinDepositAmount,
@@ -64,7 +64,7 @@ class FDSchemeDescrModel {
         this.pmincommissionvalue,
         this.pmaxcommissionvalue});
 
-  FDSchemeDescrModel.fromJson(Map<String, dynamic> json) {
+  FDDescriptionModel.fromJson(Map<String, dynamic> json) {
     pFdCalculationmode = json['pFdCalculationmode'];
     pcompoundinteresttype = json['pcompoundinteresttype'];
     pMinDepositAmount = json['pMinDepositAmount'];

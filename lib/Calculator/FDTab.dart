@@ -1,18 +1,20 @@
 import 'dart:developer';
-import 'package:finsta_mac/Calculator/bloc/FdBloc/FDState.dart';
+import 'package:finsta_mac/Calculator/bloc/FD/FDState.dart';
 import 'package:finsta_mac/Calculator/model/FDInterestDetailsModel.dart';
-import 'package:finsta_mac/Calculator/model/FdTenureModel.dart';
+import 'package:finsta_mac/Calculator/model/DepositTenureModel.dart';
+import 'package:finsta_mac/Calculator/model/FDMaturityModel.dart';
 import 'package:finsta_mac/Calculator/model/SchemaDetailsModel.dart';
 import 'package:finsta_mac/components/CustomTextField.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../components/AppWidgets.dart';
 import '../components/CustomDropdown.dart';
 import '../components/KeyValueModel.dart';
 import '../network/Repository.dart';
 import '../utils/AppStyles.dart';
-import 'bloc/FdBloc/FDBloc.dart';
-import 'bloc/FdBloc/FDEvent.dart';
-import 'model/FDSchemeDescModel.dart';
+import 'bloc/FD/FDBloc.dart';
+import 'bloc/FD/FDEvent.dart';
+import 'model/FDDescriptionModel.dart';
 
 class FDTabWidget extends StatefulWidget {
   const FDTabWidget({
@@ -34,7 +36,8 @@ class _FDTabWidgetState extends State<FDTabWidget> {
   List<KeyValueModel> tenureKVList =[];
   List<KeyValueModel> interestTypeKVList =[];
   List<KeyValueModel> interestPayOutKVList =[];
-  List<FDSchemeDescrModel> fdSchemeDescList =[];
+  List<FDDescriptionModel> fdSchemeDescList =[];
+  List<FDMaturityModel> fdMaturityList =[];
   bool isTenureLoader=false;
   var tenureTxtController = TextEditingController();
   var fdAmountController = TextEditingController();
@@ -43,7 +46,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
   dynamic maxInterestRate;
   bool isInterestRate=false;
   bool isDescriptionVisible=false;
-
+  FDInterestDetailsModel interestDetailsModel=FDInterestDetailsModel();
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -55,7 +58,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
           if(state is FDLoadingState){
             return Center(child: CircularProgressIndicator(color: AppStyles.btnColor));
           }
-          if(state is FDGetTransactionSuccessState){
+          if(state is GetTransactionSuccessState){
             schemaList = state.responseModel;
             fdKVList =SchemaDetailsModel.keyValueList(state.responseModel);
             return buildBody(context,state.responseModel);
@@ -66,7 +69,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
 
         },
         listener: (context, state) {
-          if(state is FDGetTransactionSuccessState){
+          if(state is GetTransactionSuccessState){
             fdKVList =SchemaDetailsModel.keyValueList(state.responseModel);
           }
           else if(state is FDTenureLoadingState){
@@ -76,13 +79,14 @@ class _FDTabWidgetState extends State<FDTabWidget> {
           else if(state is FDGetTenureSuccessState){
             isTenureLoader = false;
             // _selectedTenureValue ="Select";
-            tenureKVList =FdTenureModel.keyValueList(state.responseModel);
+            tenureKVList =DepositeTenureModel.keyValueList(state.responseModel);
           }
           else if(state is FDInterestDetailsSuccessState){
             isTenureLoader = false;
             interestTypeKVList = FdInteresttype.keyValueList(state.responseModel.fdInteresttype!);
             interestPayOutList = state.responseModel.fdInteresttype![0].fdInterestPayoutList!;
             interestPayOutKVList  =  FdInterestPayoutList.keyValueList(interestPayOutList);
+            interestDetailsModel = state.responseModel ;
           }
           else if(state is FDInterestRateSuccessState){
             isTenureLoader = false;
@@ -93,6 +97,10 @@ class _FDTabWidgetState extends State<FDTabWidget> {
           else if(state is FDSchemeDescrSuccessState){
             isTenureLoader = false;
             fdSchemeDescList = state.responseModel;
+          }
+          else if(state is FDMaturitySuccessState){
+            isTenureLoader = false;
+            fdMaturityList = state.responseModel;
           }
           else{
             isTenureLoader = false;
@@ -106,29 +114,31 @@ class _FDTabWidgetState extends State<FDTabWidget> {
     double gapHeight=15.0;
     return Column(
           children: [
-            SizedBox(height: gapHeight),
             Visibility(
               visible: isDescriptionVisible,
-              child: GestureDetector(
-                onTap: () {
-                  if(fdSchemeDescList.isNotEmpty){
-                    _showBottomSheet(context);
-                  }
-                },
-                child: Align(
-                    alignment: Alignment.topRight,
-                    child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: AppStyles.borderRadiusCircularColor,
-                          color: AppStyles.btnColor,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('Description',style: AppStyles.smallLabelText,),
-                        ))),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    if(fdSchemeDescList.isNotEmpty){
+                      _showBottomSheet(context);
+                    }
+                  },
+                  child: Align(
+                      alignment: Alignment.topRight,
+                      child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: AppStyles.borderRadiusCircularColor,
+                            color: AppStyles.btnColor,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('Description',style: AppStyles.customTextStyle(color: Colors.white,fontSize: 12),),
+                          ))),
+                ),
               ),
             ),
-            SizedBox(height: gapHeight),
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -163,7 +173,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                 Expanded(
                   flex: 3,
                   child:CustomTextField(
-                      boxHeight: 50,
+                      boxHeight: 45,
                       context: context, controller: fdAmountController,
                       onChanged: (value) {
                         if(tenureTxtController.text != "" && fdAmountController.text != ""){
@@ -317,6 +327,51 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                 )
               ],
             ),
+            SizedBox(height: gapHeight),
+            SizedBox(height: gapHeight),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: fdMaturityList.length,
+                itemBuilder:(context, i) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: AppStyles.gridColor,
+                      borderRadius: BorderRadius.circular(12)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Column(
+                            children: [
+                              Text('Interest Amount',style: AppStyles.boldTextBlack,),
+                              SizedBox(height: 10,),
+                              Text(fdMaturityList[i].pInterestamount.toString(),style: AppStyles.smallLabelTextBold),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              Text('Maturity Amount',style: AppStyles.boldTextBlack),
+                              SizedBox(height: 10,),
+                              Text(fdMaturityList[i].pMatueritytAmount.toString(),style: AppStyles.smallLabelTextBold),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+            ),
+            SizedBox(height: gapHeight),
+            SizedBox(height: gapHeight),
+            SizedBox(height: gapHeight),
+            payButton(() {
+              context.read<FDBloc>().add(GetFDMaturityEvent(_selectedTenureValue.name,tenureTxtController.text,fdAmountController.text,
+              _selectedPayOutValue.name,_selectedInterestTypeValue.name,
+                interestRateController.text,interestDetailsModel.pCaltype.toString(),interestDetailsModel.pCompoundInterestType.toString()
+              ));
+            },"Calculate")
           ],
         );
   }
@@ -444,13 +499,15 @@ class _FDTabWidgetState extends State<FDTabWidget> {
   }
 }
 
-addressRows(List<FDSchemeDescrModel> descList){
-  return descList.asMap().map((i, data) => MapEntry(i,
-      DataRow(cells:[
+addressRows(List<FDDescriptionModel> descList){
+  return descList.asMap().map((i, data) {
+    return MapEntry(
+      i,
+      DataRow(cells: [
         DataCell(SizedBox(
           child: Center(
               child: Text(
-                  "${i+1}",
+                  "${i + 1}",
                   style: AppStyles.smallLabelTextBlack)),
         )),
         DataCell(SizedBox(
@@ -461,7 +518,7 @@ addressRows(List<FDSchemeDescrModel> descList){
         )),
         DataCell(SizedBox(
           child: Center(
-              child: Text( "${data.pInvestmentPeriodFrom} - ${data.pInvestmentPeriodTo}",
+              child: Text("${data.pInvestmentPeriodFrom} - ${data.pInvestmentPeriodTo}",
                   style: AppStyles.smallLabelTextBlack)),
         )),
         DataCell(
@@ -479,13 +536,13 @@ addressRows(List<FDSchemeDescrModel> descList){
         DataCell(SizedBox(
           child: Center(
               child: Text(
-                  data.pcompoundinteresttype??"N/A",
+                  data.pcompoundinteresttype ?? "N/A",
                   style: AppStyles.smallLabelTextBlack)),
         )),
         DataCell(SizedBox(
           child: Center(
               child: Text(
-                  data.pschemeMaturiytype??"N/A",
+                  data.pschemeMaturiytype ?? "N/A",
                   style: AppStyles.smallLabelTextBlack)),
         )),
         DataCell(SizedBox(
@@ -495,6 +552,7 @@ addressRows(List<FDSchemeDescrModel> descList){
                   style: AppStyles.smallLabelTextBlack)),
         )),
       ]
-      )
-  )).values.toList();
+      ),
+    );
+  }).values.toList();
 }

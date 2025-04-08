@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:finsta_mac/Calculator/model/FDInterestDetailsModel.dart';
-import 'package:finsta_mac/Calculator/model/FDSchemeDescModel.dart';
+import 'package:finsta_mac/Calculator/model/FDDescriptionModel.dart';
+import 'package:finsta_mac/Calculator/model/FDMaturityModel.dart';
+import 'package:finsta_mac/Calculator/model/RDDescriptionModel.dart';
+import 'package:finsta_mac/Calculator/model/RDInterestDetailsModel.dart';
 import 'package:finsta_mac/Calculator/model/SchemaDetailsModel.dart';
 import 'package:finsta_mac/Home/model/LoanDataResponse.dart';
 import 'package:finsta_mac/Home/model/MemberDetailsResponse.dart';
@@ -9,8 +12,8 @@ import 'package:finsta_mac/Login/model/GetOtpModel.dart';
 import 'package:finsta_mac/network/ApiURL.dart';
 import 'package:finsta_mac/utils/SharedPrefs.dart';
 import 'package:http/http.dart' as http;
-import '../Calculator/model/FDInterestRateModel.dart';
-import '../Calculator/model/FdTenureModel.dart';
+import '../Calculator/model/DepositInterestRateModel.dart';
+import '../Calculator/model/DepositTenureModel.dart';
 import '../Home/model/MembersAllDuesModel.dart';
 import '../Login/model/CompanyDetailsModel.dart';
 
@@ -160,21 +163,21 @@ class Repository{
     }
 }
 
-  Future<List<FdTenureModel>> getFDTenureTypeRepo(String fdName) async{
+  Future<List<DepositeTenureModel>> getFDTenureTypeRepo(String fdName) async{
     TAG = 'getTenureTypeRepo';
     String applicantType="";
     String memberType="";
     List<MemberDetailsResponse> data = await memberData();
     applicantType= data[0].papplicanttype;
     memberType = data[0].pmembertype;
-    List<FdTenureModel> listData=[];
+    List<DepositeTenureModel> listData=[];
     try{
       String url = ApiURL.getFdTenureModesApi(fdName, applicantType, memberType);
       Uri apiUrl = Uri.parse(url);
       log("URL $TAG  --------$apiUrl");
       var response = await http.get(apiUrl,headers: loginHeader);
       List body = json.decode(response.body);
-      listData= body.map((e) => FdTenureModel.fromJson(e)).toList();
+      listData= body.map((e) => DepositeTenureModel.fromJson(e)).toList();
       log('==$TAG ${listData.length}');
       return listData;
     }
@@ -207,7 +210,7 @@ class Repository{
     }
   }
 
-  Future<FDInterestRateModel> getFDInterestTRateRepo(String fdName,depositAmount,tenure,tenureMode,interestPayout) async{
+  Future<DepositInterestRateModel> getFDInterestTRateRepo(String fdName,depositAmount,tenure,tenureMode,interestPayout) async{
     TAG = 'getFDInterestDetailsRepo';
     String applicantType="";
     String memberType="";
@@ -220,7 +223,7 @@ class Repository{
       log("URL $TAG  --------$apiUrl");
       var response = await http.get(apiUrl,headers: loginHeader);
 
-      final FDInterestRateModel responseData = FDInterestRateModel.fromJson(jsonDecode(response.body));
+      final DepositInterestRateModel responseData = DepositInterestRateModel.fromJson(jsonDecode(response.body));
       log('RESPONSE $TAG >>>> ${jsonEncode(responseData)}');
       return responseData;
     }
@@ -230,7 +233,7 @@ class Repository{
     }
   }
 
-  Future<List<FDSchemeDescrModel>> getFDSchemeDescrRepo(String fdName) async{
+  Future<List<FDDescriptionModel>> getFDSchemeDescrRepo(String fdName) async{
     TAG = 'getFDSchemeDescrRepo';
     String applicantType="";
     String memberType="";
@@ -245,7 +248,129 @@ class Repository{
       log('RESPONSE $TAG >>>> ${jsonDecode(response.body)}');
 
       List body= json.decode(response.body);
-      return body.map((e) => FDSchemeDescrModel.fromJson(e)).toList();
+      return body.map((e) => FDDescriptionModel.fromJson(e)).toList();
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<List<FDMaturityModel>> getFDMaturityAmountRepo(String interestMode,tenure,enterAmount,
+      interestPayout,compoundSimpleInterestType,interestRate,calTyPe,compoundType) async{
+    TAG = 'getFDMaturityAmountRepo';
+    List<FDMaturityModel> listData=[];
+    try{
+      String url = ApiURL.getFdMaturityAmountApi(
+          interestMode: interestMode,
+          tenure: tenure,
+          enterAmount: enterAmount,
+          interestPayOut: interestPayout,
+          compoundSimpleInterestType: compoundSimpleInterestType,
+          interestRate: interestRate,
+          calType: calTyPe,
+          compoundType: compoundType);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+      List body = json.decode(response.body);
+      listData= body.map((e) => FDMaturityModel.fromJson(e)).toList();
+
+      log('RESPONSE $TAG >>>> ${jsonEncode(listData)}');
+      return listData;
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<List<DepositeTenureModel>> getRDTenureTypeRepo(String rdName) async{
+    TAG = 'getRDTenureTypeRepo';
+    String applicantType="";
+    String memberType="";
+    List<MemberDetailsResponse> data = await memberData();
+    applicantType= data[0].papplicanttype;
+    memberType = data[0].pmembertype;
+    List<DepositeTenureModel> listData=[];
+    try{
+      String url = ApiURL.getRdTenureModesApi(rdName, applicantType, memberType);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+      List body = json.decode(response.body);
+      listData= body.map((e) => DepositeTenureModel.fromJson(e)).toList();
+      log('==$TAG ${listData.length}');
+      return listData;
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<RDInterestDetailsModel> getRDInterestDetailsRepo(String configID,rdName,tenure,tenureMode,installmentAmount) async{
+    TAG = 'getRDInterestDetailsRepo';
+    String applicantType="";
+    String memberType="";
+    List<MemberDetailsResponse> data = await memberData();
+    applicantType= data[0].papplicanttype;
+    memberType = data[0].pmembertype;
+    try{
+      String url = ApiURL.getRdInterestDetailsApi(applicantType, memberType,configID,rdName,tenure,tenureMode,installmentAmount);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+
+      final RDInterestDetailsModel responseData = RDInterestDetailsModel.fromJson(jsonDecode(response.body));
+      log('RESPONSE $TAG >>>> ${jsonEncode(responseData)}');
+      return responseData;
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<DepositInterestRateModel> getRDInterestTRateRepo(String rdName,instalmentAmount,tenure,tenureMode,interestPayout) async{
+    TAG = 'getRDInterestTRateRepo';
+    String applicantType="";
+    String memberType="";
+    List<MemberDetailsResponse> data = await memberData();
+    applicantType= data[0].papplicanttype;
+    memberType = data[0].pmembertype;
+    try{
+      String url = ApiURL.getRdInterestRateApi(rdName,instalmentAmount,tenure,tenureMode,interestPayout,memberType,applicantType);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+
+      final DepositInterestRateModel responseData = DepositInterestRateModel.fromJson(jsonDecode(response.body));
+      log('RESPONSE $TAG >>>> ${jsonEncode(responseData)}');
+      return responseData;
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<List<RDDescriptionModel>> getRdDescriptionRepo(String rdName) async{
+    TAG = 'getRdDescriptionRepo';
+    String applicantType="";
+    String memberType="";
+    List<MemberDetailsResponse> data = await memberData();
+    applicantType= data[0].papplicanttype;
+    memberType = data[0].pmembertype;
+    try{
+      String url = ApiURL.getRdDescriptionApi(rdName,memberType,applicantType);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+      log('RESPONSE $TAG >>>> ${jsonDecode(response.body)}');
+
+      List body= json.decode(response.body);
+      return body.map((e) => RDDescriptionModel.fromJson(e)).toList();
     }
     catch(e){
       log("$TAG error $e");

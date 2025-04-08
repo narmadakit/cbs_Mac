@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:finsta_mac/Calculator/model/FDMaturityModel.dart';
 
 abstract class FDEvent extends Equatable{
 }
@@ -37,4 +38,21 @@ class GetFDSchemeDescrEvent extends FDEvent{
   GetFDSchemeDescrEvent(this.fdName);
   @override
   List<Object?> get props => [fdName];
+}
+
+class GetFDMaturityEvent extends FDEvent{
+  final String interestMode;
+  final String tenure;
+  final String enterAmount;
+  final String interestPayout;
+  final String compoundSimpleInterestType;
+  final String  interestRate;
+  final String  calTyPe;
+  final String  compoundType;
+  GetFDMaturityEvent(
+      this.interestMode,this.tenure,this.enterAmount,this.interestPayout,
+      this.compoundSimpleInterestType,this.interestRate,this.calTyPe,this.compoundType);
+  @override
+  List<Object?> get props => [interestMode,tenure,enterAmount,interestPayout,compoundSimpleInterestType,
+    interestRate,calTyPe,compoundType];
 }

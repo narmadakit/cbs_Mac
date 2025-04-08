@@ -35,6 +35,7 @@ class CustomDropdown<T> extends StatelessWidget {
       onTap: () => _showBottomSheet(context,onChanged,items), // Open BottomSheet when tapped
       child: Container(
         padding: const EdgeInsets.only(left: 6, bottom: 12,top: 12),
+        height: 45,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.grey),

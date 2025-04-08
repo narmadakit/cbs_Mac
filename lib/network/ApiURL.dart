@@ -14,4 +14,13 @@ class ApiURL{
   static String getFdInterestRateApi(String fdName,depositAmount,tenure,tenureMode,interestPayout,memberType,applicantType) => "${BASE_URL}api/Banking/GetTenureandMininterestRateofInterestRate?Fdname=$fdName&Depositamount=$depositAmount&Tenure=$tenure&TenureMode=$tenureMode&InterestPayout=$interestPayout&MemberType=$memberType&papplicanttype=$applicantType";
   static String getFdSchemeDescriptionApi(String fdName,memberType,applicantType) => "${BASE_URL}api/Banking/GetFdSchemeDetailsforGrid?Fdname=$fdName&ApplicantType=$applicantType&MemberType=$memberType";
 
+  static String getFdMaturityAmountApi({required String interestMode, tenure, enterAmount, interestPayOut, compoundSimpleInterestType, interestRate, calType, compoundType}) =>
+      "${BASE_URL}api/Banking/GetFDMaturityamount?pInterestMode=$interestMode&pInterestTenure=$tenure&pDepositAmount=$enterAmount&pInterestPayOut=$interestPayOut&pCompoundorSimpleInterestType=$compoundSimpleInterestType&pInterestRate=$interestRate&pCalType=$calType&pcompoundtype=$compoundType";
+
+  static String getRdTenureModesApi(String rdName,applicantType,memberType) => "${BASE_URL}api/Banking/GetRdSchemeTenureModes?Rdname=$rdName&ApplicantType=$applicantType&MemberType=$memberType";
+  static String getRdInterestDetailsApi(String applicantType,memberType,configID,rdName,tenure,tenureMode,instalmentAmount) => "${BASE_URL}api/Banking/GetRdSchemeDetails?ApplicantType=$applicantType&MemberType=$memberType&RdconfigID=$configID&Rdname=$rdName&Tenure=$tenure&Tenuremode=$tenureMode&instalmentamount=$instalmentAmount";
+  static String getRdInterestRateApi(String rdName,installmentAmount,tenure,tenureMode,interestPayout,memberType,applicantType) => "${BASE_URL}api/Banking/GetRDTenureandMininterestRateofInterestRate?Rdname=$rdName&instalmentamount=$installmentAmount&Tenure=$tenure&TenureMode=$tenureMode&InterestPayout=$interestPayout&MemberType=$memberType&papplicanttype=$applicantType";
+  static String getRdMaturityAmountApi(String interestMode,tenure,instalmentAmount,interestPayOut,compoundSimpleInterestType,compoundType,interestRate,calType) => "${BASE_URL}api/Banking/getRdMaturityAmountApi?pInterestMode=$interestMode&pInterestTenure=$tenure&instalmentamount=$instalmentAmount&pInterestPayOut=$interestPayOut&pCompoundorSimpleInterestType=$compoundSimpleInterestType&pCompoundType=$compoundType&pInterestRate=$interestRate&pCalType=$calType";
+  static String getRdDescriptionApi(String rdName,memberType,applicantType) => "${BASE_URL}api/Banking/GetRdSchemeDetailsforGrid?Rdname=$rdName&ApplicantType=$applicantType&MemberType=$memberType";
+
 }

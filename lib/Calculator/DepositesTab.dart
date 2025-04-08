@@ -1,6 +1,9 @@
 import 'package:finsta_mac/Calculator/FDTab.dart';
 import 'package:finsta_mac/components/KeyValueModel.dart';
+import 'package:finsta_mac/utils/AppStyles.dart';
 import 'package:flutter/material.dart';
+
+import 'RDTab.dart';
 
 class DepositesTab extends StatefulWidget {
   const DepositesTab({
@@ -28,12 +31,12 @@ class _DepositesTabState extends State<DepositesTab> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Select Deposit Type'),
+            Center(child: Text('Select Deposit Type',style: AppStyles.customTextStyle(fontSize: 17, color: Colors.black),)),
             Row(
               children: [
                 Expanded(
                   child: ListTile(
-                    title: const Text('Fixed Deposit'),
+                    title: Text('Fixed Deposit',style: AppStyles.customTextStyle(color: Colors.black),),
                     contentPadding: const EdgeInsets.all(0.0),
                     dense: true,
                     horizontalTitleGap: 0,
@@ -46,6 +49,7 @@ class _DepositesTabState extends State<DepositesTab> {
                           selectedRadioValue = value;
                           _selectedValue = "FIXED DEPOSIT";
                           isFDVisible = true;
+                          isRDVisible = false;
                           // context.read<FDBloc>().add(FDInitEvent(_selectedValue.toString()));
                         });
                       },
@@ -54,7 +58,7 @@ class _DepositesTabState extends State<DepositesTab> {
                 ),
                 Expanded(
                   child: ListTile(
-                    title: const Text('Recurring Deposit'),
+                    title: Text('Recurring Deposit',style: AppStyles.customTextStyle(color: Colors.black)),
                     contentPadding: const EdgeInsets.all(0.0),
                     dense: true,
                     horizontalTitleGap: 0,
@@ -67,6 +71,7 @@ class _DepositesTabState extends State<DepositesTab> {
                           selectedRadioValue = value;
                           _selectedValue = "RECURRING DEPOSIT";
                           isRDVisible = true;
+                          isFDVisible = false;
                           // context.read<FDBloc>().add(FDInitEvent(_selectedValue.toString()));
                         });
                       },
@@ -78,7 +83,9 @@ class _DepositesTabState extends State<DepositesTab> {
             Visibility(
                 visible: isFDVisible,
                 child: const FDTabWidget()),
-        
+            Visibility(
+                visible: isRDVisible,
+                child: const RDTabWidget()),
           ],
         ),
       )

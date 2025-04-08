@@ -1,9 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:finsta_mac/Calculator/model/FDInterestDetailsModel.dart';
-import 'package:finsta_mac/Calculator/model/FDSchemeDescModel.dart';
-import 'package:finsta_mac/Calculator/model/FdTenureModel.dart';
+import 'package:finsta_mac/Calculator/model/FDDescriptionModel.dart';
+import 'package:finsta_mac/Calculator/model/DepositTenureModel.dart';
+import 'package:finsta_mac/Calculator/model/FDMaturityModel.dart';
 
-import '../../model/FDInterestRateModel.dart';
+import '../../model/DepositInterestRateModel.dart';
 import '../../model/SchemaDetailsModel.dart';
 
 abstract class FDStates extends Equatable{}
@@ -18,9 +19,9 @@ class FDLoadingState extends FDStates{
   List<Object?> get props => [];
 }
 
-class FDGetTransactionSuccessState extends FDStates{
+class GetTransactionSuccessState extends FDStates{
 final List<SchemaDetailsModel> responseModel;
-FDGetTransactionSuccessState(this.responseModel);
+GetTransactionSuccessState(this.responseModel);
   @override
   List<Object?> get props => [responseModel];
 }
@@ -43,7 +44,7 @@ class FDTenureLoadingState extends FDStates{
   List<Object?> get props => [];
 }
 class FDGetTenureSuccessState extends FDStates{
-  final List<FdTenureModel> responseModel;
+  final List<DepositeTenureModel> responseModel;
   FDGetTenureSuccessState(this.responseModel);
   @override
   List<Object?> get props => [responseModel];
@@ -57,15 +58,22 @@ class FDInterestDetailsSuccessState extends FDStates{
 }
 
 class FDInterestRateSuccessState extends FDStates{
-  final FDInterestRateModel responseModel;
+  final DepositInterestRateModel responseModel;
   FDInterestRateSuccessState(this.responseModel);
   @override
   List<Object?> get props => [responseModel];
 }
 
 class FDSchemeDescrSuccessState extends FDStates{
-  final List<FDSchemeDescrModel> responseModel;
+  final List<FDDescriptionModel> responseModel;
   FDSchemeDescrSuccessState(this.responseModel);
+  @override
+  List<Object?> get props => [responseModel];
+}
+
+class FDMaturitySuccessState extends FDStates{
+  final List<FDMaturityModel> responseModel;
+  FDMaturitySuccessState(this.responseModel);
   @override
   List<Object?> get props => [responseModel];
 }

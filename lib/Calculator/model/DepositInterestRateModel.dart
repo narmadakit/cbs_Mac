@@ -1,4 +1,4 @@
-class FDInterestRateModel {
+class DepositInterestRateModel {
   dynamic pTenureCount;
   dynamic pMinInterestRate;
   dynamic pMaxInterestRate;
@@ -8,7 +8,7 @@ class FDInterestRateModel {
   dynamic pValuefor100;
   dynamic pCaltype;
 
-  FDInterestRateModel(
+  DepositInterestRateModel(
       {this.pTenureCount,
         this.pMinInterestRate,
         this.pMaxInterestRate,
@@ -18,7 +18,7 @@ class FDInterestRateModel {
         this.pValuefor100,
         this.pCaltype});
 
-  FDInterestRateModel.fromJson(Map<String, dynamic> json) {
+  DepositInterestRateModel.fromJson(Map<String, dynamic> json) {
     pTenureCount = json['pTenureCount'];
     pMinInterestRate = json['pMinInterestRate'];
     pMaxInterestRate = json['pMaxInterestRate'];
