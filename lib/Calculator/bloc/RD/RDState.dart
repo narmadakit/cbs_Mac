@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:finsta_mac/Calculator/model/DepositTenureModel.dart';
 import '../../model/DepositInterestRateModel.dart';
+import '../../model/FDMaturityModel.dart';
 import '../../model/RDDescriptionModel.dart';
 import '../../model/RDInterestDetailsModel.dart';
 import '../../model/SchemaDetailsModel.dart';
@@ -65,6 +66,13 @@ class RDInterestRateSuccessState extends RDStates{
 class RDSchemeDescrSuccessState extends RDStates{
   final List<RDDescriptionModel> responseModel;
   RDSchemeDescrSuccessState(this.responseModel);
+  @override
+  List<Object?> get props => [responseModel];
+}
+
+class RDMaturitySuccessState extends RDStates{
+  final List<DepositMaturityModel> responseModel;
+  RDMaturitySuccessState(this.responseModel);
   @override
   List<Object?> get props => [responseModel];
 }

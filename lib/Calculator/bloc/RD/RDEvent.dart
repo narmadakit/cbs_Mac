@@ -38,3 +38,20 @@ class GetRdDescriptionEvent extends RDEvent{
   @override
   List<Object?> get props => [rdName];
 }
+
+class GetRDMaturityEvent extends RDEvent{
+  final String interestMode;
+  final String tenure;
+  final String enterAmount;
+  final String interestPayout;
+  final String compoundSimpleInterestType;
+  final String  interestRate;
+  final String  calTyPe;
+  final String  compoundType;
+  GetRDMaturityEvent(
+      this.interestMode,this.tenure,this.enterAmount,this.interestPayout,
+      this.compoundSimpleInterestType,this.interestRate,this.calTyPe,this.compoundType);
+  @override
+  List<Object?> get props => [interestMode,tenure,enterAmount,interestPayout,compoundSimpleInterestType,
+    interestRate,calTyPe,compoundType];
+}

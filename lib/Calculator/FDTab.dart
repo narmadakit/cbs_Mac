@@ -37,13 +37,15 @@ class _FDTabWidgetState extends State<FDTabWidget> {
   List<KeyValueModel> interestTypeKVList =[];
   List<KeyValueModel> interestPayOutKVList =[];
   List<FDDescriptionModel> fdSchemeDescList =[];
-  List<FDMaturityModel> fdMaturityList =[];
+  List<DepositMaturityModel> maturityList =[];
   bool isTenureLoader=false;
   var tenureTxtController = TextEditingController();
   var fdAmountController = TextEditingController();
   var interestRateController = TextEditingController();
-  dynamic minInterestRate;
-  dynamic maxInterestRate;
+  double minInterestRate =0.0;
+  double maxInterestRate=20.0;
+  // Define the current values for the range
+  double _currentRangeValues = 15;
   bool isInterestRate=false;
   bool isDescriptionVisible=false;
   FDInterestDetailsModel interestDetailsModel=FDInterestDetailsModel();
@@ -86,12 +88,13 @@ class _FDTabWidgetState extends State<FDTabWidget> {
             interestTypeKVList = FdInteresttype.keyValueList(state.responseModel.fdInteresttype!);
             interestPayOutList = state.responseModel.fdInteresttype![0].fdInterestPayoutList!;
             interestPayOutKVList  =  FdInterestPayoutList.keyValueList(interestPayOutList);
-            interestDetailsModel = state.responseModel ;
+            interestDetailsModel = state.responseModel;
           }
           else if(state is FDInterestRateSuccessState){
             isTenureLoader = false;
-            minInterestRate= state.responseModel.pMinInterestRate.toString();
-            maxInterestRate= state.responseModel.pMaxInterestRate.toString();
+            minInterestRate= double.parse(state.responseModel.pMinInterestRate.toString());
+            maxInterestRate= double.parse(state.responseModel.pMaxInterestRate.toString());
+            _currentRangeValues = maxInterestRate;
             isInterestRate=true;
           }
           else if(state is FDSchemeDescrSuccessState){
@@ -100,7 +103,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
           }
           else if(state is FDMaturitySuccessState){
             isTenureLoader = false;
-            fdMaturityList = state.responseModel;
+            maturityList = state.responseModel;
           }
           else{
             isTenureLoader = false;
@@ -143,7 +146,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Expanded(
-                    flex: 1,
+                    flex: 2,
                     child: Text('FD Name',style: AppStyles.boldTextBlack)),
                 const SizedBox(width: 10,),
                 Expanded(
@@ -167,7 +170,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Expanded(
-                    flex: 1,
+                    flex: 2,
                     child: Text('FD Amount',style: AppStyles.boldTextBlack)),
                 const SizedBox(width: 10,),
                 Expanded(
@@ -190,7 +193,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Expanded(
-                  flex: 1,
+                  flex: 2,
                     child: Text('Tenure',style: AppStyles.boldTextBlack)),
                 const SizedBox(width: 10,),
                 Expanded(
@@ -210,7 +213,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                       ),
                       const SizedBox(width: 5,),
                       Expanded(
-                        flex: 1,
+                        flex: 2,
                         child: CustomDropdown(context: context,selectedValue: _selectedTenureValue,
                           onChanged: (value) {
                             _selectedTenureValue = value;
@@ -233,8 +236,8 @@ class _FDTabWidgetState extends State<FDTabWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Expanded(
-                    flex: 1,
-                    child: Text('Interest\nType',style: AppStyles.boldTextBlack)),
+                    flex: 2,
+                    child: Text('Interest Type',style: AppStyles.boldTextBlack)),
                 const SizedBox(width: 10,),
                 Expanded(
                   flex: 3,
@@ -255,7 +258,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Expanded(
-                    flex: 1,
+                    flex: 2,
                     child: Text('Interest Payout',style: AppStyles.boldTextBlack)),
                 const SizedBox(width: 10),
                 Expanded(
@@ -275,63 +278,38 @@ class _FDTabWidgetState extends State<FDTabWidget> {
               ],
             ),
             SizedBox(height: gapHeight),
-            Visibility(
-              visible: isInterestRate,
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                    Expanded(
-                      flex:2,
-                        child: Container()),
-                    Expanded(
-                      flex: 2,
-                      child: Row(
-                        children: [
-                          const Text('Min: '),
-                          Text(minInterestRate??""),
-                        ],
-                      ),
-                    ),
-                      Expanded(
-                        flex: 2,
-                        child: Row(
-                          children: [
-                            const Text('Max: '),
-                            Text(maxInterestRate??""),
-                          ],
-                        ),
-                      ),
-                  ],),
-                  const SizedBox(height: 5),
-                ],
-              ),
-            ),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Expanded(
-                    flex: 1,
-                    child: Text('Interest\nRate',style: AppStyles.boldTextBlack)),
+                    flex: 2,
+                    child: Text('Interest Rate\n(Per annum)',style: AppStyles.boldTextBlack)),
                 const SizedBox(width: 10,),
-                Expanded(
-                  flex: 3,
-                  child:CustomTextField(
-                      boxHeight: 50,
-                      context: context,
-                      controller: interestRateController,
-                      onChanged: (value) {
-                      }, hint: "Enter Interest Rate", textInputType: TextInputType.number),
-                )
+               Expanded(
+                 flex: 4,
+                 child: Slider(
+                   value: _currentRangeValues,
+                   divisions: 100,
+                   activeColor: AppStyles.btnColor,
+                   inactiveColor: AppStyles.bgColor3,
+                   min: minInterestRate,
+                   max: maxInterestRate,
+                   label: '${_currentRangeValues.toStringAsFixed(1)}%',
+                   onChanged: (value) {
+                     setState(() {
+                       _currentRangeValues = value;
+                       interestRateController.text = value.toString();
+                     });
+                 },),
+               ),
               ],
             ),
             SizedBox(height: gapHeight),
             SizedBox(height: gapHeight),
             ListView.builder(
               shrinkWrap: true,
-              itemCount: fdMaturityList.length,
+              itemCount: maturityList.length,
                 itemBuilder:(context, i) {
                   return Container(
                     decoration: BoxDecoration(
@@ -347,14 +325,14 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                             children: [
                               Text('Interest Amount',style: AppStyles.boldTextBlack,),
                               SizedBox(height: 10,),
-                              Text(fdMaturityList[i].pInterestamount.toString(),style: AppStyles.smallLabelTextBold),
+                              Text(maturityList[i].pInterestamount.toString(),style: AppStyles.smallLabelTextBold),
                             ],
                           ),
                           Column(
                             children: [
                               Text('Maturity Amount',style: AppStyles.boldTextBlack),
                               SizedBox(height: 10,),
-                              Text(fdMaturityList[i].pMatueritytAmount.toString(),style: AppStyles.smallLabelTextBold),
+                              Text(maturityList[i].pMatueritytAmount.toString(),style: AppStyles.smallLabelTextBold),
                             ],
                           ),
                         ],
@@ -397,21 +375,23 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                       width: 0.5,
                       color:Colors.grey,
                     ),
+                      dataTextStyle: AppStyles.smallLabelTextBold,
+                      headingTextStyle: AppStyles.customTextStyle(color: Colors.white,fontSize: 11),
                       headingRowHeight: 55,
                       horizontalMargin: 5,
                       showBottomBorder: true,
                       dataRowMaxHeight: 55,
                       columnSpacing: 12,
-                      headingRowColor: MaterialStateColor.resolveWith(
-                              (states) => Colors.blue.withOpacity(0.40)),
-                      columns: [
+                      headingRowColor: MaterialStateProperty.resolveWith<Color>((states) {
+                        return AppStyles.btnColor; // Color when the slider is active
+                      }),
+                      columns: const[
                         DataColumn(
                           label: SizedBox(
                             width: 40,
                             child: Center(
                               child: Text(
                                 "SL No",
-                                style: AppStyles.smallLabelTextBold,
                               ),
                             ),
                           ),
@@ -421,7 +401,6 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                             child: Center(
                               child: Text(
                                 "Deposit Amount",
-                                style: AppStyles.smallLabelTextBold,
                               ),
                             ),
                           ),
@@ -431,7 +410,6 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                             child: Center(
                               child: Text(
                                 "Investment Period",
-                                style: AppStyles.smallLabelTextBold,
                               ),
                             ),
                           ),
@@ -441,7 +419,6 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                             child: Center(
                               child: Text(
                                 "Interest Rate/Value Per 100",
-                                style: AppStyles.smallLabelTextBold,
                               ),
                             ),
                           ),
@@ -451,7 +428,6 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                             child: Center(
                               child: Text(
                                 "Interest Type",
-                                style: AppStyles.smallLabelTextBold,
                               ),
                             ),
                           ),
@@ -461,7 +437,6 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                             child: Center(
                               child: Text(
                                 "Compound Type",
-                                style: AppStyles.smallLabelTextBold,
                               ),
                             ),
                           ),
@@ -471,7 +446,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                             child: Center(
                               child: Text(
                                 "Interest PayOut",
-                                  style: AppStyles.smallLabelTextBold,
+
                               ),
                             ),
                           ),
@@ -480,9 +455,8 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                     label: SizedBox(
                       child: Center(
                         child: Text(
-                            "Applicant Type",
-                            style: AppStyles.smallLabelTextBold,
-                                          ),
+                            "Applicant Type"
+                        ),
                       ),
                     ),
                               ),

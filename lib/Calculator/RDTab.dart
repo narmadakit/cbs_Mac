@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:finsta_mac/Calculator/bloc/RD/RDBloc.dart';
 import 'package:finsta_mac/Calculator/bloc/RD/RDEvent.dart';
 import 'package:finsta_mac/Calculator/bloc/RD/RDState.dart';
@@ -8,10 +10,12 @@ import 'package:finsta_mac/Calculator/model/SchemaDetailsModel.dart';
 import 'package:finsta_mac/components/CustomTextField.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../components/AppWidgets.dart';
 import '../components/CustomDropdown.dart';
 import '../components/KeyValueModel.dart';
 import '../network/Repository.dart';
 import '../utils/AppStyles.dart';
+import 'model/FDMaturityModel.dart';
 
 class RDTabWidget extends StatefulWidget {
   const RDTabWidget({
@@ -40,10 +44,15 @@ class _RDTabWidgetState extends State<RDTabWidget> {
   var tenureTxtController = TextEditingController();
   var rdAmountController = TextEditingController();
   var interestRateController = TextEditingController();
-  String minInterestRate ="0";
-  String maxInterestRate ="0";
+  double minInterestRate =0.0;
+  double maxInterestRate=20.0;
+  // Define the current values for the range
+  double _currentRangeValues = 15;
   bool isInterestRate=false;
   bool isDescriptionVisible=false;
+  RDInterestDetailsModel interestDetailsModel=RDInterestDetailsModel();
+  List<DepositMaturityModel> maturityList =[];
+  bool isAmountVisible=false;
 
   @override
   Widget build(BuildContext context) {
@@ -85,16 +94,24 @@ class _RDTabWidgetState extends State<RDTabWidget> {
             interestTypeKVList = RdInteresttype.keyValueList(state.responseModel.rdInteresttype!);
             interestPayOutList = state.responseModel.rdInteresttype![0].rdInterestPayoutList!;
             interestPayOutKVList  =  RdInterestPayoutList.keyValueList(interestPayOutList);
+            interestDetailsModel = state.responseModel;
           }
           else if(state is RDInterestRateSuccessState){
             isTenureLoader = false;
-            minInterestRate= state.responseModel.pMinInterestRate??"0";
-            maxInterestRate= state.responseModel.pMaxInterestRate??"0";
+            if(state.responseModel.pMinInterestRate != null && state.responseModel.pMaxInterestRate != null){
+              minInterestRate= double.parse(state.responseModel.pMinInterestRate.toString());
+              maxInterestRate= double.parse(state.responseModel.pMaxInterestRate.toString());
+            }
+            _currentRangeValues = maxInterestRate;
             isInterestRate=true;
           }
           else if(state is RDSchemeDescrSuccessState){
             isTenureLoader = false;
             descriptionList = state.responseModel;
+          }
+          else if(state is RDMaturitySuccessState){
+            isTenureLoader = false;
+            maturityList = state.responseModel;
           }
           else{
             isTenureLoader = false;
@@ -108,26 +125,28 @@ class _RDTabWidgetState extends State<RDTabWidget> {
     double gapHeight=15.0;
     return Column(
       children: [
-        SizedBox(height: gapHeight),
         Visibility(
           visible: isDescriptionVisible,
-          child: GestureDetector(
-            onTap: () {
-              if(descriptionList.isNotEmpty){
-                _showBottomSheet(context);
-              }
-            },
-            child: Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: AppStyles.borderRadiusCircularColor,
-                      color: AppStyles.btnColor,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Description',style: AppStyles.smallLabelText,),
-                    ))),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: GestureDetector(
+              onTap: () {
+                if(descriptionList.isNotEmpty){
+                  _showBottomSheet(context);
+                }
+              },
+              child: Align(
+                  alignment: Alignment.topRight,
+                  child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: AppStyles.borderRadiusCircularColor,
+                        color: AppStyles.btnColor,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Description',style: AppStyles.customTextStyle(color: Colors.white,fontSize: 12),),
+                      ))),
+            ),
           ),
         ),
         SizedBox(height: gapHeight),
@@ -135,7 +154,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Expanded(
-                flex: 1,
+                flex: 2,
                 child: Text('RD Name',style: AppStyles.boldTextBlack)),
             const SizedBox(width: 10,),
             Expanded(
@@ -143,6 +162,12 @@ class _RDTabWidgetState extends State<RDTabWidget> {
               child: CustomDropdown(context: context,selectedValue: _selectedRDNameValue,
                 onChanged: (value) {
                   _selectedRDNameValue = value;
+                  if(_selectedRDNameValue.name == "DAILY DEPOSITS"){
+                    isAmountVisible = false;
+                  }
+                  else{
+                    isAmountVisible=true;
+                  }
                   setState(() {
                   });
                   Navigator.pop(context);
@@ -154,27 +179,35 @@ class _RDTabWidgetState extends State<RDTabWidget> {
             )
           ],
         ),
-        SizedBox(height: gapHeight),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Expanded(
-                flex: 1,
-                child: Text('RD Installment Amount',style: AppStyles.boldTextBlack)),
-            const SizedBox(width: 10,),
-            Expanded(
-              flex: 3,
-              child:CustomTextField(
-                  boxHeight: 50,
-                  context: context, controller: rdAmountController,
-                  onChanged: (value) {
-                    if(tenureTxtController.text != "" && rdAmountController.text != ""){
-                      context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,rdAmountController.text));
-                    }
-                  }, hint: "Enter RD Installment Amount", textInputType: TextInputType.number),
-            )
-          ],
+        Visibility(
+          visible:isAmountVisible,
+          child: Column(
+            children: [
+              SizedBox(height: gapHeight),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Expanded(
+                      flex: 2,
+                      child: Text('RD Installment Amount',style: AppStyles.boldTextBlack)),
+                  const SizedBox(width: 10,),
+                  Expanded(
+                    flex: 3,
+                    child:CustomTextField(
+                        boxHeight: 50,
+                        context: context, controller: rdAmountController,
+                        onChanged: (value) {
+                          if(tenureTxtController.text != "" && rdAmountController.text != ""){
+                            context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,rdAmountController.text));
+                          }
+                        }, hint: "Enter RD Installment Amount", textInputType: TextInputType.number),
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
+
         SizedBox(height: gapHeight),
         (isTenureLoader == true)?
         CircularProgressIndicator(color: AppStyles.btnColor):
@@ -182,7 +215,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Expanded(
-                flex: 1,
+                flex: 2,
                 child: Text('Tenure',style: AppStyles.boldTextBlack)),
             const SizedBox(width: 10,),
             Expanded(
@@ -202,12 +235,12 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                   ),
                   const SizedBox(width: 5,),
                   Expanded(
-                    flex: 1,
+                    flex: 2,
                     child: CustomDropdown(context: context,selectedValue: _selectedTenureValue,
                       onChanged: (value) {
                         _selectedTenureValue = value;
                         if(tenureTxtController.text != "" && rdAmountController.text != ""){
-                          context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,rdAmountController.text));
+                          context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedPayInValue.name,rdAmountController.text));
                         }
                         setState(() {
                         });
@@ -225,8 +258,8 @@ class _RDTabWidgetState extends State<RDTabWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Expanded(
-                flex: 1,
-                child: Text('Installment\nPay-In',style: AppStyles.boldTextBlack)),
+                flex: 2,
+                child: Text('Installment Pay-In',style: AppStyles.boldTextBlack)),
             const SizedBox(width: 10,),
             Expanded(
               flex: 3,
@@ -246,8 +279,8 @@ class _RDTabWidgetState extends State<RDTabWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Expanded(
-                flex: 1,
-                child: Text('Interest\nType',style: AppStyles.boldTextBlack)),
+                flex: 2,
+                child: Text('Interest Type',style: AppStyles.boldTextBlack)),
             const SizedBox(width: 10,),
             Expanded(
               flex: 3,
@@ -267,7 +300,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Expanded(
-                flex: 1,
+                flex: 2,
                 child: Text('Interest Payout',style: AppStyles.boldTextBlack)),
             const SizedBox(width: 10),
             Expanded(
@@ -287,58 +320,82 @@ class _RDTabWidgetState extends State<RDTabWidget> {
           ],
         ),
         SizedBox(height: gapHeight),
-        Visibility(
-          visible: isInterestRate,
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                      flex:2,
-                      child: Container()),
-                  Expanded(
-                    flex: 2,
-                    child: Row(
-                      children: [
-                        const Text('Min: '),
-                        Text(minInterestRate??"0"),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Row(
-                      children: [
-                        const Text('Max: '),
-                        Text(maxInterestRate??"0"),
-                      ],
-                    ),
-                  ),
-                ],),
-              const SizedBox(height: 5),
-            ],
-          ),
-        ),
-
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Expanded(
-                flex: 1,
-                child: Text('Interest\nRate',style: AppStyles.boldTextBlack)),
+                flex: 2,
+                child: Text('Interest Rate\n(Per annum)',style: AppStyles.boldTextBlack)),
             const SizedBox(width: 10,),
             Expanded(
-              flex: 3,
-              child:CustomTextField(
-                  boxHeight: 50,
-                  context: context,
-                  controller: interestRateController,
-                  onChanged: (value) {
-                  }, hint: "Enter Interest Rate", textInputType: TextInputType.number),
-            )
+              flex: 4,
+              child: Slider(
+                value: _currentRangeValues,
+                divisions: 100,
+                activeColor: AppStyles.btnColor,
+                inactiveColor: AppStyles.bgColor3,
+                min: minInterestRate,
+                max: maxInterestRate,
+                label: '${_currentRangeValues.toStringAsFixed(1)}%',
+                onChanged: (value) {
+                  setState(() {
+                    _currentRangeValues = value;
+                    interestRateController.text = value.toString();
+                  });
+                },),
+            ),
           ],
         ),
+
+        SizedBox(height: gapHeight),
+        SizedBox(height: gapHeight),
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: maturityList.length,
+          itemBuilder:(context, i) {
+            return Container(
+              decoration: BoxDecoration(
+                  color: AppStyles.gridColor,
+                  borderRadius: BorderRadius.circular(12)
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Column(
+                      children: [
+                        Text('Interest Amount',style: AppStyles.boldTextBlack,),
+                        SizedBox(height: 10,),
+                        Text(maturityList[i].pInterestamount.toString(),style: AppStyles.smallLabelTextBold),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text('Maturity Amount',style: AppStyles.boldTextBlack),
+                        SizedBox(height: 10,),
+                        Text(maturityList[i].pMatueritytAmount.toString(),style: AppStyles.smallLabelTextBold),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        SizedBox(height: gapHeight),
+        SizedBox(height: gapHeight),
+        SizedBox(height: gapHeight),
+
+        Visibility(
+          visible: isAmountVisible,
+          child: payButton(() {
+            context.read<RDBloc>().add(GetRDMaturityEvent(_selectedPayInValue.name,tenureTxtController.text, rdAmountController.text,
+                _selectedPayOutValue.name,_selectedInterestTypeValue.name,
+                interestRateController.text,interestDetailsModel.pCaltype.toString(),interestDetailsModel.pCompoundInterestType.toString()
+            ));
+          },"Calculate"),
+        )
       ],
     );
   }
@@ -364,21 +421,23 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                           width: 0.5,
                           color:Colors.grey,
                         ),
+                        dataTextStyle: AppStyles.smallLabelTextBold,
+                        headingTextStyle: AppStyles.customTextStyle(color: Colors.white,fontSize: 11),
                         headingRowHeight: 55,
                         horizontalMargin: 5,
                         showBottomBorder: true,
                         dataRowMaxHeight: 55,
                         columnSpacing: 12,
-                        headingRowColor: MaterialStateColor.resolveWith(
-                                (states) => Colors.blue.withOpacity(0.40)),
-                        columns: [
+                        headingRowColor: MaterialStateProperty.resolveWith<Color>((states) {
+                          return AppStyles.btnColor; // Color when the slider is active
+                        }),
+                        columns: const [
                           DataColumn(
                             label: SizedBox(
                               width: 40,
                               child: Center(
                                 child: Text(
                                   "SL No",
-                                  style: AppStyles.smallLabelTextBold,
                                 ),
                               ),
                             ),
@@ -388,7 +447,6 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                               child: Center(
                                 child: Text(
                                   "Installment Amount",
-                                  style: AppStyles.smallLabelTextBold,
                                 ),
                               ),
                             ),
@@ -397,8 +455,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                             label: SizedBox(
                               child: Center(
                                 child: Text(
-                                  "Investment Period",
-                                  style: AppStyles.smallLabelTextBold,
+                                  "Investment Period"
                                 ),
                               ),
                             ),
@@ -407,8 +464,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                             label: SizedBox(
                               child: Center(
                                 child: Text(
-                                  "Interest Rate/Value Per 100",
-                                  style: AppStyles.smallLabelTextBold,
+                                  "Interest Rate/Value Per 100"
                                 ),
                               ),
                             ),
@@ -417,8 +473,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                             label: SizedBox(
                               child: Center(
                                 child: Text(
-                                  "Interest Type",
-                                  style: AppStyles.smallLabelTextBold,
+                                  "Interest Type"
                                 ),
                               ),
                             ),
@@ -427,8 +482,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                             label: SizedBox(
                               child: Center(
                                 child: Text(
-                                  "Compound Type",
-                                  style: AppStyles.smallLabelTextBold,
+                                  "Compound Type"
                                 ),
                               ),
                             ),
@@ -437,8 +491,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                             label: SizedBox(
                               child: Center(
                                 child: Text(
-                                  "Interest PayOut",
-                                  style: AppStyles.smallLabelTextBold,
+                                  "Interest PayOut"
                                 ),
                               ),
                             ),
@@ -447,8 +500,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                             label: SizedBox(
                               child: Center(
                                 child: Text(
-                                  "Applicant Type",
-                                  style: AppStyles.smallLabelTextBold,
+                                  "Applicant Type"
                                 ),
                               ),
                             ),

@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../model/DepositTenureModel.dart';
 import '../../model/DepositInterestRateModel.dart';
+import '../../model/FDMaturityModel.dart';
 import 'RDEvent.dart';
 
 class RDBloc extends Bloc<RDEvent,RDStates>{
@@ -18,6 +19,7 @@ class RDBloc extends Bloc<RDEvent,RDStates>{
     on<GetRDInterestDetailsEvent>(getRDInterestDetailsBloc);
     on<GetRDInterestRateEvent>(getRDInterestRateBloc);
     on<GetRdDescriptionEvent>(getRdDescriptionBloc);
+    on<GetRDMaturityEvent>(getRDMaturityAmountBloc);
   }
 
   getTransactionSchemesBloc(RDInitEvent event, Emitter<RDStates> emit) async {
@@ -69,6 +71,18 @@ class RDBloc extends Bloc<RDEvent,RDStates>{
     try{
       List<RDDescriptionModel> responseData = await repo.getRdDescriptionRepo(event.rdName);
       emit(RDSchemeDescrSuccessState(responseData));
+    }
+    catch(e){
+      emit(RDErrorState(e.toString()));
+    }
+  }
+
+  getRDMaturityAmountBloc(GetRDMaturityEvent event, Emitter<RDStates> emit) async {
+    emit(RDTenureLoadingState());
+    try{
+      List<DepositMaturityModel> responseData = await repo.getRDMaturityAmountRepo(event.interestMode,event.tenure,event.enterAmount,
+          event.interestPayout,event.compoundSimpleInterestType,event.interestRate,event.calTyPe,event.compoundType);
+      emit(RDMaturitySuccessState(responseData));
     }
     catch(e){
       emit(RDErrorState(e.toString()));

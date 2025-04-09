@@ -72,7 +72,7 @@ class FDSchemeDescrSuccessState extends FDStates{
 }
 
 class FDMaturitySuccessState extends FDStates{
-  final List<FDMaturityModel> responseModel;
+  final List<DepositMaturityModel> responseModel;
   FDMaturitySuccessState(this.responseModel);
   @override
   List<Object?> get props => [responseModel];

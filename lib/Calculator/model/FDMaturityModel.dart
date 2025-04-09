@@ -1,10 +1,10 @@
-class FDMaturityModel {
+class DepositMaturityModel {
   dynamic pMatueritytAmount;
   dynamic pInterestamount;
 
-  FDMaturityModel({this.pMatueritytAmount, this.pInterestamount});
+  DepositMaturityModel({this.pMatueritytAmount, this.pInterestamount});
 
-  FDMaturityModel.fromJson(Map<String, dynamic> json) {
+  DepositMaturityModel.fromJson(Map<String, dynamic> json) {
     pMatueritytAmount = json['pMatueritytAmount'];
     pInterestamount = json['pInterestamount'];
   }

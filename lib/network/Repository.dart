@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:finsta_mac/Calculator/model/FDInterestDetailsModel.dart';
 import 'package:finsta_mac/Calculator/model/FDDescriptionModel.dart';
 import 'package:finsta_mac/Calculator/model/FDMaturityModel.dart';
+import 'package:finsta_mac/Calculator/model/LoanTypeModel.dart';
 import 'package:finsta_mac/Calculator/model/RDDescriptionModel.dart';
 import 'package:finsta_mac/Calculator/model/RDInterestDetailsModel.dart';
 import 'package:finsta_mac/Calculator/model/SchemaDetailsModel.dart';
@@ -256,10 +257,10 @@ class Repository{
     }
   }
 
-  Future<List<FDMaturityModel>> getFDMaturityAmountRepo(String interestMode,tenure,enterAmount,
+  Future<List<DepositMaturityModel>> getFDMaturityAmountRepo(String interestMode,tenure,enterAmount,
       interestPayout,compoundSimpleInterestType,interestRate,calTyPe,compoundType) async{
     TAG = 'getFDMaturityAmountRepo';
-    List<FDMaturityModel> listData=[];
+    List<DepositMaturityModel> listData=[];
     try{
       String url = ApiURL.getFdMaturityAmountApi(
           interestMode: interestMode,
@@ -274,7 +275,7 @@ class Repository{
       log("URL $TAG  --------$apiUrl");
       var response = await http.get(apiUrl,headers: loginHeader);
       List body = json.decode(response.body);
-      listData= body.map((e) => FDMaturityModel.fromJson(e)).toList();
+      listData= body.map((e) => DepositMaturityModel.fromJson(e)).toList();
 
       log('RESPONSE $TAG >>>> ${jsonEncode(listData)}');
       return listData;
@@ -378,5 +379,52 @@ class Repository{
     }
   }
 
+  Future<List<DepositMaturityModel>> getRDMaturityAmountRepo(String interestMode,tenure,enterAmount,
+      interestPayout,compoundSimpleInterestType,interestRate,calTyPe,compoundType) async{
+    TAG = 'getRDMaturityAmountRepo';
+    List<DepositMaturityModel> listData=[];
+    try{
+      String url = ApiURL.getRdMaturityAmountApi(
+          interestMode: interestMode,
+          tenure: tenure,
+          enterAmount: enterAmount,
+          interestPayOut: interestPayout,
+          compoundSimpleInterestType: compoundSimpleInterestType,
+          interestRate: interestRate,
+          calType: calTyPe,
+          compoundType: compoundType);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+      List body = json.decode(response.body);
+      listData= body.map((e) => DepositMaturityModel.fromJson(e)).toList();
+
+      log('RESPONSE $TAG >>>> ${jsonEncode(listData)}');
+      return listData;
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
+//LOANS
+  Future<List<LoanTypeModel>> getLoanTypeRepo() async{
+    TAG = 'getLoanTypeRepo';
+    try{
+      String url = ApiURL.getLoanTypeApi;
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+      log('RESPONSE $TAG >>>> ${jsonDecode(response.body)}');
+
+      List body= json.decode(response.body);
+      return body.map((e) => LoanTypeModel.fromJson(e)).toList();
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
 
 }

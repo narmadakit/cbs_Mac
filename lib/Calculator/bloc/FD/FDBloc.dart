@@ -80,7 +80,7 @@ class FDBloc extends Bloc<FDEvent,FDStates>{
   getFDMaturityAmountBloc(GetFDMaturityEvent event, Emitter<FDStates> emit) async {
     emit(FDTenureLoadingState());
     try{
-      List<FDMaturityModel> responseData = await repo.getFDMaturityAmountRepo(event.interestMode,event.tenure,event.enterAmount,
+      List<DepositMaturityModel> responseData = await repo.getFDMaturityAmountRepo(event.interestMode,event.tenure,event.enterAmount,
           event.interestPayout,event.compoundSimpleInterestType,event.interestRate,event.calTyPe,event.compoundType);
       emit(FDMaturitySuccessState(responseData));
     }
