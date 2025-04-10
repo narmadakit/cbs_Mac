@@ -194,7 +194,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                   Expanded(
                     flex: 3,
                     child:CustomTextField(
-                        boxHeight: 50,
+                        boxHeight: 45,
                         context: context, controller: rdAmountController,
                         onChanged: (value) {
                           if(tenureTxtController.text != "" && rdAmountController.text != ""){
@@ -225,7 +225,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                   Expanded(
                     flex: 2,
                     child: CustomTextField(
-                        boxHeight: 50,
+                        boxHeight: 45,
                         context: context, controller: tenureTxtController,
                         onChanged: (value) {
                           if(tenureTxtController.text != "" && rdAmountController.text != ""){

@@ -4,7 +4,7 @@ import '../components/AppWidgets.dart';
 import '../components/CustomMainBackground.dart';
 import '../utils/AppStyles.dart';
 import 'DepositesTab.dart';
-import 'LoansTab.dart';
+import 'DepositLoansTab.dart';
 
 class EmiCalculatorScreen extends StatefulWidget {
   const EmiCalculatorScreen({super.key});
@@ -52,7 +52,7 @@ class _EmiCalculatorScreenState extends State<EmiCalculatorScreen> {
   Widget buildBody(BuildContext context) {
     return const TabBarView(
       children: [
-        LoansTab(),
+        DepositLoansTab(),
         DepositesTab(),
       ],
     );

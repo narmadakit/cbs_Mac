@@ -1,5 +1,6 @@
 
 import 'package:equatable/equatable.dart';
+import 'package:finsta_mac/Home/model/BanneImageModel.dart';
 import 'package:finsta_mac/Home/model/LoanDataResponse.dart';
 import 'package:finsta_mac/Home/model/MemberDetailsResponse.dart';
 
@@ -47,6 +48,13 @@ class AllDuesErrorState extends HomeState{
   AllDuesErrorState(this.error);
   @override
   List<Object?> get props => [error];
+}
+
+class BannerImageSuccessState extends HomeState{
+  final List<BannerImageModel> responseData;
+  BannerImageSuccessState(this.responseData);
+  @override
+  List<Object?> get props => [responseData];
 }
 
 

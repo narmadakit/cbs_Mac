@@ -36,8 +36,8 @@ class _DepositesTabState extends State<DepositesTab> {
               children: [
                 Expanded(
                   child: ListTile(
-                    title: Text('Fixed Deposit',style: AppStyles.customTextStyle(color: Colors.black),),
-                    contentPadding: const EdgeInsets.all(0.0),
+                    title: Text('Fixed Deposit',style: AppStyles.customTextStyle(color: Colors.black,fontSize: 12),),
+                    contentPadding: const EdgeInsets.all(10.0),
                     dense: true,
                     horizontalTitleGap: 0,
                     titleTextStyle: const TextStyle(fontSize: 12,color: Colors.black),
@@ -58,7 +58,7 @@ class _DepositesTabState extends State<DepositesTab> {
                 ),
                 Expanded(
                   child: ListTile(
-                    title: Text('Recurring Deposit',style: AppStyles.customTextStyle(color: Colors.black)),
+                    title: Text('Recurring Deposit',style: AppStyles.customTextStyle(color: Colors.black,fontSize: 12)),
                     contentPadding: const EdgeInsets.all(0.0),
                     dense: true,
                     horizontalTitleGap: 0,

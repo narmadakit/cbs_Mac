@@ -3,10 +3,13 @@ import 'dart:developer';
 import 'package:finsta_mac/Calculator/model/FDInterestDetailsModel.dart';
 import 'package:finsta_mac/Calculator/model/FDDescriptionModel.dart';
 import 'package:finsta_mac/Calculator/model/FDMaturityModel.dart';
-import 'package:finsta_mac/Calculator/model/LoanTypeModel.dart';
+import 'package:finsta_mac/Calculator/model/Loans/DepositLoanPayInModel.dart';
+import 'package:finsta_mac/Calculator/model/Loans/LoanNameModel.dart';
+import 'package:finsta_mac/Calculator/model/Loans/LoanTypeModel.dart';
 import 'package:finsta_mac/Calculator/model/RDDescriptionModel.dart';
 import 'package:finsta_mac/Calculator/model/RDInterestDetailsModel.dart';
 import 'package:finsta_mac/Calculator/model/SchemaDetailsModel.dart';
+import 'package:finsta_mac/Home/model/BanneImageModel.dart';
 import 'package:finsta_mac/Home/model/LoanDataResponse.dart';
 import 'package:finsta_mac/Home/model/MemberDetailsResponse.dart';
 import 'package:finsta_mac/Login/model/GetOtpModel.dart';
@@ -103,7 +106,6 @@ class Repository{
       print("$TAG, getMemberDetailsRepo - exceptipon : ${e.toString()}");
       throw Exception(e);
     }
-
   }
 
   Future<LoanDataResponse> getLoanDetailsRepo(String memberId) async {
@@ -113,7 +115,7 @@ class Repository{
     try{
       var response = await http.get(apiUrl,headers: loginHeader);
       final LoanDataResponse responseData = LoanDataResponse.fromJson(jsonDecode(response.body));
-      log('RESPONSE getLoanDetailsRepo >>>> ${jsonEncode(responseData)}');
+      // log('RESPONSE getLoanDetailsRepo >>>> ${jsonEncode(responseData)}');
       return responseData;
     }
     catch(e){
@@ -134,6 +136,24 @@ class Repository{
     }
     catch(e){
       log("getMemberAllDuesRepo error $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<List<BannerImageModel>> getBannerImageRepo() async{
+    TAG = 'getBannerImageRepo';
+    try{
+      String url = ApiURL.getBannerImages;
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+      log('RESPONSE $TAG >>>> ${jsonDecode(response.body)}');
+
+      List body= json.decode(response.body);
+      return body.map((e) => BannerImageModel.fromJson(e)).toList();
+    }
+    catch(e){
+      log("$TAG error $e");
       throw Exception(e);
     }
   }
@@ -408,7 +428,7 @@ class Repository{
     }
   }
 
-//LOANS
+ //LOANS
   Future<List<LoanTypeModel>> getLoanTypeRepo() async{
     TAG = 'getLoanTypeRepo';
     try{
@@ -420,6 +440,45 @@ class Repository{
 
       List body= json.decode(response.body);
       return body.map((e) => LoanTypeModel.fromJson(e)).toList();
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<List<LoanNameModel>> getLoanNameRepo(String loanTypeId) async{
+    TAG = 'getLoanNameRepo';
+    try{
+      String url = ApiURL.getLoanNameApi(loanTypeId);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+      log('RESPONSE $TAG >>>> ${jsonDecode(response.body)}');
+
+      List body= json.decode(response.body);
+      return body.map((e) => LoanNameModel.fromJson(e)).toList();
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<List<DepositLoanPayInModel>> getEmiLoanPayInRepo(String loanId,schemeId) async{
+    TAG = 'getEmiLoanPayInRepo';
+    String applicantType="";
+    List<MemberDetailsResponse> data = await memberData();
+    applicantType= data[0].papplicanttype;
+    try{
+      String url = ApiURL.getLoanPayInApi(loanId,applicantType,schemeId);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+      log('RESPONSE $TAG >>>> ${jsonDecode(response.body)}');
+
+      List body= json.decode(response.body);
+      return body.map((e) => DepositLoanPayInModel.fromJson(e)).toList();
     }
     catch(e){
       log("$TAG error $e");

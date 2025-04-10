@@ -1,9 +1,11 @@
-class LoanTypeModel {
+import 'package:finsta_mac/components/KeyValueModel.dart';
+
+class LoanNameModel {
   dynamic getidentificationdocumentsList;
   dynamic instalmentdatedetailslist;
   dynamic loanconfigurationlist;
   dynamic identificationdocumentsList;
-  dynamic  referralCommissioLoanList;
+  dynamic referralCommissioLoanList;
   dynamic penaltyConfigurationList;
   dynamic ltvConfiguration;
   dynamic rbtConfiguration;
@@ -13,7 +15,7 @@ class LoanTypeModel {
   dynamic pLoanid;
   dynamic pLoanNmae;
   dynamic pLoantypeid;
-  String? pLoantype;
+  dynamic pLoantype;
   dynamic pLoanname;
   dynamic pLoancode;
   dynamic pCompanycode;
@@ -39,7 +41,7 @@ class LoanTypeModel {
   dynamic preleasetype;
   dynamic pbranchid;
 
-  LoanTypeModel(
+  LoanNameModel(
       {this.getidentificationdocumentsList,
         this.instalmentdatedetailslist,
         this.loanconfigurationlist,
@@ -80,7 +82,7 @@ class LoanTypeModel {
         this.preleasetype,
         this.pbranchid});
 
-  LoanTypeModel.fromJson(Map<String, dynamic> json) {
+  LoanNameModel.fromJson(Map<String, dynamic> json) {
     getidentificationdocumentsList = json['getidentificationdocumentsList'];
     instalmentdatedetailslist = json['instalmentdatedetailslist'];
     loanconfigurationlist = json['loanconfigurationlist'];
@@ -165,5 +167,11 @@ class LoanTypeModel {
     data['preleasetype'] = this.preleasetype;
     data['pbranchid'] = this.pbranchid;
     return data;
+  }
+  
+  static List<KeyValueModel> keyValueList(List<LoanNameModel> list){
+    return list.map((e) {
+      return KeyValueModel(id: e.pLoanid.toString(), name: e.pLoanNmae.toString());
+    }).toList();
   }
 }

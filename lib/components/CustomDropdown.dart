@@ -36,6 +36,7 @@ class CustomDropdown<T> extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.only(left: 6, bottom: 12,top: 12),
         height: 45,
+        width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.grey),
@@ -43,7 +44,7 @@ class CustomDropdown<T> extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(selectedValue.name,style: AppStyles.boldTextBlack,),
+            Expanded(child: Text(selectedValue.name,style: AppStyles.boldTextBlack,overflow: TextOverflow.ellipsis,)),
             const Icon(Icons.arrow_drop_down),
           ],
         ),

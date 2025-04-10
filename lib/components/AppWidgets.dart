@@ -36,7 +36,7 @@ Widget circularBorderImage(String icon){
       ));
 }
 
- Widget payButton(Function() onTap, String btnText){
+ Widget payButton(Function() onTap, String btnText, {bool disable = true}){
   return SizedBox(
     height: 50,
     child: GestureDetector(
@@ -44,7 +44,7 @@ Widget circularBorderImage(String icon){
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(borderRadius: const BorderRadius.all(Radius.circular(25)),
-            color: AppStyles.btnColor),
+            color: disable?AppStyles.btnColor:AppStyles.shadowColor),
         child: Center(
           child: Text(
             btnText,

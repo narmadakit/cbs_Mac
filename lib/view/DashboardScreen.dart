@@ -1,8 +1,12 @@
 
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:finsta_mac/Calculator/EmiCalculatorScreen.dart';
 import 'package:finsta_mac/Home/bloc/HomeBloc.dart';
 import 'package:finsta_mac/Home/bloc/HomeEvent.dart';
+import 'package:finsta_mac/Home/model/BanneImageModel.dart';
 import 'package:finsta_mac/Home/model/LoanDataResponse.dart';
 import 'package:finsta_mac/Profile/ProfileScreen.dart';
 import 'package:finsta_mac/network/Repository.dart';
@@ -36,6 +40,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool loadingVisibility = false;
   bool duesLoadingVisibility = true;
   List<Savingslist>? savingLoan=[];
+  List<BannerImageModel> bannerImageList=[];
   List<MembersAllDuesModel>? duesLoanList=[];
   double totalDuesListAmt=0;
   String memberName="";
@@ -55,11 +60,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Navigator.push(context, MaterialPageRoute(builder: (builder)=>const DashboardScreen()));
   }
 
-  final List<String> imageUrls = [
-    'https://graphicsfamily.com/wp-content/uploads/2020/06/Bank-Service-Web-Banner-1180x664.jpg',
-    'https://graphicsfamily.com/wp-content/uploads/2020/06/Bank-Service-Web-Banner-1180x664.jpg',
-    'https://graphicsfamily.com/wp-content/uploads/2020/06/Bank-Service-Web-Banner-1180x664.jpg',
-  ];
+  // final List<String> imageUrls = [
+  //   'https://graphicsfamily.com/wp-content/uploads/2020/06/Bank-Service-Web-Banner-1180x664.jpg',
+  //   'https://graphicsfamily.com/wp-content/uploads/2020/06/Bank-Service-Web-Banner-1180x664.jpg',
+  //   'https://graphicsfamily.com/wp-content/uploads/2020/06/Bank-Service-Web-Banner-1180x664.jpg',
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -83,35 +88,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: BlocConsumer<HomeBloc,HomeState>(
           listener: (context, state) {
             if(state is HomeLoadingState){
-              print("=====HomeLoadingState listener ");
               loadingVisibility = true;
             }
             else if(state is HomeSuccessState){
-              print("=====HomeSuccessState listener ");
               loanData = state.responseData;
               savingLoan=loanData.savingslist;
               loadingVisibility = false;
               context.read<HomeBloc>().add(GetAllDuesEvent());
             }
+            else if(state is BannerImageSuccessState){
+              bannerImageList=state.responseData;
+              loadingVisibility = false;
+            }
             else if(state is AllDuesSuccessState){
-              print("=====AllDuesSuccessState listener ");
               duesLoanList = state.responseData;
               duesLoadingVisibility = false;
             }
           },
           builder:  (BuildContext context, state) {
             if(state is HomeLoadingState){
-              print("=======HomeLoadingState builder ");
               return Center(child: CircularProgressIndicator(color: AppStyles.btnColor));
             }
             else if(state is HomeSuccessState){
-              print("=======HomeSuccessState Builder ");
               loanData = state.responseData;
               savingLoan=loanData.savingslist;
               return blocBuilderBody();
             }
+            else if(state is BannerImageSuccessState){
+              bannerImageList = state.responseData;
+              return blocBuilderBody();
+            }
             else if(state is AllDuesSuccessState){
-              print("=======AllDuesSuccessState Builder ");
               duesLoanList =state.responseData;
               return blocBuilderBody();
             }
@@ -220,15 +227,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 CarouselSlider.builder(
                   carouselController: _controller,
-                  itemCount: imageUrls.length,
+                  itemCount: bannerImageList.length,
                   itemBuilder: (context, index, realIndex) {
-                    // Savingslist savingData=savingLoan![index];
-                    return buildCaruselBanner(index);
+                    Uint8List? bytesLogo;
+                    if (bannerImageList[index].pschemepath != null && bannerImageList[index].pschemepath!.isNotEmpty) {
+                      bytesLogo = base64Decode(bannerImageList[index].pschemeimagepath.toString());
+                    }
+                    return buildCaruselBanner(index,bytesLogo);
                   },
                   options: CarouselOptions(
                       autoPlay: true,
                       enlargeCenterPage: true,
-                      aspectRatio: 2.4,
+                      aspectRatio: 2.3,
                       viewportFraction: 1.0,
                       enableInfiniteScroll: false,
                       onPageChanged: (index, reason) {
@@ -239,7 +249,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: imageUrls.asMap().entries.map((entry) {
+                  children: bannerImageList.asMap().entries.map((entry) {
                     return GestureDetector(
                       onTap: () => _controller.animateToPage(entry.key),
                       child: Container(
@@ -492,14 +502,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget buildCaruselBanner(int index) {
+  Widget buildCaruselBanner(int index, Uint8List? bytesLogo) {
     return ClipRRect(
-        borderRadius: BorderRadius.circular(0),
+        borderRadius: BorderRadius.circular(12),
         // child: Image.asset("assets/images/banner.jpeg",fit: BoxFit.cover,
         //   width: double.infinity)
-        child: Image.network(imageUrls[index],
-        fit: BoxFit.cover,
-          width: double.infinity)
+        child:
+        Image.memory(bytesLogo!,
+          width: double.infinity,
+          fit: BoxFit.cover,)
+
     );
   }
 

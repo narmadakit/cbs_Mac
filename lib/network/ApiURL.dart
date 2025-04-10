@@ -6,6 +6,8 @@ class ApiURL{
   static String validateLoginOtp(String mobile,String otp,String date) => "${BASE_URL}api/MobileAPP/ValidateLoginOTP?pMobileno=$mobile&potp=$otp&pdate=$date";
   static String getMemberAllDues(String memberId,String date) => "${BASE_URL}api/MobileAPP/GetMemberaganist_allDues?pmemberid=$memberId&ptransdate=$date";
   static String getCompanyDetails= "${BASE_URL}api/Settings/GetcompanyNameandaddressDetails";
+  static String getBannerImages= "${BASE_URL}api/MobileAPP/GetClientSchemes?prequestfrom=mobile";
+
 
   //Emi calculator
   //FD
@@ -28,6 +30,9 @@ class ApiURL{
 
   //LOANs
   static String getLoanTypeApi = "${BASE_URL}api/loans/masters/loanmaster/getfiLoanTypes";
+  static String getLoanNameApi(String loanTypeId) => "${BASE_URL}api/loans/masters/loanmaster/getLoanNames?loanTypeId=$loanTypeId";
+  static String getLoanPayInApi(String loanId,applicantType,schemeId) => "${BASE_URL}api/loans/Transactions/Firstinformation/GetLoanpayin?Loanid=$loanId&Contacttype=Individual&Applicanttype=$applicantType&schemeid=$schemeId";
+  static String getLoanMinMaxAmountApi(String loanId,applicantType,loanPayIn,schemeId,interestType) => "${BASE_URL}api/loans/Transactions/Firstinformation/GetLoanMinandmaxAmounts?Loanid=$loanId&Contacttype=Individual&Applicanttype=$applicantType&Loanpayin=$loanPayIn&schemeid=$schemeId&interesttype=$interestType";
 
 
 }
