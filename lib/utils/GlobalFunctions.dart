@@ -19,6 +19,13 @@ convertToCurrencyFormat(dynamic amount) {
  return currencyFormat.format(amount);
 }
 
+convertToCurrencyFormat2(dynamic amount) {
+ amount = removeCurrencyFormat(amount);
+ double parsedAmount = double.tryParse(amount.toString()) ?? 0.0;
+ dynamic amt = parsedAmount.toStringAsFixed(0);
+ return amt;
+}
+
 String convertDateFormat(String input){
  String dateTimeString = input;
  DateTime parsedDateTime = DateTime.parse(dateTimeString);
@@ -100,6 +107,12 @@ String getTenureModeName(String text, String paymentMode) {
   }
  }
  return dummy;
+}
+
+getNumericOnly(String text){
+ String input = text;
+ String numberOnly = input.replaceAll(RegExp(r'[^0-9]'), '');
+ print(numberOnly); // Output: 12
 }
 
 

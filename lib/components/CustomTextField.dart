@@ -34,30 +34,31 @@ class CustomTextField<T> extends StatelessWidget {
         height: boxHeight,
         child: TextFormField(
           keyboardType: textInputType,
+          style:  AppStyles.boldTextBlack,
           onTap: onTap,
           textAlignVertical: TextAlignVertical.center,
           controller: controller,
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(vertical: 5,horizontal: 8),
-            fillColor: AppStyles.gridColor,
+            fillColor: AppStyles.bgColor2,
             filled: true,
             hintText: hint,
             hintStyle: AppStyles.smallLabelTextBlack,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppStyles.bgColor3,)
+                borderSide: BorderSide(color: Colors.grey)
             ),
             focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppStyles.bgColor3,)
+                borderSide: BorderSide(color: Colors.grey)
             ),
             disabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppStyles.bgColor3,)
+                borderSide: BorderSide(color: Colors.grey)
             ),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppStyles.bgColor3,)
+                borderSide: BorderSide(color: Colors.grey)
             ),
           ),
         ),

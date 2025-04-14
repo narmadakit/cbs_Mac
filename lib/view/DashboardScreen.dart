@@ -297,9 +297,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
                               decoration: BoxDecoration(
                                   shape: BoxShape.rectangle,
-                                  color: (Theme.of(context).brightness == Brightness.dark
-                                      ? Colors.white
-                                      : AppStyles.imageBgColor)
+                                  color: (_current == entry.key
+                                      ? Colors.grey
+                                      : AppStyles.carouselCardColor)
                                       .withOpacity(_current == entry.key ? 0.9 : 0.4)),
                             ),
                           );
@@ -462,13 +462,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                        padding: EdgeInsets.all(0),
                        onPressed: () {
                          Clipboard.setData(ClipboardData(text: savingData.pSavingaccountno.toString())).then((_) {
-                           // Show a message when text is copied successfully
                            ScaffoldMessenger.of(context).showSnackBar(
                              const SnackBar(content: Text('Text copied to clipboard!')),
                            );
                          });
                        },
-                       icon: Icon( Icons.copy_all,size: 18),
+                       icon: const Icon(Icons.copy_all,size: 18),
                          color: Colors.grey,)
                       ],
                     ),

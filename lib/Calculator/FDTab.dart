@@ -114,7 +114,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
   }
 
   Column buildBody(BuildContext context, List<SchemaDetailsModel> responseModel) {
-    double gapHeight=15.0;
+    double gapHeight=20.0;
     return Column(
           children: [
             Visibility(
@@ -150,7 +150,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                     child: Text('FD Name',style: AppStyles.boldTextBlack)),
                 const SizedBox(width: 10,),
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: CustomDropdown(context: context,selectedValue: _selectedFDNameValue,
                     onChanged: (value) {
                       _selectedFDNameValue = value;
@@ -174,7 +174,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                     child: Text('FD Amount',style: AppStyles.boldTextBlack)),
                 const SizedBox(width: 10,),
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child:CustomTextField(
                       boxHeight: 45,
                       context: context, controller: fdAmountController,
@@ -197,7 +197,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                     child: Text('Tenure',style: AppStyles.boldTextBlack)),
                 const SizedBox(width: 10,),
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: Row(
                     children: [
                       Expanded(
@@ -240,7 +240,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                     child: Text('Interest Type',style: AppStyles.boldTextBlack)),
                 const SizedBox(width: 10,),
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: CustomDropdown(context: context,selectedValue: _selectedInterestTypeValue,
                     onChanged: (value) {
                       _selectedInterestTypeValue = value;
@@ -262,7 +262,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                     child: Text('Interest Payout',style: AppStyles.boldTextBlack)),
                 const SizedBox(width: 10),
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: CustomDropdown(context: context,selectedValue: _selectedPayOutValue,
                     onChanged: (value) {
                       _selectedPayOutValue = value;

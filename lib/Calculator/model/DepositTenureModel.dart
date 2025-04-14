@@ -31,7 +31,7 @@ class DepositeTenureModel {
   }
   static List<KeyValueModel> rdTenurekeyValueList(List<DepositeTenureModel> list) {
     return list.map((member) {
-      return KeyValueModel(id: member.pPayinduration.toString(), name: member.pTenurenature.toString());
+      return KeyValueModel(id: member.pTenurename.toString(), name: member.pTenurenature.toString());
     }).toList();
   }
 

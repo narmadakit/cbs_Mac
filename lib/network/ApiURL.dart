@@ -33,6 +33,7 @@ class ApiURL{
   static String getLoanNameApi(String loanTypeId) => "${BASE_URL}api/loans/masters/loanmaster/getLoanNames?loanTypeId=$loanTypeId";
   static String getLoanPayInApi(String loanId,applicantType,schemeId) => "${BASE_URL}api/loans/Transactions/Firstinformation/GetLoanpayin?Loanid=$loanId&Contacttype=Individual&Applicanttype=$applicantType&schemeid=$schemeId";
   static String getLoanMinMaxAmountApi(String loanId,applicantType,loanPayIn,schemeId,interestType) => "${BASE_URL}api/loans/Transactions/Firstinformation/GetLoanMinandmaxAmounts?Loanid=$loanId&Contacttype=Individual&Applicanttype=$applicantType&Loanpayin=$loanPayIn&schemeid=$schemeId&interesttype=$interestType";
+  static String getLoanInterestRatePostApi  = "${BASE_URL}api/loans/Transactions/Firstinformation/GetInterestRates";
 
 
 }

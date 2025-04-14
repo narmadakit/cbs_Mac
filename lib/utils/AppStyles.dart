@@ -23,6 +23,7 @@ class AppStyles{
  static TextStyle customTextStyle({double? fontSize, Color? color}) => GoogleFonts.poppins(color: color, fontWeight: FontWeight.w600, fontSize: fontSize);
  static TextStyle statusTextStyle({double? fontSize}) => GoogleFonts.poppins(color: Colors.amber.shade900, fontWeight: FontWeight.w600, fontSize: fontSize);
  static TextStyle smallLabelTextBlack=const TextStyle(fontSize: 11,color: Colors.black);
+ static TextStyle hintTextStyleBlack= TextStyle(fontSize: 11,color:bgColor1 );
  static TextStyle smallLabelTextBold=const TextStyle(fontSize: 11,color: Colors.black,fontWeight: FontWeight.w600);
  static TextStyle headerTextBlack=const TextStyle(color: Colors.black,fontWeight: FontWeight.bold);
  static TextStyle highLightText= TextStyle(color: AppStyles.btnColor,fontWeight: FontWeight.bold,fontSize: 13);

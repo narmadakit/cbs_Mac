@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:finsta_mac/Calculator/bloc/Loan/LoanBloc.dart';
 import 'package:finsta_mac/Calculator/bloc/Loan/LoanEvent.dart';
 import 'package:finsta_mac/Calculator/bloc/Loan/LoanState.dart';
@@ -91,183 +93,187 @@ class _DepositLoansTabState extends State<DepositLoansTab> {
   }
 
   Widget buildBody(BuildContext context) {
-    double gapHeight=15.0;
+    double gapHeight=20.0;
     return Padding(
                 padding: const EdgeInsets.all(15.0),
-                child:  SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: gapHeight),
-                      Row(
-                        children: [
-                          Expanded(
-                              flex: 2,
-                              child: Text('Loan Type',style: AppStyles.boldTextBlack)),
-                          Expanded(
-                            flex: 3,
-                            child: CustomDropdown(context: context, selectedValue: _selectedLoanType,
-                                items:kvLoanTypeList, onChanged: (value) {
-                                  setState(() {
-                                    _selectedLoanType = value;
-                                    _selectedNameType = KeyValueModel(id: "0", name: "Select");
-                                  });
-                                  Navigator.pop(context);
-                                  context.read<LoanBloc>().add(GetLoanNameEvent(_selectedLoanType.id));
-                                }, hint: ""),
-                          )
-                        ],
+                child:  Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: gapHeight),
+                            Row(
+                              children: [
+                                Expanded(
+                                    flex: 2,
+                                    child: Text('Loan Type',style: AppStyles.boldTextBlack)),
+                                Expanded(
+                                  flex: 4,
+                                  child: CustomDropdown(context: context, selectedValue: _selectedLoanType,
+                                      items:kvLoanTypeList, onChanged: (value) {
+                                        setState(() {
+                                          _selectedLoanType = value;
+                                          _selectedNameType = KeyValueModel(id: "0", name: "Select");
+                                        });
+                                        Navigator.pop(context);
+                                        context.read<LoanBloc>().add(GetLoanNameEvent(_selectedLoanType.id));
+                                      }, hint: ""),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: gapHeight),
+                            Row(
+                              children: [
+                                Expanded(
+                                    flex: 2,
+                                    child: Text('Loan Name',style: AppStyles.boldTextBlack)),
+                                Expanded(
+                                  flex: 4,
+                                  child: CustomDropdown(context: context, selectedValue: _selectedNameType,
+                                      items:kvLoanNameList, onChanged: (value) {
+                                        setState(() {
+                                          _selectedNameType = value;
+                                          _selectedPayIn = KeyValueModel(id: "0", name: "Select");
+                                        });
+                                        Navigator.pop(context);
+                                        log("loan id===== ${_selectedNameType.id}");
+                                        context.read<LoanBloc>().add(GetLoanPayInEvent(_selectedNameType.id,_selectedPayIn.id));
+                                      }, hint: ""),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: gapHeight),
+                            Row(
+                              children: [
+                                Expanded(
+                                    flex: 2,
+                                    child: Text('Loan Pay-in',style: AppStyles.boldTextBlack)),
+                                Expanded(
+                                  flex: 4,
+                                  child: CustomDropdown(context: context, selectedValue: _selectedPayIn,
+                                      items:kvPayInList, onChanged: (value) {
+                                        setState(() {
+                                          _selectedPayIn = value;
+                                        });
+                                        Navigator.pop(context);
+                                      }, hint: ""),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: gapHeight),
+                            Row(
+                              children: [
+                                Expanded(
+                                    flex: 2,
+                                    child: Text('Interest Type',style: AppStyles.boldTextBlack)),
+                                Expanded(
+                                  flex: 4,
+                                  child: CustomDropdown(context: context, selectedValue: _selectedInterestType,
+                                      items:kvInterestTypeList, onChanged: (value) {
+                                        setState(() {
+                                          _selectedInterestType = value;
+                                        });
+                                        Navigator.pop(context);
+                                      }, hint: ""),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: gapHeight),
+                            Row(
+                              children: [
+                                Expanded(
+                                    flex: 2,
+                                    child: Text('Loan Amount',style: AppStyles.boldTextBlack)),
+                                Expanded(
+                                  flex: 4,
+                                  child: CustomTextField(
+                                      boxHeight: 45,
+                                      context: context, controller: amountTextController,
+                                      onChanged: (value) {
+                                        // if(amountTextController.text != ""){
+                                        //   context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,rdAmountController.text));
+                                        // }
+                                      }, hint: "Enter Loan Amount", textInputType: TextInputType.number),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: gapHeight),
+                            Row(
+                              children: [
+                                Expanded(
+                                    flex: 2,
+                                    child: Text('Tenure',style: AppStyles.boldTextBlack)),
+                                Expanded(
+                                  flex: 4,
+                                  child: CustomDropdown(context: context, selectedValue: _selectedInterestType,
+                                      items:kvInterestTypeList, onChanged: (value) {
+                                        setState(() {
+                                          _selectedInterestType = value;
+                                        });
+                                        Navigator.pop(context);
+                                      }, hint: ""),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: gapHeight),
+                            Row(
+                              children: [
+                                Expanded(
+                                    flex: 2,
+                                    child: Text('Loan Installment Mode',style: AppStyles.boldTextBlack)),
+                              const SizedBox(width: 5),
+                                Expanded(
+                                  flex: 4,
+                                  child: CustomDropdown(context: context, selectedValue: _selectedInstallMode,
+                                      items:kvInstallModeList, onChanged: (value) {
+                                        setState(() {
+                                          _selectedInstallMode = value;
+                                        });
+                                        Navigator.pop(context);
+                                      }, hint: ""),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: gapHeight),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Expanded(
+                                    flex: 2,
+                                    child: Text('Interest Rate\n(Per annum)',style: AppStyles.boldTextBlack)),
+                                const SizedBox(width: 10,),
+                                Expanded(
+                                  flex: 5,
+                                  child: Slider(
+                                    value: _currentRangeValues,
+                                    divisions: 100,
+                                    activeColor: AppStyles.btnColor,
+                                    inactiveColor: AppStyles.bgColor3,
+                                    min: minInterestRate,
+                                    max: maxInterestRate,
+                                    label: '${_currentRangeValues.toStringAsFixed(1)}%',
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _currentRangeValues = value;
+                                      });
+                                    },),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                      SizedBox(height: gapHeight),
-                      Row(
-                        children: [
-                          Expanded(
-                              flex: 2,
-                              child: Text('Loan Name',style: AppStyles.boldTextBlack)),
-                          Expanded(
-                            flex: 3,
-                            child: CustomDropdown(context: context, selectedValue: _selectedNameType,
-                                items:kvLoanNameList, onChanged: (value) {
-                                  setState(() {
-                                    _selectedNameType = value;
-                                    _selectedPayIn = KeyValueModel(id: "0", name: "Select");
-                                  });
-                                  Navigator.pop(context);
-                                  context.read<LoanBloc>().add(GetLoanPayInEvent(_selectedNameType.id,_selectedPayIn.id));
-                                }, hint: ""),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: gapHeight),
-                      Row(
-                        children: [
-                          Expanded(
-                              flex: 2,
-                              child: Text('Loan Pay-in',style: AppStyles.boldTextBlack)),
-                          Expanded(
-                            flex: 3,
-                            child: CustomDropdown(context: context, selectedValue: _selectedPayIn,
-                                items:kvPayInList, onChanged: (value) {
-                                  setState(() {
-                                    _selectedPayIn = value;
-                                  });
-                                  Navigator.pop(context);
-                                }, hint: ""),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: gapHeight),
-                      Row(
-                        children: [
-                          Expanded(
-                              flex: 2,
-                              child: Text('Interest Type',style: AppStyles.boldTextBlack)),
-                          Expanded(
-                            flex: 3,
-                            child: CustomDropdown(context: context, selectedValue: _selectedInterestType,
-                                items:kvInterestTypeList, onChanged: (value) {
-                                  setState(() {
-                                    _selectedInterestType = value;
-                                  });
-                                  Navigator.pop(context);
-                                }, hint: ""),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: gapHeight),
-                      Row(
-                        children: [
-                          Expanded(
-                              flex: 2,
-                              child: Text('Loan Amount',style: AppStyles.boldTextBlack)),
-                          Expanded(
-                            flex: 3,
-                            child: CustomTextField(
-                                boxHeight: 45,
-                                context: context, controller: amountTextController,
-                                onChanged: (value) {
-                                  // if(amountTextController.text != ""){
-                                  //   context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,rdAmountController.text));
-                                  // }
-                                }, hint: "Enter Loan Amount", textInputType: TextInputType.number),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: gapHeight),
-                      Row(
-                        children: [
-                          Expanded(
-                              flex: 2,
-                              child: Text('Tenure',style: AppStyles.boldTextBlack)),
-                          Expanded(
-                            flex: 3,
-                            child: CustomDropdown(context: context, selectedValue: _selectedInterestType,
-                                items:kvInterestTypeList, onChanged: (value) {
-                                  setState(() {
-                                    _selectedInterestType = value;
-                                  });
-                                  Navigator.pop(context);
-                                }, hint: ""),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: gapHeight),
-                      Row(
-                        children: [
-                          Expanded(
-                              flex: 2,
-                              child: Text('Loan Installment Mode',style: AppStyles.boldTextBlack)),
-                          Expanded(
-                            flex: 3,
-                            child: CustomDropdown(context: context, selectedValue: _selectedInstallMode,
-                                items:kvInstallModeList, onChanged: (value) {
-                                  setState(() {
-                                    _selectedInstallMode = value;
-                                  });
-                                  Navigator.pop(context);
-                                }, hint: ""),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: gapHeight),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Expanded(
-                              flex: 2,
-                              child: Text('Interest Rate\n(Per annum)',style: AppStyles.boldTextBlack)),
-                          const SizedBox(width: 10,),
-                          Expanded(
-                            flex: 4,
-                            child: Slider(
-                              value: _currentRangeValues,
-                              divisions: 100,
-                              activeColor: AppStyles.btnColor,
-                              inactiveColor: AppStyles.bgColor3,
-                              min: minInterestRate,
-                              max: maxInterestRate,
-                              label: '${_currentRangeValues.toStringAsFixed(1)}%',
-                              onChanged: (value) {
-                                setState(() {
-                                  _currentRangeValues = value;
-                                });
-                              },),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: gapHeight),
-                      SizedBox(height: gapHeight),
-                      SizedBox(height: gapHeight),
+                    ),
 
-                         payButton(() {
-                          // context.read<LoanBloc>().add(GetRDMaturityEvent(_selectedPayInValue.name,tenureTxtController.text, rdAmountController.text,
-                          //     _selectedPayOutValue.name,_selectedInterestTypeValue.name,
-                          //     interestRateController.text,interestDetailsModel.pCaltype.toString(),interestDetailsModel.pCompoundInterestType.toString()
-                          // ));
-                        },"Calculate",disable: false),
-
-                    ],
-                  ),
+                    payButton(() {
+                      // context.read<LoanBloc>().add(GetRDMaturityEvent(_selectedPayInValue.name,tenureTxtController.text, rdAmountController.text,
+                      //     _selectedPayOutValue.name,_selectedInterestTypeValue.name,
+                      //     interestRateController.text,interestDetailsModel.pCaltype.toString(),interestDetailsModel.pCompoundInterestType.toString()
+                      // ));
+                    },"CALCULATE",disable: false),
+                  ],
                 )
             );
   }

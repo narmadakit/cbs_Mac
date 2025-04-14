@@ -146,3 +146,4 @@ Widget getRowText({String? text, String? rupeeSymbol}){
     ],
   );
 }
+
