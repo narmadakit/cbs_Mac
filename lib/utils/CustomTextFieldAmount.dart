@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../utils/AppStyles.dart';
+import '../utils/CurrencyFormatText.dart';
 
-class CustomTextField<T> extends StatelessWidget {
+class CustomTextFieldAmount<T> extends StatelessWidget {
   final BuildContext context;
   final TextEditingController controller;
   final ValueChanged onChanged;
@@ -13,7 +15,7 @@ class CustomTextField<T> extends StatelessWidget {
   final TextInputType textInputType;
   final Function()? onTap;
 
-  const CustomTextField({
+  const CustomTextFieldAmount({
     super.key,
     required this.context,
     required this.controller,
@@ -39,6 +41,10 @@ class CustomTextField<T> extends StatelessWidget {
           onFieldSubmitted: onChanged,
           textAlignVertical: TextAlignVertical.center,
           controller: controller,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            CurrencyInputFormatter(),
+          ],
           decoration: InputDecoration(
             contentPadding: EdgeInsets.symmetric(vertical: 5,horizontal: 8),
             fillColor: AppStyles.bgColor2,
@@ -46,7 +52,7 @@ class CustomTextField<T> extends StatelessWidget {
             hintText: hint,
             hintStyle: AppStyles.smallLabelTextBlack,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(color: Colors.grey)
             ),
             focusedBorder: OutlineInputBorder(

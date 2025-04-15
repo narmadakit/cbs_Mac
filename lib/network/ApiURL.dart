@@ -34,6 +34,7 @@ class ApiURL{
   static String getLoanPayInApi(String loanId,applicantType,schemeId) => "${BASE_URL}api/loans/Transactions/Firstinformation/GetLoanpayin?Loanid=$loanId&Contacttype=Individual&Applicanttype=$applicantType&schemeid=$schemeId";
   static String getLoanMinMaxAmountApi(String loanId,applicantType,loanPayIn,schemeId,interestType) => "${BASE_URL}api/loans/Transactions/Firstinformation/GetLoanMinandmaxAmounts?Loanid=$loanId&Contacttype=Individual&Applicanttype=$applicantType&Loanpayin=$loanPayIn&schemeid=$schemeId&interesttype=$interestType";
   static String getLoanInterestRatePostApi  = "${BASE_URL}api/loans/Transactions/Firstinformation/GetInterestRates";
-
-
+  static String getLoanInterestTypeApi(String loanId,schemeId,applicantType,loanPayIn) => "${BASE_URL}api/loans/Transactions/Firstinformation/GetLoanInterestTypes?Loanid=$loanId&schemeid=$schemeId&Contacttype=Individual&Applicanttype=$applicantType&Loanpayin=$loanPayIn";
+  static String getLoaninstalmentModeApi(String loanId) => "${BASE_URL}api/loans/Transactions/Firstinformation/getLoaninstalmentmodesbyloanid?ploanid=$loanId";
+  static String getEmiLoanViewApi({required String loanamount, interesttype, loanpayin, interestrate, tenureofloan, loaninstalmentmode, loanId}) => "${BASE_URL}api/loans/Transactions/Firstinformation/GetFiEmiSchesuleview?loanamount=$loanamount&interesttype=$interesttype&loanpayin=$loanpayin&interestrate=$interestrate&tenureofloan=$tenureofloan&Loaninstalmentmode=$loaninstalmentmode&emiprincipalpayinterval=0&emitype=REGULAR&loanid=$loanId";
 }

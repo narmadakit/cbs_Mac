@@ -55,6 +55,7 @@ class CustomDropdown<T> extends StatelessWidget {
   void _showBottomSheet(BuildContext context, ValueChanged onChanged,List<KeyValueModel> items) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (context) {
         return CustomDropdownBottomSheet(
           onItemSelected: onChanged, items: items,
@@ -72,13 +73,18 @@ class CustomDropdownBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context,) {
-    return Container(
+    return  (items.isEmpty)?SizedBox(
       height: 300,
+        child: Center(child: Text("No Data",style:AppStyles.headerTextBlack))):
+      Container(
+      height: 400,
       padding: const EdgeInsets.all(16),
       child: ListView.builder(
         itemCount: items.length,
         itemBuilder: (context, index) {
-          return ListTile(
+          return
+            ListTile(
+              selectedTileColor: AppStyles.bgColor2,
             title: Text(items[index].name),
             onTap: () {
               onItemSelected(items[index]);

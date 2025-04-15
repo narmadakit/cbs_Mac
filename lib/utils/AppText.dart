@@ -18,4 +18,4 @@ const String validateOtpText = "Validate OTP";
 const String login = "Login";
 const String enterYourNumber = "Enter Your Mobile Number";
 const String profile = "Profile";
-const String calculator = "Calculator";
+const String calculator = "EMI Calculator";

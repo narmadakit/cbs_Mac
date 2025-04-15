@@ -12,6 +12,7 @@ import '../components/CustomDropdown.dart';
 import '../components/KeyValueModel.dart';
 import '../network/Repository.dart';
 import '../utils/AppStyles.dart';
+import '../utils/CustomTextFieldAmount.dart';
 import 'bloc/FD/FDBloc.dart';
 import 'bloc/FD/FDEvent.dart';
 import 'model/FDDescriptionModel.dart';
@@ -49,6 +50,8 @@ class _FDTabWidgetState extends State<FDTabWidget> {
   bool isInterestRate=false;
   bool isDescriptionVisible=false;
   FDInterestDetailsModel interestDetailsModel=FDInterestDetailsModel();
+  bool icCalculateEnable=false;
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -85,9 +88,15 @@ class _FDTabWidgetState extends State<FDTabWidget> {
           }
           else if(state is FDInterestDetailsSuccessState){
             isTenureLoader = false;
-            interestTypeKVList = FdInteresttype.keyValueList(state.responseModel.fdInteresttype!);
-            interestPayOutList = state.responseModel.fdInteresttype![0].fdInterestPayoutList!;
-            interestPayOutKVList  =  FdInterestPayoutList.keyValueList(interestPayOutList);
+            if(state.responseModel.fdInteresttype?.isNotEmpty ?? false) {
+              interestTypeKVList = FdInteresttype.keyValueList(state.responseModel.fdInteresttype!);
+              interestPayOutList = state.responseModel.fdInteresttype![0].fdInterestPayoutList!;
+              interestPayOutKVList  =  FdInterestPayoutList.keyValueList(interestPayOutList);
+            }
+            else{
+              isTenureLoader = false;
+              showSnackBar(context, 'Enter Valid Data');
+            }
             interestDetailsModel = state.responseModel;
           }
           else if(state is FDInterestRateSuccessState){
@@ -96,6 +105,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
             maxInterestRate= double.parse(state.responseModel.pMaxInterestRate.toString());
             _currentRangeValues = maxInterestRate;
             isInterestRate=true;
+            icCalculateEnable=true;
           }
           else if(state is FDSchemeDescrSuccessState){
             isTenureLoader = false;
@@ -107,6 +117,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
           }
           else{
             isTenureLoader = false;
+            showSnackBar(context, 'Enter Valid Data');
           }
         },
       ),
@@ -116,242 +127,247 @@ class _FDTabWidgetState extends State<FDTabWidget> {
   Column buildBody(BuildContext context, List<SchemaDetailsModel> responseModel) {
     double gapHeight=20.0;
     return Column(
-          children: [
-            Visibility(
-              visible: isDescriptionVisible,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: GestureDetector(
-                  onTap: () {
-                    if(fdSchemeDescList.isNotEmpty){
-                      _showBottomSheet(context);
-                    }
-                  },
-                  child: Align(
-                      alignment: Alignment.topRight,
-                      child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: AppStyles.borderRadiusCircularColor,
-                            color: AppStyles.btnColor,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text('Description',style: AppStyles.customTextStyle(color: Colors.white,fontSize: 12),),
-                          ))),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Column(
               children: [
-                Expanded(
-                    flex: 2,
-                    child: Text('FD Name',style: AppStyles.boldTextBlack)),
-                const SizedBox(width: 10,),
-                Expanded(
-                  flex: 4,
-                  child: CustomDropdown(context: context,selectedValue: _selectedFDNameValue,
-                    onChanged: (value) {
-                      _selectedFDNameValue = value;
-                      setState(() {
-                      });
-                      Navigator.pop(context);
-                      context.read<FDBloc>().add(FDGetTenureEvent(_selectedFDNameValue.name));
-                      context.read<FDBloc>().add(GetFDSchemeDescrEvent(_selectedFDNameValue.name));
-                      isDescriptionVisible =true;
-                    },
-                    hint: "",items:fdKVList,icon: Icons.arrow_downward,labelText: '', ),
-                )
-              ],
-            ),
-            SizedBox(height: gapHeight),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Expanded(
-                    flex: 2,
-                    child: Text('FD Amount',style: AppStyles.boldTextBlack)),
-                const SizedBox(width: 10,),
-                Expanded(
-                  flex: 4,
-                  child:CustomTextField(
-                      boxHeight: 45,
-                      context: context, controller: fdAmountController,
-                      onChanged: (value) {
-                        if(tenureTxtController.text != "" && fdAmountController.text != ""){
-                          context.read<FDBloc>().add(GetFDInterestDetailsEvent(_selectedFDNameValue.id,_selectedFDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,fdAmountController.text));
+                Visibility(
+                  visible: isDescriptionVisible,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        if(fdSchemeDescList.isNotEmpty){
+                          _showBottomSheet(context);
                         }
-                      }, hint: "Enter FD Amount", textInputType: TextInputType.number),
-                )
-              ],
-            ),
-            SizedBox(height: gapHeight),
-            (isTenureLoader == true)?
-            CircularProgressIndicator(color: AppStyles.btnColor):
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Expanded(
-                  flex: 2,
-                    child: Text('Tenure',style: AppStyles.boldTextBlack)),
-                const SizedBox(width: 10,),
-                Expanded(
-                  flex: 4,
-                  child: Row(
-                    children: [
-                      Expanded(
-                       flex: 2,
-                        child: CustomTextField(
-                            boxHeight: 50,
-                            context: context, controller: tenureTxtController,
-                            onChanged: (value) {
-                              if(tenureTxtController.text != "" && fdAmountController.text != ""){
-                                context.read<FDBloc>().add(GetFDInterestDetailsEvent(_selectedFDNameValue.id,_selectedFDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,fdAmountController.text));
-                              }
-                            }, hint: "Enter Tenure", textInputType: TextInputType.number),
-                      ),
-                      const SizedBox(width: 5,),
-                      Expanded(
+                      },
+                      child: Align(
+                          alignment: Alignment.topRight,
+                          child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: AppStyles.borderRadiusCircularColor,
+                                color: AppStyles.btnColor,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('Description',style: AppStyles.customTextStyle(color: Colors.white,fontSize: 12),),
+                              ))),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
                         flex: 2,
-                        child: CustomDropdown(context: context,selectedValue: _selectedTenureValue,
+                        child: Text('FD Name',style: AppStyles.boldTextBlack)),
+                    const SizedBox(width: 10,),
+                    Expanded(
+                      flex: 4,
+                      child: CustomDropdown(context: context,selectedValue: _selectedFDNameValue,
+                        onChanged: (value) {
+                          _selectedFDNameValue = value;
+                          setState(() {
+                          });
+                          Navigator.pop(context);
+                          context.read<FDBloc>().add(FDGetTenureEvent(_selectedFDNameValue.name));
+                          context.read<FDBloc>().add(GetFDSchemeDescrEvent(_selectedFDNameValue.name));
+                          isDescriptionVisible =true;
+                        },
+                        hint: "",items:fdKVList,icon: Icons.arrow_downward,labelText: '', ),
+                    )
+                  ],
+                ),
+                SizedBox(height: gapHeight),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                        flex: 2,
+                        child: Text('FD Amount',style: AppStyles.boldTextBlack)),
+                    const SizedBox(width: 10,),
+                    Expanded(
+                      flex: 4,
+                      child:CustomTextFieldAmount(
+                          boxHeight: 45,
+                          context: context, controller: fdAmountController,
                           onChanged: (value) {
-                            _selectedTenureValue = value;
                             if(tenureTxtController.text != "" && fdAmountController.text != ""){
                               context.read<FDBloc>().add(GetFDInterestDetailsEvent(_selectedFDNameValue.id,_selectedFDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,fdAmountController.text));
                             }
-                            setState(() {
-                            });
-                            Navigator.pop(context);
-                          },
-                          hint: "",items:tenureKVList,icon: Icons.arrow_downward,labelText: '', ),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
-            SizedBox(height: gapHeight),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Expanded(
-                    flex: 2,
-                    child: Text('Interest Type',style: AppStyles.boldTextBlack)),
-                const SizedBox(width: 10,),
-                Expanded(
-                  flex: 4,
-                  child: CustomDropdown(context: context,selectedValue: _selectedInterestTypeValue,
-                    onChanged: (value) {
-                      _selectedInterestTypeValue = value;
-                      setState(() {
-                      });
-                      Navigator.pop(context);
-                      // context.read<FDBloc>().add(FDGetTenureEvent(_selectedFDNameValue.name));
-                    },
-                    hint: "",items:interestTypeKVList,icon: Icons.arrow_downward,labelText: '', ),
-                )
-              ],
-            ),
-            SizedBox(height: gapHeight),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Expanded(
-                    flex: 2,
-                    child: Text('Interest Payout',style: AppStyles.boldTextBlack)),
-                const SizedBox(width: 10),
-                Expanded(
-                  flex: 4,
-                  child: CustomDropdown(context: context,selectedValue: _selectedPayOutValue,
-                    onChanged: (value) {
-                      _selectedPayOutValue = value;
-                      if(tenureTxtController.text != "" && fdAmountController.text != ""){
-                        context.read<FDBloc>().add(GetFDInterestRateEvent(_selectedFDNameValue.name, fdAmountController.text, tenureTxtController.text, _selectedTenureValue.name, _selectedPayOutValue.name));
-                      }
-                      setState(() {
-                      });
-                      Navigator.pop(context);
-                    },
-                    hint: "",items:interestPayOutKVList,icon: Icons.arrow_downward,labelText: '', ),
-                )
-              ],
-            ),
-            SizedBox(height: gapHeight),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Expanded(
-                    flex: 2,
-                    child: Text('Interest Rate\n(Per annum)',style: AppStyles.boldTextBlack)),
-                const SizedBox(width: 10,),
-               Expanded(
-                 flex: 4,
-                 child: Slider(
-                   value: _currentRangeValues,
-                   divisions: 100,
-                   activeColor: AppStyles.btnColor,
-                   inactiveColor: AppStyles.bgColor3,
-                   min: minInterestRate,
-                   max: maxInterestRate,
-                   label: '${_currentRangeValues.toStringAsFixed(1)}%',
-                   onChanged: (value) {
-                     setState(() {
-                       _currentRangeValues = value;
-                       interestRateController.text = value.toString();
-                     });
-                 },),
-               ),
-              ],
-            ),
-            SizedBox(height: gapHeight),
-            SizedBox(height: gapHeight),
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: maturityList.length,
-                itemBuilder:(context, i) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: AppStyles.gridColor,
-                      borderRadius: BorderRadius.circular(12)
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
+                          }, hint: "Enter FD Amount", textInputType: TextInputType.number),
+                    )
+                  ],
+                ),
+                SizedBox(height: gapHeight),
+                (isTenureLoader == true)?
+                CircularProgressIndicator(color: AppStyles.btnColor):
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                        child: Text('Tenure',style: AppStyles.boldTextBlack)),
+                    const SizedBox(width: 10,),
+                    Expanded(
+                      flex: 4,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Column(
-                            children: [
-                              Text('Interest Amount',style: AppStyles.boldTextBlack,),
-                              SizedBox(height: 10,),
-                              Text(maturityList[i].pInterestamount.toString(),style: AppStyles.smallLabelTextBold),
-                            ],
+                          Expanded(
+                           flex: 2,
+                            child: CustomTextField(
+                                boxHeight: 50,
+                                context: context, controller: tenureTxtController,
+                                onChanged: (value) {
+                                  if(tenureTxtController.text != "" && fdAmountController.text != ""){
+                                    context.read<FDBloc>().add(GetFDInterestDetailsEvent(_selectedFDNameValue.id,_selectedFDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,fdAmountController.text));
+                                  }
+                                }, hint: "Enter Tenure", textInputType: TextInputType.number),
                           ),
-                          Column(
-                            children: [
-                              Text('Maturity Amount',style: AppStyles.boldTextBlack),
-                              SizedBox(height: 10,),
-                              Text(maturityList[i].pMatueritytAmount.toString(),style: AppStyles.smallLabelTextBold),
-                            ],
-                          ),
+                          const SizedBox(width: 5,),
+                          Expanded(
+                            flex: 2,
+                            child: CustomDropdown(context: context,selectedValue: _selectedTenureValue,
+                              onChanged: (value) {
+                                _selectedTenureValue = value;
+                                if(tenureTxtController.text != "" && fdAmountController.text != ""){
+                                  context.read<FDBloc>().add(GetFDInterestDetailsEvent(_selectedFDNameValue.id,_selectedFDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,fdAmountController.text));
+                                }
+                                setState(() {
+                                });
+                                Navigator.pop(context);
+                              },
+                              hint: "",items:tenureKVList,icon: Icons.arrow_downward,labelText: '', ),
+                          )
                         ],
                       ),
-                    ),
-                  );
-                },
+                    )
+                  ],
+                ),
+                SizedBox(height: gapHeight),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                        flex: 2,
+                        child: Text('Interest Type',style: AppStyles.boldTextBlack)),
+                    const SizedBox(width: 10,),
+                    Expanded(
+                      flex: 4,
+                      child: CustomDropdown(context: context,selectedValue: _selectedInterestTypeValue,
+                        onChanged: (value) {
+                          _selectedInterestTypeValue = value;
+                          setState(() {
+                          });
+                          Navigator.pop(context);
+                          // context.read<FDBloc>().add(FDGetTenureEvent(_selectedFDNameValue.name));
+                        },
+                        hint: "",items:interestTypeKVList,icon: Icons.arrow_downward,labelText: '', ),
+                    )
+                  ],
+                ),
+                SizedBox(height: gapHeight),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                        flex: 2,
+                        child: Text('Interest Payout',style: AppStyles.boldTextBlack)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      flex: 4,
+                      child: CustomDropdown(context: context,selectedValue: _selectedPayOutValue,
+                        onChanged: (value) {
+                          _selectedPayOutValue = value;
+                          if(tenureTxtController.text != "" && fdAmountController.text != ""){
+                            context.read<FDBloc>().add(GetFDInterestRateEvent(_selectedFDNameValue.name, fdAmountController.text, tenureTxtController.text, _selectedTenureValue.name, _selectedPayOutValue.name));
+                          }
+                          setState(() {
+                          });
+                          Navigator.pop(context);
+                        },
+                        hint: "",items:interestPayOutKVList,icon: Icons.arrow_downward,labelText: '', ),
+                    )
+                  ],
+                ),
+                SizedBox(height: gapHeight),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                        flex: 2,
+                        child: Text('Interest Rate\n(Per annum)',style: AppStyles.boldTextBlack)),
+                    const SizedBox(width: 10,),
+                   Expanded(
+                     flex: 4,
+                     child: Slider(
+                       value: _currentRangeValues,
+                       divisions: 100,
+                       activeColor: AppStyles.btnColor,
+                       inactiveColor: AppStyles.bgColor3,
+                       min: minInterestRate,
+                       max: maxInterestRate,
+                       label: '${_currentRangeValues.toStringAsFixed(1)}%',
+                       onChanged: (value) {
+                         setState(() {
+                           _currentRangeValues = value;
+                           interestRateController.text = value.toString();
+                         });
+                     },),
+                   ),
+                  ],
+                ),
+                SizedBox(height: gapHeight),
+                SizedBox(height: gapHeight),
+                (maturityList.isNotEmpty)?
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: maturityList.length,
+                    itemBuilder:(context, i) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: AppStyles.bgColor2,
+                          borderRadius: BorderRadius.circular(12)
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Column(
+                                children: [
+                                  Text('Interest Amount',style: AppStyles.boldTextBlack,),
+                                  SizedBox(height: 10,),
+                                  Text(maturityList[i].pInterestamount.toString(),style: AppStyles.smallLabelTextBold),
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  Text('Maturity Amount',style: AppStyles.boldTextBlack),
+                                  SizedBox(height: 10,),
+                                  Text(maturityList[i].pMatueritytAmount.toString(),style: AppStyles.smallLabelTextBold),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                )
+                :Container(),
+                SizedBox(height: gapHeight),
+                SizedBox(height: gapHeight),
+              ],
             ),
-            SizedBox(height: gapHeight),
-            SizedBox(height: gapHeight),
-            SizedBox(height: gapHeight),
-            payButton(() {
-              context.read<FDBloc>().add(GetFDMaturityEvent(_selectedTenureValue.name,tenureTxtController.text,fdAmountController.text,
+        payButton(() {
+          context.read<FDBloc>().add(GetFDMaturityEvent(_selectedTenureValue.name,tenureTxtController.text,fdAmountController.text,
               _selectedPayOutValue.name,_selectedInterestTypeValue.name,
-                interestRateController.text,interestDetailsModel.pCaltype.toString(),interestDetailsModel.pCompoundInterestType.toString()
-              ));
-            },"Calculate")
-          ],
-        );
+              interestRateController.text,interestDetailsModel.pCaltype.toString(),interestDetailsModel.pCompoundInterestType.toString()
+          ));
+        },"Calculate",disable: icCalculateEnable)
+      ],
+    );
   }
 
   void _showBottomSheet(BuildContext context) {

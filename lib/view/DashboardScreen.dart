@@ -161,35 +161,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _selectedIndex = index;
 
     if(_selectedIndex == 1){
-    Navigator.push(
-    context,
-    MaterialPageRoute(
-    builder: (context) => MyLoansScreen(
-    loanData.loanslist
-    )));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const EmiCalculatorScreen(
+              )));
     }
     if(_selectedIndex == 2){
-    Navigator.push(
-    context,
-    MaterialPageRoute(
-    builder: (context) => MyDepositsScreen(
-    loanData.rdlist,loanData.fdslist
-    )));
-    }
-    if(_selectedIndex == 3){
-    Navigator.push(
-    context,
-    MaterialPageRoute(
-    builder: (context) => const EmiCalculatorScreen(
-    )));
-    }
-    if(_selectedIndex == 4){
       Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => const ProfileScreen(
               )));
     }
+    // if(_selectedIndex == 3){
+    // Navigator.push(
+    // context,
+    // MaterialPageRoute(
+    // builder: (context) => const EmiCalculatorScreen(
+    // )));
+    // }
+    // if(_selectedIndex == 4){
+    //   Navigator.push(
+    //       context,
+    //       MaterialPageRoute(
+    //           builder: (context) => const ProfileScreen(
+    //           )));
+    // }
     });
     },
     selectedLabelStyle: const TextStyle(color: Colors.grey,fontSize: 11),
@@ -198,14 +196,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     icon: Icon(Icons.home_outlined,size: 20,),
     label: home,
     ),
-    BottomNavigationBarItem(
-    icon: Icon(Icons.home_repair_service_outlined,size: 20),
-    label: loans,
-    ),
-    BottomNavigationBarItem(
-    icon: Icon(Icons.savings_outlined,size: 20),
-    label: deposits,
-    ),
+    // BottomNavigationBarItem(
+    // icon: Icon(Icons.home_repair_service_outlined,size: 20),
+    // label: loans,
+    // ),
+    // BottomNavigationBarItem(
+    // icon: Icon(Icons.savings_outlined,size: 20),
+    // label: deposits,
+    // ),
       BottomNavigationBarItem(
         icon: Icon(Icons.calculate_outlined,size: 20),
         label: calculator,
@@ -238,7 +236,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   options: CarouselOptions(
                       autoPlay: true,
                       enlargeCenterPage: true,
-                      aspectRatio: 2.3,
+                      aspectRatio: 2.2,
                       viewportFraction: 1.0,
                       enableInfiniteScroll: false,
                       onPageChanged: (index, reason) {
@@ -427,7 +425,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   builder: (context) => const TotalDuesScreen(
                                     accountType: "",
                                   )));
-                        },payNowText)
+                        },"Details")
                       )
                     ],
                   ),
@@ -502,15 +500,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget buildCaruselBanner(int index, Uint8List? bytesLogo) {
-    return ClipRRect(
+    return Container(
+      decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        // child: Image.asset("assets/images/banner.jpeg",fit: BoxFit.cover,
-        //   width: double.infinity)
-        child:
-        Image.memory(bytesLogo!,
-          width: double.infinity,
-          fit: BoxFit.cover,)
+        color: Colors.white,
+      ),
 
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            // child: Image.asset("assets/images/banner.jpeg",fit: BoxFit.cover,
+            //   width: double.infinity)
+            child:
+            Image.memory(bytesLogo!,
+              width: double.infinity,
+              fit: BoxFit.cover,)
+
+        ),
+      ),
     );
   }
 

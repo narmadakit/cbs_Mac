@@ -17,11 +17,11 @@ class RDGetTenureEvent extends RDEvent{
 }
 
 class GetRDInterestDetailsEvent extends RDEvent{
-  final String configID,rdName,tenure,tenureMode,depositAmount;
+  final String configID,rdName,tenure,tenureMode,amount;
 
-  GetRDInterestDetailsEvent(this.configID,this.rdName,this.tenure,this.tenureMode,this.depositAmount);
+  GetRDInterestDetailsEvent(this.configID,this.rdName,this.tenure,this.tenureMode,this.amount);
   @override
-  List<Object?> get props => [configID,rdName,tenure,tenureMode,depositAmount];
+  List<Object?> get props => [configID,rdName,tenure,tenureMode,amount];
 }
 
 class GetRDInterestRateEvent extends RDEvent{

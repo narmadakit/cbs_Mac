@@ -1,6 +1,6 @@
 import '../../../components/KeyValueModel.dart';
 
-class LoanInterestRatesModel {
+class LoanInstalmentModel {
   dynamic pschemeid;
   dynamic pSchemename;
   dynamic pLoanpayin;
@@ -16,12 +16,12 @@ class LoanInterestRatesModel {
   dynamic pminintrate;
   dynamic pmaxrate;
   dynamic pTenorto;
-  String? pfrrtype;
+  dynamic pfrrtype;
   dynamic pfrrrate;
-  dynamic pLoaninstalmentpaymentmode;
-  dynamic pLoaninstalmentpaymentmodecode;
+  String? pLoaninstalmentpaymentmode;
+  String? pLoaninstalmentpaymentmodecode;
 
-  LoanInterestRatesModel(
+  LoanInstalmentModel(
       {this.pschemeid,
         this.pSchemename,
         this.pLoanpayin,
@@ -42,7 +42,7 @@ class LoanInterestRatesModel {
         this.pLoaninstalmentpaymentmode,
         this.pLoaninstalmentpaymentmodecode});
 
-  LoanInterestRatesModel.fromJson(Map<String, dynamic> json) {
+  LoanInstalmentModel.fromJson(Map<String, dynamic> json) {
     pschemeid = json['pschemeid'];
     pSchemename = json['pSchemename'];
     pLoanpayin = json['pLoanpayin'];
@@ -89,9 +89,9 @@ class LoanInterestRatesModel {
     return data;
   }
 
-  static List<KeyValueModel> kVInteretTypeList(List<LoanInterestRatesModel> list){
+  static List<KeyValueModel> kVInstalmentModeList(List<LoanInstalmentModel> list){
     return list.map((e) {
-      return KeyValueModel(id: e.pschemeid.toString(), name: e.pInteresttype.toString());
+      return KeyValueModel(id: e.pschemeid.toString(), name: e.pLoaninstalmentpaymentmode.toString());
     }).toList();
   }
 }

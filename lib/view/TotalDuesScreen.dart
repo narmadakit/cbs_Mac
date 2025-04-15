@@ -6,11 +6,13 @@ import 'package:finsta_mac/components/AppWidgets.dart';
 import 'package:finsta_mac/components/CustomMainBackground.dart';
 import 'package:finsta_mac/utils/AppStyles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../Home/bloc/HomeBloc.dart';
 import '../network/Repository.dart';
 import '../utils/AppText.dart';
+import '../utils/CurrencyFormatText.dart';
 import '../utils/GlobalFunctions.dart';
 
 class TotalDuesScreen extends StatefulWidget {
@@ -32,17 +34,18 @@ class _TotalDuesScreenState extends State<TotalDuesScreen> {
     print("====== loan type ${widget.accountType}");
     return CustomMainBackground(
         title: totalDuesText,
-        bottomNavBar: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: payButton((){
-            // Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //         builder: (context) => TotalDuesScreen(
-            //
-            //         )));
-          }, payNowText),
-        ),
+        // bottomNavBar: Padding(
+        //   padding: const EdgeInsets.all(8.0),
+        //   child:
+        //   payButton((){
+        //     // Navigator.push(
+        //     //     context,
+        //     //     MaterialPageRoute(
+        //     //         builder: (context) => TotalDuesScreen(
+        //     //
+        //     //         )));
+        //   }, payNowText),
+        // ),
         body: MultiBlocProvider(
           providers: [
             BlocProvider<HomeBloc>(create: (context) => HomeBloc(Repository())..add(GetAllDuesEvent(),))
@@ -170,8 +173,13 @@ class _TotalDuesScreenState extends State<TotalDuesScreen> {
                     child: Container(
                       height: 40,
                       child: TextFormField(
+                        style:  AppStyles.boldTextBlack,
                         keyboardType: TextInputType.number,
-                        controller: _amtController[index], // Attach controller
+                        controller: _amtController[index],
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          CurrencyInputFormatter(),
+                        ],
                         decoration: InputDecoration(
                           fillColor: AppStyles.gridColor,
                           filled: true,

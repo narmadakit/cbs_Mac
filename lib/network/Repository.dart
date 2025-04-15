@@ -4,6 +4,9 @@ import 'package:finsta_mac/Calculator/model/FDInterestDetailsModel.dart';
 import 'package:finsta_mac/Calculator/model/FDDescriptionModel.dart';
 import 'package:finsta_mac/Calculator/model/FDMaturityModel.dart';
 import 'package:finsta_mac/Calculator/model/Loans/DepositLoanPayInModel.dart';
+import 'package:finsta_mac/Calculator/model/Loans/FinalLoanViewModel.dart';
+import 'package:finsta_mac/Calculator/model/Loans/LoanInstalmentModel.dart';
+import 'package:finsta_mac/Calculator/model/Loans/LoanInterestRatesModel.dart';
 import 'package:finsta_mac/Calculator/model/Loans/LoanNameModel.dart';
 import 'package:finsta_mac/Calculator/model/Loans/LoanTypeModel.dart';
 import 'package:finsta_mac/Calculator/model/RDDescriptionModel.dart';
@@ -479,6 +482,102 @@ class Repository{
 
       List body= json.decode(response.body);
       return body.map((e) => DepositLoanPayInModel.fromJson(e)).toList();
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<List<LoanInterestRatesModel>> getLoanInterestTypeRepo(String loanId,schemeId,loanPayIn) async{
+    TAG = 'getLoanInterestTypeRepo';
+    String applicantType="";
+    List<MemberDetailsResponse> data = await memberData();
+    applicantType= data[0].papplicanttype;
+    try{
+      String url = ApiURL.getLoanInterestTypeApi(loanId,schemeId,applicantType,loanPayIn);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+      log('RESPONSE $TAG >>>> ${jsonDecode(response.body)}');
+
+      List body= json.decode(response.body);
+      return body.map((e) => LoanInterestRatesModel.fromJson(e)).toList();
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<List<LoanInterestRatesModel>> getLoanInterestRateRepo(String loanId,schemeId,loanPayIn,interestType,requestAmount,dateTimeNow,tenure) async {
+    TAG = 'getLoanInterestRateRepo';
+    String applicantType="";
+    String memberType="";
+    List<SchemaDetailsModel> listData=[];
+    List<MemberDetailsResponse> data = await memberData();
+    applicantType= data[0].papplicanttype;
+    memberType = data[0].pmembertype;
+
+    String url = ApiURL.getLoanInterestRatePostApi;
+    Uri apiUrl=Uri.parse(url);
+    Map<String,dynamic> requestBody=
+    {
+      "pLoanid": loanId, //"1"
+      "pContacttype": "INDIVIDUAL",
+      "pApplicanttype": applicantType, //"Regular/General"
+      "pschemeid": schemeId,
+      "pLoanpayin": loanPayIn,
+      "pInteresttype": interestType, //"Diminishing"
+      "pAmountrequested": requestAmount,
+      "pDateofapplication": dateTimeNow, //"2025-04-11T05:17:56.551Z
+      "pTenureofloan": tenure
+    };
+    log("URL getOtpRepo --------$apiUrl ${jsonEncode(requestBody)}");
+    var response = await http.post(apiUrl,headers: loginHeader,body: jsonEncode(requestBody));
+    log('RESPONSE $TAG >>>> ${response.body}');
+    List body= json.decode(response.body);
+    return body.map((e) => LoanInterestRatesModel.fromJson(e)).toList();
+  }
+
+  Future<List<LoanInstalmentModel>> getLoanInstalmentModeRepo(String loanId) async{
+    TAG = 'getLoanInstalmentModeRepo';
+    try{
+      String url = ApiURL.getLoaninstalmentModeApi(loanId);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+      log('RESPONSE $TAG >>>> ${jsonDecode(response.body)}');
+
+      List body= json.decode(response.body);
+      return body.map((e) => LoanInstalmentModel.fromJson(e)).toList();
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
+  Future<FinalLoanViewModel> getFinalLoanViewRepo( String loanamount,interesttype,loanpayin,interestrate,tenureofloan,loaninstalmentmode,loanId) async{
+    TAG = 'getFinalLoanViewRepo';
+    try{
+      String url = ApiURL.getEmiLoanViewApi(
+        loanamount: loanamount,
+        interesttype: interesttype,
+        loanpayin: loanpayin,
+        interestrate: interestrate,
+        tenureofloan: tenureofloan,
+        loaninstalmentmode: loaninstalmentmode,
+        loanId: loanId
+
+      );
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+
+      final FinalLoanViewModel responseData = FinalLoanViewModel.fromJson(jsonDecode(response.body));
+      log('RESPONSE $TAG >>>> ${jsonEncode(responseData)}');
+      return responseData;
     }
     catch(e){
       log("$TAG error $e");

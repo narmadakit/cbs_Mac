@@ -15,6 +15,7 @@ import '../components/CustomDropdown.dart';
 import '../components/KeyValueModel.dart';
 import '../network/Repository.dart';
 import '../utils/AppStyles.dart';
+import '../utils/CustomTextFieldAmount.dart';
 import '../utils/GlobalFunctions.dart';
 import 'model/FDMaturityModel.dart';
 
@@ -47,7 +48,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
   String tenureTo ="";
   bool isTenureLoader=false;
   var tenureTxtController = TextEditingController();
-  var rdAmountController = TextEditingController();
+  var amountController = TextEditingController();
   var interestRateController = TextEditingController();
   double minInterestRate =0.0;
   double maxInterestRate=20.0;
@@ -58,6 +59,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
   RDInterestDetailsModel interestDetailsModel=RDInterestDetailsModel();
   List<DepositMaturityModel> maturityList =[];
   bool isAmountVisible=false;
+  bool icCalculateEnable=false;
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +85,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
         listener: (context, state) {
           if(state is GetTransactionSuccessState){
             rdKVList =SchemaDetailsModel.keyValueList(state.responseModel);
+            callRDClearFunction();
           }
           else if(state is RDTenureLoadingState){
             isTenureLoader = true;
@@ -100,7 +103,12 @@ class _RDTabWidgetState extends State<RDTabWidget> {
               interestTypeKVList = RdInteresttype.keyValueList(state.responseModel.rdInteresttype!);
               interestPayOutList = state.responseModel.rdInteresttype![0].rdInterestPayoutList!;
               interestPayOutKVList  =  RdInterestPayoutList.keyValueList(interestPayOutList);
-              interestDetailsModel = state.responseModel;
+            }
+            else if(double.parse(amountController.text) < double.parse(minAmount)){
+              showSnackBar(context, 'Installment amount should not be less than $minAmount amount');
+            }
+            else if(double.parse(amountController.text) > double.parse(maxAmount)){
+              showSnackBar(context, 'Installment amount should not be greater than $maxAmount amount');
             }
             else{
               showSnackBar(context, 'Enter Valid Tenure');
@@ -120,10 +128,13 @@ class _RDTabWidgetState extends State<RDTabWidget> {
           else if(state is RDSchemeDescrSuccessState){
             isTenureLoader = false;
             descriptionList = state.responseModel;
-            // minAmount = descriptionList[0].pMinInstallmentAmount.toString();
-            // maxAmount = descriptionList[0].pMaxInstallmentAmount.toString();
-            // tenureFrom = descriptionList[0].pInvestmentPeriodFrom.toString();
-            // tenureTo = descriptionList[0].pInvestmentPeriodTo.toString();
+            if(descriptionList.isNotEmpty){
+              minAmount = descriptionList[0].pMinInstallmentAmount.toString();
+              maxAmount = descriptionList[0].pMaxInstallmentAmount.toString();
+              // tenureFrom = descriptionList[0].pInvestmentPeriodFrom.toString();
+              // tenureTo = descriptionList[0].pInvestmentPeriodTo.toString();
+            }
+
           }
           else if(state is RDMaturitySuccessState){
             isTenureLoader = false;
@@ -137,332 +148,352 @@ class _RDTabWidgetState extends State<RDTabWidget> {
     );
   }
 
+  callRDClearFunction(){
+    maturityList =[];
+    _selectedTenureValue = KeyValueModel(id: "0", name: "Select");
+    amountController.text ="";
+    tenureTxtController.text="";
+    _selectedPayInValue = KeyValueModel(id: "0", name: "Select");
+    _selectedInterestTypeValue = KeyValueModel(id: "0", name: "Select");
+    _selectedPayOutValue = KeyValueModel(id: "0", name: "Select");
+    interestRateController.text = "0";
+     minInterestRate =0.0;
+     maxInterestRate=20.0;
+  }
+
   Column buildBody(BuildContext context, List<SchemaDetailsModel> responseModel) {
     double gapHeight=20.0;
     return Column(
       children: [
-        Visibility(
-          visible: isDescriptionVisible,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 0.0),
-            child: GestureDetector(
-              onTap: () {
-                if(descriptionList.isNotEmpty){
-                  _showBottomSheet(context);
-                }
-              },
-              child: Align(
-                  alignment: Alignment.topRight,
-                  child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: AppStyles.borderRadiusCircularColor,
-                        color: AppStyles.btnColor,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Description',style: AppStyles.customTextStyle(color: Colors.white,fontSize: 12),),
-                      ))),
-            ),
-          ),
-        ),
-        SizedBox(height: gapHeight),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+        Column(
           children: [
-            Expanded(
-                flex: 2,
-                child: Text('RD Name',style: AppStyles.boldTextBlack)),
-            const SizedBox(width: 10,),
-            Expanded(
-              flex: 4,
-              child: CustomDropdown(context: context,selectedValue: _selectedRDNameValue,
-                onChanged: (value) {
-                  _selectedRDNameValue = value;
-                  if(_selectedRDNameValue.name == "DAILY DEPOSITS"){
-                    isAmountVisible = false;
-                  }
-                  else{
-                    isAmountVisible=true;
-                  }
-                  setState(() {
-                  });
-                  Navigator.pop(context);
-                  context.read<RDBloc>().add(RDGetTenureEvent(_selectedRDNameValue.name));
-                  context.read<RDBloc>().add(GetRdDescriptionEvent(_selectedRDNameValue.name));
-                  rdAmountController.text="";
-                  tenureTxtController.text="";
-                  // _selectedTenureValue = KeyValueModel(id: "0", name: "Select");
-                  // _selectedPayInValue =  KeyValueModel(id: "0", name: "Select");
-                  // _selectedPayOutValue =  KeyValueModel(id: "0", name: "Select");
-                  // _sele =  KeyValueModel(id: "0", name: "Select");
-                  isDescriptionVisible =true;
-                },
-                hint: "",items:rdKVList,icon: Icons.arrow_downward,labelText: '', ),
-            )
-          ],
-        ),
-        Visibility(
-          visible:isAmountVisible,
-          child: Column(
-            children: [
-              SizedBox(height: gapHeight),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Expanded(
-                      flex: 2,
-                      child: Text('RD Installment Amount',style: AppStyles.boldTextBlack)),
-                  const SizedBox(width: 10,),
-                  Expanded(
-                    flex: 4,
-                    child:CustomTextField(
-                        boxHeight: 45,
-                        context: context, controller: rdAmountController,
-                        onChanged: (value) {
-                          if(tenureTxtController.text != "" && rdAmountController.text != ""){
-                            context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,rdAmountController.text));
-                          }
-                        }, hint: "Enter RD Installment Amount", textInputType: TextInputType.number),
-                  )
-                ],
-              ),
-              // const SizedBox(height: 5),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-              //   children: [
-              //     Expanded(
-              //         flex: 2,
-              //         child: Text('',style: AppStyles.boldTextBlack)),
-              //     const SizedBox(width: 10,),
-              //     Expanded(
-              //       flex: 4,
-              //       child:Row(
-              //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //         children: [
-              //           Text('Min: ${convertToCurrencyFormat2(double.tryParse(minAmount)??"0")}',style: AppStyles.smallLabelTextBlack),
-              //           Text('Max: ${convertToCurrencyFormat2(double.tryParse(maxAmount)??"0")}',style: AppStyles.smallLabelTextBlack)
-              //         ],
-              //       ),
-              //     )
-              //   ],
-              // ),
-            ],
-          ),
-        ),
-
-        SizedBox(height: gapHeight),
-        (isTenureLoader == true)?
-        CircularProgressIndicator(color: AppStyles.btnColor):
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Expanded(
-                flex: 2,
-                child: Text('Tenure',style: AppStyles.boldTextBlack)),
-            const SizedBox(width: 10,),
-            Expanded(
-              flex: 4,
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: CustomTextField(
-                        boxHeight: 45,
-                        context: context, controller: tenureTxtController,
-                        onChanged: (value) {
-                          if(tenureTxtController.text != "" && rdAmountController.text != ""){
-                            context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,rdAmountController.text));
-                          }
-                        }, hint: "Enter Tenure", textInputType: TextInputType.number),
-                  ),
-                  const SizedBox(width: 5,),
-                  Expanded(
-                    flex: 2,
-                    child: CustomDropdown(context: context,selectedValue: _selectedTenureValue,
-                      onChanged: (value) {
-                        _selectedTenureValue = value;
-                        if(tenureTxtController.text != "" && rdAmountController.text != ""){
-                          context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedPayInValue.name,rdAmountController.text));
-                        }
-                        setState(() {
-                        });
-                        Navigator.pop(context);
-                      },
-                      hint: "",items:tenureKVList,icon: Icons.arrow_downward,labelText: '', ),
-                  )
-                ],
-              ),
-            )
-          ],
-        ),
-        const SizedBox(height: 5),
-
-        // (tenureFrom=="")?Container():
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-        //   children: [
-        //     Expanded(
-        //         flex: 2,
-        //         child: Text('',style: AppStyles.boldTextBlack)),
-        //     const SizedBox(width: 10,),
-        //     Expanded(
-        //       flex: 2,
-        //       child:Row(
-        //         mainAxisAlignment: MainAxisAlignment.start,
-        //         children: [
-        //           Text('$tenureFrom - ',style: AppStyles.smallLabelTextBlack),
-        //           Text(tenureTo,style: AppStyles.smallLabelTextBlack)
-        //         ],
-        //       ),
-        //     ),
-        //     Expanded(flex: 2, child: Container())
-        //   ],
-        // ),
-        SizedBox(height: gapHeight),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Expanded(
-                flex: 2,
-                child: Text('Installment\nPay-In',style: AppStyles.boldTextBlack)),
-            const SizedBox(width: 10,),
-            Expanded(
-              flex: 4,
-              child: CustomDropdown(context: context,selectedValue: _selectedPayInValue,
-                onChanged: (value) {
-                  _selectedPayInValue = value;
-                  if(tenureTxtController.text != "" && rdAmountController.text != ""){
-                    context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedPayInValue.name,rdAmountController.text));
-                  }
-                  setState(() {
-                  });
-                  Navigator.pop(context);
-                },
-                hint: "",items:payInKVList,icon: Icons.arrow_downward,labelText: '', ),
-            )
-          ],
-        ),
-        SizedBox(height: gapHeight),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Expanded(
-                flex: 2,
-                child: Text('Interest Type',style: AppStyles.boldTextBlack)),
-            const SizedBox(width: 10,),
-            Expanded(
-              flex: 4,
-              child: CustomDropdown(context: context,selectedValue: _selectedInterestTypeValue,
-                onChanged: (value) {
-                  _selectedInterestTypeValue = value;
-                  setState(() {
-                  });
-                  Navigator.pop(context);
-                },
-                hint: "",items:interestTypeKVList,icon: Icons.arrow_downward,labelText: '', ),
-            )
-          ],
-        ),
-        SizedBox(height: gapHeight),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Expanded(
-                flex: 2,
-                child: Text('Interest Payout',style: AppStyles.boldTextBlack)),
-            const SizedBox(width: 10),
-            Expanded(
-              flex: 4,
-              child: CustomDropdown(context: context,selectedValue: _selectedPayOutValue,
-                onChanged: (value) {
-                  _selectedPayOutValue = value;
-                  if(tenureTxtController.text != "" && rdAmountController.text != ""){
-                    context.read<RDBloc>().add(GetRDInterestRateEvent(_selectedRDNameValue.name, rdAmountController.text, tenureTxtController.text, _selectedTenureValue.name, _selectedPayOutValue.name));
-                  }
-                  setState(() {
-                  });
-                  Navigator.pop(context);
-                },
-                hint: "",items:interestPayOutKVList,icon: Icons.arrow_downward,labelText: '', ),
-            )
-          ],
-        ),
-        SizedBox(height: gapHeight),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Expanded(
-                flex: 2,
-                child: Text('Interest Rate\n(Per annum)',style: AppStyles.boldTextBlack)),
-            const SizedBox(width: 10,),
-            Expanded(
-              flex: 5,
-              child: Slider(
-                value: _currentRangeValues,
-                divisions: 100,
-                activeColor: AppStyles.btnColor,
-                inactiveColor: AppStyles.bgColor3,
-                min: minInterestRate,
-                max: maxInterestRate,
-                label: '${_currentRangeValues.toStringAsFixed(1)}%',
-                onChanged: (value) {
-                  setState(() {
-                    _currentRangeValues = value;
-                    interestRateController.text = value.toString();
-                  });
-                },),
-            ),
-          ],
-        ),
-
-        SizedBox(height: gapHeight),
-        SizedBox(height: gapHeight),
-        ListView.builder(
-          shrinkWrap: true,
-          itemCount: maturityList.length,
-          itemBuilder:(context, i) {
-            return Container(
-              decoration: BoxDecoration(
-                  color: AppStyles.gridColor,
-                  borderRadius: BorderRadius.circular(12)
-              ),
+            Visibility(
+              visible: isDescriptionVisible,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
-                      children: [
-                        Text('Interest Amount',style: AppStyles.boldTextBlack,),
-                        SizedBox(height: 10,),
-                        Text(maturityList[i].pInterestamount.toString(),style: AppStyles.smallLabelTextBold),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Text('Maturity Amount',style: AppStyles.boldTextBlack),
-                        SizedBox(height: 10,),
-                        Text(maturityList[i].pMatueritytAmount.toString(),style: AppStyles.smallLabelTextBold),
-                      ],
-                    ),
-                  ],
+                padding: const EdgeInsets.only(top: 0.0),
+                child: GestureDetector(
+                  onTap: () {
+                    if(descriptionList.isNotEmpty){
+                      _showBottomSheet(context);
+                    }
+                  },
+                  child: Align(
+                      alignment: Alignment.topRight,
+                      child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: AppStyles.borderRadiusCircularColor,
+                            color: AppStyles.btnColor,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('Description',style: AppStyles.customTextStyle(color: Colors.white,fontSize: 12),),
+                          ))),
                 ),
               ),
-            );
-          },
-        ),
-        SizedBox(height: gapHeight),
-        SizedBox(height: gapHeight),
-        SizedBox(height: gapHeight),
+            ),
+            SizedBox(height: gapHeight),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                    flex: 2,
+                    child: Text('RD Name',style: AppStyles.boldTextBlack)),
+                const SizedBox(width: 10,),
+                Expanded(
+                  flex: 4,
+                  child: CustomDropdown(context: context,selectedValue: _selectedRDNameValue,
+                    onChanged: (value) {
+                      _selectedRDNameValue = value;
+                      if(_selectedRDNameValue.name == "DAILY DEPOSITS"){
+                        isAmountVisible = false;
+                        callRDClearFunction();
+                      }
+                      else{
+                        isAmountVisible=true;
+                        callRDClearFunction();
+                      }
+                      setState(() {
+                      });
+                      Navigator.pop(context);
+                      context.read<RDBloc>().add(RDGetTenureEvent(_selectedRDNameValue.name));
+                      context.read<RDBloc>().add(GetRdDescriptionEvent(_selectedRDNameValue.name));
+                      amountController.text="";
+                      tenureTxtController.text="";
+                      isDescriptionVisible =true;
+                    },
+                    hint: "",items:rdKVList,icon: Icons.arrow_downward,labelText: '', ),
+                )
+              ],
+            ),
+            Visibility(
+              visible:isAmountVisible,
+              child: Column(
+                children: [
+                  SizedBox(height: gapHeight),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Expanded(
+                          flex: 2,
+                          child: Text('RD Installment Amount',style: AppStyles.boldTextBlack)),
+                      const SizedBox(width: 10,),
+                      Expanded(
+                        flex: 4,
+                        child:CustomTextFieldAmount(
+                            boxHeight: 45,
+                            context: context, controller: amountController,
+                            onChanged: (value) {
 
+                              if(tenureTxtController.text != "" && amountController.text != ""){
+                                context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedTenureValue.id,amountController.text));
+                              }
+                            }, hint: "Enter RD Installment Amount", textInputType: TextInputType.number),
+                      )
+                    ],
+                  ),
+                  // const SizedBox(height: 5),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  //   children: [
+                  //     Expanded(
+                  //         flex: 2,
+                  //         child: Text('',style: AppStyles.boldTextBlack)),
+                  //     const SizedBox(width: 10,),
+                  //     Expanded(
+                  //       flex: 4,
+                  //       child:Row(
+                  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //         children: [
+                  //           Text('Min: ${convertToCurrencyFormat2(double.tryParse(minAmount)??"0")}',style: AppStyles.smallLabelTextBlack),
+                  //           Text('Max: ${convertToCurrencyFormat2(double.tryParse(maxAmount)??"0")}',style: AppStyles.smallLabelTextBlack)
+                  //         ],
+                  //       ),
+                  //     )
+                  //   ],
+                  // ),
+                ],
+              ),
+            ),
+
+            SizedBox(height: gapHeight),
+            (isTenureLoader == true)?
+            CircularProgressIndicator(color: AppStyles.btnColor):
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                    flex: 2,
+                    child: Text('Tenure',style: AppStyles.boldTextBlack)),
+                const SizedBox(width: 10,),
+                Expanded(
+                  flex: 4,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: CustomTextField(
+                            boxHeight: 45,
+                            context: context, controller: tenureTxtController,
+                            onChanged: (value){
+                              setState(() {
+                                if(tenureTxtController.text != "" && amountController.text != ""){
+                                  context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,amountController.text));
+                                }
+                              });
+                            },
+                             hint: "Enter Tenure", textInputType: TextInputType.number),
+                      ),
+                      const SizedBox(width: 5,),
+                      Expanded(
+                        flex: 2,
+                        child: CustomDropdown(context: context,selectedValue: _selectedTenureValue,
+                          onChanged: (value) {
+                            _selectedTenureValue = value;
+                            if(tenureTxtController.text != "" && amountController.text != ""){
+                              context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedTenureValue.id,amountController.text));
+                            }
+                            setState(() {
+                            });
+                            Navigator.pop(context);
+                          },
+                          hint: "",items:tenureKVList,icon: Icons.arrow_downward,labelText: '', ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(height: 5),
+
+            // (tenureFrom=="")?Container():
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+            //   children: [
+            //     Expanded(
+            //         flex: 2,
+            //         child: Text('',style: AppStyles.boldTextBlack)),
+            //     const SizedBox(width: 10,),
+            //     Expanded(
+            //       flex: 2,
+            //       child:Row(
+            //         mainAxisAlignment: MainAxisAlignment.start,
+            //         children: [
+            //           Text('$tenureFrom - ',style: AppStyles.smallLabelTextBlack),
+            //           Text(tenureTo,style: AppStyles.smallLabelTextBlack)
+            //         ],
+            //       ),
+            //     ),
+            //     Expanded(flex: 2, child: Container())
+            //   ],
+            // ),
+            SizedBox(height: gapHeight),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                    flex: 2,
+                    child: Text('Installment\nPay-In',style: AppStyles.boldTextBlack)),
+                const SizedBox(width: 10,),
+                Expanded(
+                  flex: 4,
+                  child: CustomDropdown(context: context,selectedValue: _selectedPayInValue,
+                    onChanged: (value) {
+                      _selectedPayInValue = value;
+                      if(tenureTxtController.text != "" && amountController.text != ""){
+                        context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedPayInValue.name,amountController.text));
+                      }
+                      setState(() {
+                      });
+                      Navigator.pop(context);
+                    },
+                    hint: "",items:payInKVList,icon: Icons.arrow_downward,labelText: '', ),
+                )
+              ],
+            ),
+            SizedBox(height: gapHeight),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                    flex: 2,
+                    child: Text('Interest Type',style: AppStyles.boldTextBlack)),
+                const SizedBox(width: 10,),
+                Expanded(
+                  flex: 4,
+                  child: CustomDropdown(context: context,selectedValue: _selectedInterestTypeValue,
+                    onChanged: (value) {
+                      _selectedInterestTypeValue = value;
+                      setState(() {
+                      });
+                      Navigator.pop(context);
+                    },
+                    hint: "",items:interestTypeKVList,icon: Icons.arrow_downward,labelText: '', ),
+                )
+              ],
+            ),
+            SizedBox(height: gapHeight),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                    flex: 2,
+                    child: Text('Interest Payout',style: AppStyles.boldTextBlack)),
+                const SizedBox(width: 10),
+                Expanded(
+                  flex: 4,
+                  child: CustomDropdown(context: context,selectedValue: _selectedPayOutValue,
+                    onChanged: (value) {
+                      _selectedPayOutValue = value;
+                      if(tenureTxtController.text != "" && amountController.text != ""){
+                        context.read<RDBloc>().add(GetRDInterestRateEvent(_selectedRDNameValue.name, amountController.text, tenureTxtController.text, _selectedTenureValue.id, _selectedPayOutValue.name));
+                      }
+                      setState(() {
+                      });
+                      Navigator.pop(context);
+                    },
+                    hint: "",items:interestPayOutKVList,icon: Icons.arrow_downward,labelText: '', ),
+                )
+              ],
+            ),
+            SizedBox(height: gapHeight),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                    flex: 2,
+                    child: Text('Interest Rate\n(Per annum)',style: AppStyles.boldTextBlack)),
+                const SizedBox(width: 10,),
+                Expanded(
+                  flex: 5,
+                  child: Slider(
+                    value: _currentRangeValues,
+                    divisions: 100,
+                    activeColor: AppStyles.btnColor,
+                    inactiveColor: AppStyles.bgColor3,
+                    min: minInterestRate,
+                    max: maxInterestRate,
+                    label: '${_currentRangeValues.toStringAsFixed(1)}%',
+                    onChanged: (value) {
+                      setState(() {
+                        _currentRangeValues = value;
+                        interestRateController.text = value.toString();
+                        icCalculateEnable = true;
+                      });
+                    },),
+                ),
+              ],
+            ),
+
+            SizedBox(height: gapHeight),
+            (maturityList.isNotEmpty)?
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: maturityList.length,
+              itemBuilder:(context, i) {
+                return Container(
+                  decoration: BoxDecoration(
+                      color: AppStyles.bgColor2,
+                      borderRadius: BorderRadius.circular(12)
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Interest Amount',style: AppStyles.boldTextBlack,),
+                            const SizedBox(height: 8,),
+                            Text(maturityList[i].pInterestamount.toString(),style: AppStyles.smallLabelTextBold),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Maturity Amount',style: AppStyles.boldTextBlack),
+                            SizedBox(height: 8,),
+                            Text(maturityList[i].pMatueritytAmount.toString(),style: AppStyles.smallLabelTextBold),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ):Container(),
+            SizedBox(height: gapHeight),
+          ],
+        ),
+        
         Visibility(
           visible: isAmountVisible,
           child: payButton(() {
-            context.read<RDBloc>().add(GetRDMaturityEvent(_selectedPayInValue.name,tenureTxtController.text, rdAmountController.text,
+            context.read<RDBloc>().add(GetRDMaturityEvent(_selectedPayInValue.name,tenureTxtController.text, amountController.text,
                 _selectedPayOutValue.name,_selectedInterestTypeValue.name,
                 interestRateController.text,interestDetailsModel.pCaltype.toString(),interestDetailsModel.pCompoundInterestType.toString()
             ));
-          },"Calculate"),
+          },"Calculate",disable: icCalculateEnable),
         )
       ],
     );

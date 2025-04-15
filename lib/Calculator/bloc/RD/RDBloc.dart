@@ -47,7 +47,7 @@ class RDBloc extends Bloc<RDEvent,RDStates>{
   getRDInterestDetailsBloc(GetRDInterestDetailsEvent event, Emitter<RDStates> emit) async {
     emit(RDTenureLoadingState());
     try{
-      RDInterestDetailsModel responseData = await repo.getRDInterestDetailsRepo(event.configID,event.rdName,event.tenure,event.tenureMode,event.depositAmount);
+      RDInterestDetailsModel responseData = await repo.getRDInterestDetailsRepo(event.configID,event.rdName,event.tenure,event.tenureMode,event.amount);
       emit(RDInterestDetailsSuccessState(responseData));
     }
     catch(e){
