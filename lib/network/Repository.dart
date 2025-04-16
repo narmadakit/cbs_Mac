@@ -533,7 +533,7 @@ class Repository{
       "pDateofapplication": dateTimeNow, //"2025-04-11T05:17:56.551Z
       "pTenureofloan": tenure
     };
-    log("URL getOtpRepo --------$apiUrl ${jsonEncode(requestBody)}");
+    log("URL $TAG --------$apiUrl ${jsonEncode(requestBody)}");
     var response = await http.post(apiUrl,headers: loginHeader,body: jsonEncode(requestBody));
     log('RESPONSE $TAG >>>> ${response.body}');
     List body= json.decode(response.body);

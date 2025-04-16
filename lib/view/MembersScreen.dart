@@ -137,7 +137,7 @@ class _MembersScreenState extends State<MembersScreen> {
       onTap: () {
         SharedPrefs.saveString(SharedPrefs.memberId,listData.pmemberid.toString());
         SharedPrefs.saveString(SharedPrefs.memberName,listData.pContactName.toString());
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const DashboardScreen()),
         );

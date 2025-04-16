@@ -115,5 +115,8 @@ getNumericOnly(String text){
  print(numberOnly); // Output: 12
 }
 
+double parseLocalizedNumber(String input) {
+ return double.parse(input.replaceAll(',', ''));
+}
 
 

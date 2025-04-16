@@ -46,15 +46,14 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
   List<KeyValueModel> kvPayInList=[];
 
   bool isLoading = false;
-  var amountTextController=TextEditingController();
-  var tenureTextController=TextEditingController();
+  var amountController=TextEditingController();
+  var tenureTxtController=TextEditingController();
   double minInterestRate =0.0;
-  double maxInterestRate=20.0;
+  double maxInterestRate=50.0;
   // Define the current values for the range
-  double _currentRangeValues = 15;
+  double _currentRangeValues = 0;
   String schemeId="";
   List<LoanInterestRatesModel> interestRateList =[];
-  bool icCalculateEnable=false;
   List<LstInstalmentsgenerationDTO> loanViewModelList=[];
 
   @override
@@ -93,12 +92,11 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
             }
             else if(state is GetLoanInterestRateSuccessState){
               interestRateList = state.responseModel;
-              if(interestRateList.isNotEmpty || interestRateList != []){
-                minInterestRate= double.parse(interestRateList[0].pMinInterest.toString());
-                maxInterestRate= double.parse(interestRateList[0].pRateofinterest.toString());
-                _currentRangeValues = maxInterestRate;
-              }
-              icCalculateEnable = true;
+              // if(interestRateList.isNotEmpty){
+              //   minInterestRate= double.parse(interestRateList[0].pMinInterest.toString());
+              //   maxInterestRate= double.parse(interestRateList[0].pRateofinterest.toString());
+              //   _currentRangeValues = minInterestRate;
+              // }
 
             }
             else if(state is GetInstalmentModeSuccessState){
@@ -112,6 +110,51 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
             }
           },)
     );
+  }
+ bool validate(){
+    if(_selectedLoanType.name == "Select"){
+      showSnackBar(context, 'Enter Loan Type');
+      return false;
+    }
+    else if(_selectedNameType.name == "Select"){
+      showSnackBar(context, 'Enter Loan Name');
+      return false;
+    }
+    else if(_selectedPayIn.name == "Select"){
+      showSnackBar(context, 'Enter Loan Pay-In');
+      return false;
+    }
+    else if(tenureTxtController.text == ""){
+      showSnackBar(context, 'Enter Tenure');
+      return false;
+    }
+    else if(_selectedInterestType.name == "Select"){
+      showSnackBar(context, 'Enter Interest Type');
+      return false;
+    }
+    else if(_selectedInstalmentMode.name == "Select"){
+      showSnackBar(context, 'Enter Loan Installment Mode');
+      return false;
+    }
+    else if(_currentRangeValues <= 0.0){
+      showSnackBar(context, 'Choose Interest Rate');
+      return false;
+    }
+    else{
+      return true;
+    }
+}
+
+  clearDataFunction(){
+    _selectedNameType = KeyValueModel(id: "0", name: "Select");
+    _selectedPayIn = KeyValueModel(id: "0", name: "Select");
+    amountController.text ="";
+    tenureTxtController.text="";
+    _selectedInterestType = KeyValueModel(id: "0", name: "Select");
+    _selectedInstalmentMode = KeyValueModel(id: "0", name: "Select");
+    minInterestRate =0.0;
+    maxInterestRate=0.0;
+    _currentRangeValues=0;
   }
 
   void _showCalculateView(BuildContext context) {
@@ -279,8 +322,8 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                                       items:kvLoanTypeList, onChanged: (value) {
                                         setState(() {
                                           _selectedLoanType = value;
-                                          _selectedNameType = KeyValueModel(id: "0", name: "Select");
                                         });
+                                        clearDataFunction();
                                         Navigator.pop(context);
                                         context.read<LoanCalculatorBloc>().add(GetLoanNameEvent(_selectedLoanType.id));
                                         context.read<LoanCalculatorBloc>().add(GetLoanInstalmentModeEvent(_selectedLoanType.id));
@@ -340,7 +383,7 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                                   flex: 4,
                                   child: CustomTextFieldAmount(
                                       boxHeight: 45,
-                                      context: context, controller: amountTextController,
+                                      context: context, controller: amountController,
                                       onChanged: (value) {
                                         // if(amountTextController.text != ""){
                                         //   context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,rdAmountController.text));
@@ -359,7 +402,7 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                                   flex: 4,
                                   child: CustomTextField(
                                       boxHeight: 45,
-                                      context: context, controller: tenureTextController,
+                                      context: context, controller: tenureTxtController,
                                       onChanged: (value) {
                                       }, hint: "Enter Tenure", textInputType: TextInputType.number),
                                 )
@@ -380,7 +423,7 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                                           _selectedInterestType = value;
                                         });
                                         Navigator.pop(context);
-                                        context.read<LoanCalculatorBloc>().add(GetLoanInterestRateEvent(_selectedNameType.id, schemeId,_selectedPayIn.name,_selectedInterestType.name,amountTextController.text,dateTime.toString(), tenureTextController.text));
+                                        context.read<LoanCalculatorBloc>().add(GetLoanInterestRateEvent(_selectedNameType.id, schemeId,_selectedPayIn.name,_selectedInterestType.name,amountController.text,dateTime.toString(), tenureTxtController.text));
                                       }, hint: ""),
                                 )
                               ],
@@ -398,7 +441,6 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                                       items:kvInstalmentModeList, onChanged: (value) {
                                         setState(() {
                                           _selectedInstalmentMode = value;
-                                          icCalculateEnable =true;
                                         });
                                         Navigator.pop(context);
                                       }, hint: ""),
@@ -415,19 +457,24 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                                 const SizedBox(width: 10,),
                                 Expanded(
                                   flex: 5,
-                                  child: Slider(
-                                    value: _currentRangeValues,
-                                    divisions: 100,
-                                    activeColor: AppStyles.btnColor,
-                                    inactiveColor: AppStyles.bgColor3,
-                                    min: minInterestRate,
-                                    max: maxInterestRate,
-                                    label: '${_currentRangeValues.toStringAsFixed(1)}%',
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _currentRangeValues = value;
-                                      });
-                                    },),
+                                  child: Column(
+                                    children: [
+                                      Slider(
+                                        value: _currentRangeValues,
+                                        divisions: 100,
+                                        activeColor: AppStyles.btnColor,
+                                        inactiveColor: AppStyles.bgColor3,
+                                        min: minInterestRate,
+                                        max: maxInterestRate,
+                                        label: '${_currentRangeValues.toStringAsFixed(2)}%',
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _currentRangeValues = value;
+                                          });
+                                        },),
+                                      Text("(${_currentRangeValues.toStringAsFixed(2)} %)" ,style: AppStyles.smallLabelTextBold),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -437,16 +484,18 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                     ),
 
                     payButton(() {
-                      context.read<LoanCalculatorBloc>().add(GetLoanFinalLoanViewEvent(
-                          loanamount: amountTextController.text,
-                        interesttype: _selectedInterestType.name,
-                        loanpayin: _selectedPayIn.name,
-                        interestrate: _currentRangeValues.toString(),
-                        tenureofloan: tenureTextController.text,
-                        loaninstalmentmode: _selectedInstalmentMode.name,
-                        loanId: _selectedNameType.id
-                      ));
-                    },"Calculate",disable: icCalculateEnable),
+                      if(validate()){
+                        context.read<LoanCalculatorBloc>().add(GetLoanFinalLoanViewEvent(
+                            loanamount: amountController.text,
+                            interesttype: _selectedInterestType.name,
+                            loanpayin: _selectedPayIn.name,
+                            interestrate: _currentRangeValues.toString(),
+                            tenureofloan: tenureTxtController.text,
+                            loaninstalmentmode: _selectedInstalmentMode.name,
+                            loanId: _selectedNameType.id
+                        ));
+                      }
+                    },"Calculate"),
                   ],
                 )
             );

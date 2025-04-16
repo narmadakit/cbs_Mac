@@ -74,22 +74,26 @@ class CustomDropdownBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context,) {
     return  (items.isEmpty)?SizedBox(
-      height: 300,
+      height: MediaQuery.of(context).size.height * 0.4,
         child: Center(child: Text("No Data",style:AppStyles.headerTextBlack))):
       Container(
-      height: 400,
+      height: MediaQuery.of(context).size.height * 0.6,
       padding: const EdgeInsets.all(16),
       child: ListView.builder(
         itemCount: items.length,
         itemBuilder: (context, index) {
           return
-            ListTile(
-              selectedTileColor: AppStyles.bgColor2,
-            title: Text(items[index].name),
-            onTap: () {
-              onItemSelected(items[index]);
-            },
-          );
+            Column(
+              children: [
+                ListTile(
+                title: Text(items[index].name),
+                onTap: () {
+                  onItemSelected(items[index]);
+                },
+                ),
+                Divider(color: Colors.grey.shade300)
+              ],
+            );
         },
       ),
     );

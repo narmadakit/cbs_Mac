@@ -44,13 +44,12 @@ class _FDTabWidgetState extends State<FDTabWidget> {
   var fdAmountController = TextEditingController();
   var interestRateController = TextEditingController();
   double minInterestRate =0.0;
-  double maxInterestRate=20.0;
+  double maxInterestRate=0.0;
   // Define the current values for the range
-  double _currentRangeValues = 15;
+  double _currentRangeValues = 0;
   bool isInterestRate=false;
   bool isDescriptionVisible=false;
   FDInterestDetailsModel interestDetailsModel=FDInterestDetailsModel();
-  bool icCalculateEnable=false;
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +94,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
             }
             else{
               isTenureLoader = false;
-              showSnackBar(context, 'Enter Valid Data');
+              showSnackBar(context, 'Enter Valid Tenure');
             }
             interestDetailsModel = state.responseModel;
           }
@@ -103,9 +102,8 @@ class _FDTabWidgetState extends State<FDTabWidget> {
             isTenureLoader = false;
             minInterestRate= double.parse(state.responseModel.pMinInterestRate.toString());
             maxInterestRate= double.parse(state.responseModel.pMaxInterestRate.toString());
-            _currentRangeValues = maxInterestRate;
+            _currentRangeValues = minInterestRate;
             isInterestRate=true;
-            icCalculateEnable=true;
           }
           else if(state is FDSchemeDescrSuccessState){
             isTenureLoader = false;
@@ -117,7 +115,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
           }
           else{
             isTenureLoader = false;
-            showSnackBar(context, 'Enter Valid Data');
+            // showSnackBar(context, 'Enter Valid Data');
           }
         },
       ),
@@ -297,24 +295,29 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                   children: [
                     Expanded(
                         flex: 2,
-                        child: Text('Interest Rate\n(Per annum)',style: AppStyles.boldTextBlack)),
+                        child: Text('Interest Rate\n(Per Annum)',style: AppStyles.boldTextBlack)),
                     const SizedBox(width: 10,),
                    Expanded(
-                     flex: 4,
-                     child: Slider(
-                       value: _currentRangeValues,
-                       divisions: 100,
-                       activeColor: AppStyles.btnColor,
-                       inactiveColor: AppStyles.bgColor3,
-                       min: minInterestRate,
-                       max: maxInterestRate,
-                       label: '${_currentRangeValues.toStringAsFixed(1)}%',
-                       onChanged: (value) {
-                         setState(() {
-                           _currentRangeValues = value;
-                           interestRateController.text = value.toString();
-                         });
-                     },),
+                     flex: 5,
+                     child: Column(
+                       children: [
+                         Slider(
+                           value: double.parse(_currentRangeValues.toStringAsFixed(2)),
+                           divisions: 100,
+                           activeColor: AppStyles.btnColor,
+                           inactiveColor: AppStyles.bgColor3,
+                           min: double.parse(minInterestRate.toStringAsFixed(2)),
+                           max: double.parse(maxInterestRate.toStringAsFixed(2)),
+                           label: '${_currentRangeValues.toStringAsFixed(1)}%',
+                           onChanged: (value) {
+                             setState(() {
+                               _currentRangeValues = value;
+                               interestRateController.text = value.toString();
+                             });
+                         },),
+                         Text("(${_currentRangeValues.toStringAsFixed(2)} %)" ,style: AppStyles.smallLabelTextBold),
+                       ],
+                     ),
                    ),
                   ],
                 ),
@@ -331,11 +334,12 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                           borderRadius: BorderRadius.circular(12)
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.symmetric(vertical: 10.0,horizontal: 20),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text('Interest Amount',style: AppStyles.boldTextBlack,),
                                   SizedBox(height: 10,),
@@ -343,6 +347,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                                 ],
                               ),
                               Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text('Maturity Amount',style: AppStyles.boldTextBlack),
                                   SizedBox(height: 10,),
@@ -361,11 +366,13 @@ class _FDTabWidgetState extends State<FDTabWidget> {
               ],
             ),
         payButton(() {
-          context.read<FDBloc>().add(GetFDMaturityEvent(_selectedTenureValue.name,tenureTxtController.text,fdAmountController.text,
-              _selectedPayOutValue.name,_selectedInterestTypeValue.name,
-              interestRateController.text,interestDetailsModel.pCaltype.toString(),interestDetailsModel.pCompoundInterestType.toString()
-          ));
-        },"Calculate",disable: icCalculateEnable)
+    if(validate()){
+      context.read<FDBloc>().add(GetFDMaturityEvent(_selectedTenureValue.name,tenureTxtController.text,fdAmountController.text,
+          _selectedPayOutValue.name,_selectedInterestTypeValue.name,
+          interestRateController.text,interestDetailsModel.pCaltype.toString(),interestDetailsModel.pCompoundInterestType.toString()
+      ));
+    }
+        },"Calculate")
       ],
     );
   }
@@ -373,120 +380,160 @@ class _FDTabWidgetState extends State<FDTabWidget> {
   void _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (context) {
-        return Container(
-          // height: 350,
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              const SizedBox(height: 10,),
-              Text(_selectedFDNameValue.name,style: AppStyles.highLightText,),
-              const SizedBox(height: 10,),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0,horizontal: 10),
-                  child: DataTable(
-                    border: TableBorder.all(
-                      width: 0.5,
-                      color:Colors.grey,
-                    ),
-                      dataTextStyle: AppStyles.smallLabelTextBold,
-                      headingTextStyle: AppStyles.customTextStyle(color: Colors.white,fontSize: 11),
-                      headingRowHeight: 55,
-                      horizontalMargin: 5,
-                      showBottomBorder: true,
-                      dataRowMaxHeight: 55,
-                      columnSpacing: 12,
-                      headingRowColor: MaterialStateProperty.resolveWith<Color>((states) {
-                        return AppStyles.btnColor; // Color when the slider is active
-                      }),
-                      columns: const[
-                        DataColumn(
-                          label: SizedBox(
-                            width: 40,
-                            child: Center(
-                              child: Text(
-                                "SL No",
+        return SizedBox(
+          height: MediaQuery.of(context).size.height * 0.7,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 10,),
+                  Text(_selectedFDNameValue.name,style: AppStyles.highLightText,),
+                  const SizedBox(height: 10,),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0,horizontal: 10),
+                      child: DataTable(
+                        border: TableBorder.all(
+                          width: 0.5,
+                          color:Colors.grey,
+                        ),
+                          dataTextStyle: AppStyles.smallLabelTextBold,
+                          headingTextStyle: AppStyles.customTextStyle(color: Colors.white,fontSize: 11),
+                          headingRowHeight: 55,
+                          horizontalMargin: 5,
+                          showBottomBorder: true,
+                          dataRowMaxHeight: 55,
+                          columnSpacing: 12,
+                          headingRowColor: MaterialStateProperty.resolveWith<Color>((states) {
+                            return AppStyles.btnColor; // Color when the slider is active
+                          }),
+                          columns: const[
+                            DataColumn(
+                              label: SizedBox(
+                                width: 40,
+                                child: Center(
+                                  child: Text(
+                                    "SL No",
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: SizedBox(
-                            child: Center(
-                              child: Text(
-                                "Deposit Amount",
+                            DataColumn(
+                              label: SizedBox(
+                                child: Center(
+                                  child: Text(
+                                    "Deposit Amount",
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: SizedBox(
-                            child: Center(
-                              child: Text(
-                                "Investment Period",
+                            DataColumn(
+                              label: SizedBox(
+                                child: Center(
+                                  child: Text(
+                                    "Investment Period",
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: SizedBox(
-                            child: Center(
-                              child: Text(
-                                "Interest Rate/Value Per 100",
+                            DataColumn(
+                              label: SizedBox(
+                                child: Center(
+                                  child: Text(
+                                    "Interest Rate/Value Per 100",
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: SizedBox(
-                            child: Center(
-                              child: Text(
-                                "Interest Type",
+                            DataColumn(
+                              label: SizedBox(
+                                child: Center(
+                                  child: Text(
+                                    "Interest Type",
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: SizedBox(
-                            child: Center(
-                              child: Text(
-                                "Compound Type",
+                            DataColumn(
+                              label: SizedBox(
+                                child: Center(
+                                  child: Text(
+                                    "Compound Type",
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: SizedBox(
-                            child: Center(
-                              child: Text(
-                                "Interest PayOut",
+                            DataColumn(
+                              label: SizedBox(
+                                child: Center(
+                                  child: Text(
+                                    "Interest PayOut",
 
+                                  ),
+                                ),
                               ),
+                            ),
+                      DataColumn(
+                        label: SizedBox(
+                          child: Center(
+                            child: Text(
+                                "Applicant Type"
                             ),
                           ),
                         ),
-                  DataColumn(
-                    label: SizedBox(
-                      child: Center(
-                        child: Text(
-                            "Applicant Type"
-                        ),
+                                  ),
+                          ],
+                          rows: addressRows(fdSchemeDescList)
                       ),
                     ),
-                              ),
-                      ],
-                      rows: addressRows(fdSchemeDescList)
                   ),
-                ),
+                ],
               ),
-            ],
-          )
+            ),
+          ),
         );
       },
     );
   }
+
+  bool validate(){
+    if(_selectedFDNameValue.name == "Select"){
+      showSnackBar(context, 'Enter FD Name');
+      return false;
+    }
+    else if(fdAmountController.text == ""){
+      showSnackBar(context, 'Enter FD Amount');
+      return false;
+    }
+    else if(tenureTxtController.text == ""){
+      showSnackBar(context, 'Enter Tenure');
+      return false;
+    }
+    else if(_selectedTenureValue.name == "Select"){
+      showSnackBar(context, 'Enter Tenure Mode');
+      return false;
+    }
+    else if(_selectedInterestTypeValue.name == "Select"){
+      showSnackBar(context, 'Enter Interest Type ');
+      return false;
+    }
+    else if(_selectedPayOutValue.name == "Select"){
+      showSnackBar(context, 'Enter Interest Payout ');
+      return false;
+    }
+    else if(_currentRangeValues <= 0.0){
+      showSnackBar(context, 'Choose Interest Rate');
+      return false;
+    }
+    else{
+      return true;
+    }
+  }
+
 }
 
 addressRows(List<FDDescriptionModel> descList){
