@@ -36,6 +36,16 @@ class GetLoanInterestTypeEvent extends LoanEvent{
   List<Object?> get props => [loanId,schemeId,loanPayIn];
 }
 
+class GetMinMaxLoanEvent extends LoanEvent{
+  final String loanId;
+  final String schemeId;
+  final String loanPayIn;
+  final String interestType;
+  GetMinMaxLoanEvent(this.loanId,this.schemeId,this.loanPayIn,this.interestType);
+  @override
+  List<Object?> get props => [loanId,schemeId,loanPayIn,interestType];
+}
+
 class GetLoanInterestRateEvent extends LoanEvent{
   final String loanId;
   final String schemeId;
@@ -43,12 +53,11 @@ class GetLoanInterestRateEvent extends LoanEvent{
   final String interestType;
   final String requestAmount;
   final String dateTimeNow;
-  final String tenure;
 
   GetLoanInterestRateEvent(this.loanId,this.schemeId,this.loanPayIn,this.interestType,
-  this.requestAmount,this.dateTimeNow,this.tenure);
+  this.requestAmount,this.dateTimeNow);
   @override
-  List<Object?> get props => [loanId,schemeId,loanPayIn,interestType,requestAmount,dateTimeNow,tenure];
+  List<Object?> get props => [loanId,schemeId,loanPayIn,interestType,requestAmount,dateTimeNow];
 }
 
 class GetLoanInstalmentModeEvent extends LoanEvent{

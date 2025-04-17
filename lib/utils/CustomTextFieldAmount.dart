@@ -36,9 +36,10 @@ class CustomTextFieldAmount<T> extends StatelessWidget {
         height: boxHeight,
         child: TextFormField(
           keyboardType: textInputType,
+          textInputAction: TextInputAction.next,
           style:  AppStyles.boldTextBlack,
           onTap: onTap,
-          onFieldSubmitted: onChanged,
+          onChanged: onChanged,
           textAlignVertical: TextAlignVertical.center,
           controller: controller,
           inputFormatters: [

@@ -20,6 +20,7 @@ import '../components/CustomTextField.dart';
 import '../components/KeyValueModel.dart';
 import '../network/Repository.dart';
 import '../utils/CustomTextFieldAmount.dart';
+import '../utils/GlobalFunctions.dart';
 
 class LoansCalculatorTab extends StatefulWidget {
   const LoansCalculatorTab({
@@ -35,7 +36,7 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
   bool isFDVisible=false;
   bool isRDVisible=false;
   var _selectedLoanType = KeyValueModel(id: "0", name: "Select");
-  var _selectedNameType = KeyValueModel(id: "0", name: "Select");
+  var _selectedLoanName = KeyValueModel(id: "0", name: "Select");
   var _selectedInterestType = KeyValueModel(id: "0", name: "Select");
   var _selectedPayIn = KeyValueModel(id: "0", name: "Select");
   var _selectedInstalmentMode = KeyValueModel(id: "0", name: "Select");
@@ -50,11 +51,16 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
   var tenureTxtController=TextEditingController();
   double minInterestRate =0.0;
   double maxInterestRate=50.0;
+  double minAmount =0.0;
+  double maxAmount=0.0;
   // Define the current values for the range
   double _currentRangeValues = 0;
+  var enterAmount;
   String schemeId="";
   List<LoanInterestRatesModel> interestRateList =[];
   List<LstInstalmentsgenerationDTO> loanViewModelList=[];
+  double tenureFrom=0;
+  double tenureTo=0;
 
   @override
   Widget build(BuildContext context) {
@@ -90,13 +96,21 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
             else if(state is GetLoanInterestTypeSuccessState){
               kvInterestTypeList = LoanInterestRatesModel.kVInteretTypeList(state.responseModel);
             }
+            else if(state is GetMinMaxLoanAmountSuccessState){
+              minAmount = state.responseModel[0].pMinloanamount;
+              maxAmount = state.responseModel[0].pMaxloanamount;
+            }
             else if(state is GetLoanInterestRateSuccessState){
               interestRateList = state.responseModel;
-              // if(interestRateList.isNotEmpty){
-              //   minInterestRate= double.parse(interestRateList[0].pMinInterest.toString());
-              //   maxInterestRate= double.parse(interestRateList[0].pRateofinterest.toString());
-              //   _currentRangeValues = minInterestRate;
-              // }
+              if(interestRateList.isNotEmpty){
+                minInterestRate= double.parse(interestRateList[0].pMinInterest.toString());
+                maxInterestRate= double.parse(interestRateList[0].pRateofinterest.toString());
+                _currentRangeValues = minInterestRate;
+
+                tenureFrom = interestRateList[0].pTenorfrom;
+                tenureTo = interestRateList[0].pTenorto;
+
+              }
 
             }
             else if(state is GetInstalmentModeSuccessState){
@@ -116,7 +130,7 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
       showSnackBar(context, 'Enter Loan Type');
       return false;
     }
-    else if(_selectedNameType.name == "Select"){
+    else if(_selectedLoanName.name == "Select"){
       showSnackBar(context, 'Enter Loan Name');
       return false;
     }
@@ -132,7 +146,19 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
       showSnackBar(context, 'Enter Interest Type');
       return false;
     }
-    else if(_selectedInstalmentMode.name == "Select"){
+    else if(amountController.text == ""){
+      showSnackBar(context, 'Enter Loan Amount');
+      return false;
+    }
+    else if((double.parse(enterAmount) < minAmount) || (double.parse(enterAmount) > maxAmount)) {
+      showSnackBar(context, 'Enter Valid Amount');
+      return false;
+    }
+    else if((double.parse(tenureTxtController.text) < tenureFrom) || (double.parse(tenureTxtController.text) > tenureTo)) {
+      showSnackBar(context, 'Enter Valid Tenure');
+      return false;
+    }
+   else if(_selectedInstalmentMode.name == "Select"){
       showSnackBar(context, 'Enter Loan Installment Mode');
       return false;
     }
@@ -146,18 +172,24 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
 }
 
   clearDataFunction(){
-    _selectedNameType = KeyValueModel(id: "0", name: "Select");
+    _selectedLoanName = KeyValueModel(id: "0", name: "Select");
     _selectedPayIn = KeyValueModel(id: "0", name: "Select");
     amountController.text ="";
     tenureTxtController.text="";
     _selectedInterestType = KeyValueModel(id: "0", name: "Select");
     _selectedInstalmentMode = KeyValueModel(id: "0", name: "Select");
-    minInterestRate =0.0;
-    maxInterestRate=0.0;
+    minAmount =0;
+    maxAmount =0;
+    tenureFrom =0;
+    tenureTo =0;
     _currentRangeValues=0;
+    minInterestRate=0;
+    maxInterestRate=0;
   }
 
   void _showCalculateView(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width ;
     double sumPrincipal = 0.0;
     double sumInterest = 0.0;
     double sumAmount = 0.0;
@@ -166,41 +198,43 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
       sumInterest += item.pInstalmentinterest ?? 0.0;
       sumAmount+= item.pInstalmentamount ?? 0.0;
     }
-    log("=====sumPrincipal $sumPrincipal $sumAmount $sumInterest");
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) {
         return Container(
-          padding: const EdgeInsets.symmetric(vertical: 30,horizontal: 20),
+          height: MediaQuery.of(context).size.height * 0.8,
+          padding: const EdgeInsets.symmetric(vertical: 30,horizontal: 10),
           child: Column(
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  // scrollDirection: Axis.horizontal,
-                  child:  DataTable(
-                    border: TableBorder.all(width: 0.5, color: Colors.grey),
-                    dataTextStyle: AppStyles.smallLabelTextBold,
-                    headingTextStyle: AppStyles.customTextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                    ),
-                    horizontalMargin: 15,
-                    showBottomBorder: true,
-                    headingRowColor:
-                    MaterialStateProperty.resolveWith<Color>(
-                          (states) => AppStyles.btnColor,
-                    ),
-                    columns: const [
-                      DataColumn(
-                        label: Expanded(child: Center(child: Text("SL No. "))),
+                  scrollDirection: Axis.vertical,
+                  child:  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      border: TableBorder.all(width: 0.5, color: Colors.grey),
+                      dataTextStyle: AppStyles.smallLabelTextBold,
+                      headingTextStyle: AppStyles.customTextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
                       ),
-                      DataColumn(label: Expanded(child: Center(child: Text("Principal")))),
-                      DataColumn(label:Expanded(child: Center(child: Text("Interest")))),
-                      DataColumn(label: Expanded(
-                          child: Center(child: Text("Amount")))),
-                    ],
-                    rows: loanViewRows(loanViewModelList),
+                      horizontalMargin: 15,
+                      showBottomBorder: true,
+                      headingRowColor:
+                      MaterialStateProperty.resolveWith<Color>(
+                            (states) => AppStyles.btnColor,
+                      ),
+                      columns: [
+                         DataColumn(label: SizedBox(
+                           width: width * 0.08,
+                             child: const Center(child: Text("SL No ")))),
+                         const DataColumn(label: Expanded(child: Center(child: Text("Principal")))),
+                         const DataColumn(label:Expanded(child: Center(child: Text("Interest")))),
+                         const DataColumn(label: Expanded(child: Center(child: Text("Amount")))),
+                      ],
+                      rows: loanViewRows(loanViewModelList),
+                    ),
                   ),
                 ),
               ),
@@ -211,40 +245,55 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                   Container(
                     color: Colors.grey[200],
                     padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 8),
+                        vertical: 10, horizontal: 10),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Expanded(
-                          flex: 1,
-                          child: Center(
-                              child: Text(
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Text(
                                 "Total",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              )),
+                                style: AppStyles.customTextStyle(fontSize: 13),
+                              ),
+                            ],
+                          ),
                         ),
                         Expanded(
-                          flex: 2,
-                          child: Center(
-                              child: Text(
-                                sumPrincipal.toStringAsFixed(0),
-                                style: AppStyles.smallLabelTextBlack,
-                              )),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              getRuppeText(fontSize: 14,color: AppStyles.btnColor),
+                              Text(
+                               (sumPrincipal == 0.00)?sumPrincipal.toStringAsFixed(0):sumPrincipal.toStringAsFixed(2),
+                                style: AppStyles.highLightText,
+                              ),
+                            ],
+                          ),
                         ),
                         Expanded(
-                          flex: 2,
-                          child: Center(
-                              child: Text(
-                                sumInterest.toStringAsFixed(0),
-                                style: AppStyles.smallLabelTextBlack,
-                              )),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              getRuppeText(fontSize: 14,color: AppStyles.btnColor),
+                              Text(
+                                (sumInterest == 0.00)?sumInterest.toStringAsFixed(0):sumInterest.toStringAsFixed(2),
+                                style: AppStyles.highLightText,
+                              ),
+                            ],
+                          ),
                         ),
                         Expanded(
-                          flex: 2,
-                          child: Center(
-                              child: Text(
-                                sumAmount.toStringAsFixed(0),
-                                style: AppStyles.smallLabelTextBlack,
-                              )),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              getRuppeText(fontSize: 14,color: AppStyles.btnColor),
+                              Text(
+                                (sumAmount == 0.00)?sumAmount.toStringAsFixed(0):sumAmount.toStringAsFixed(2),
+                                style: AppStyles.highLightText,
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -253,7 +302,7 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Close'),
+                      child: Text('CLOSE',style: AppStyles.smallLabelTextBold,),
                     ),
                   ),
                 ],
@@ -267,32 +316,28 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
   loanViewRows(List<LstInstalmentsgenerationDTO> listData){
     return listData.asMap().map((i, data) => MapEntry(i,
         DataRow(cells:[
-          DataCell(SizedBox(
-            width: double.infinity,
-            child: Center(
-                child: Text(
-                    data.pInstalmentno.toString(),
-                    style: AppStyles.smallLabelTextBlack)),
+          DataCell(Center(
+            child: Text(
+                data.pInstalmentno.toString(),
+                style: AppStyles.smallLabelTextBlack),
           )),
-          DataCell(SizedBox(
-            width: double.infinity,
-            child: Center(
-                child: Text( data.pInstalmentprinciple.toString(),
-                    style: AppStyles.smallLabelTextBlack)),
+          DataCell(Center(
+            child: Text( data.pInstalmentprinciple.toString(),
+                style: AppStyles.smallLabelTextBlack),
           )),
           DataCell(
-              SizedBox(
-                width: double.infinity,
-                child: Center(
-                  child: Text(data.pInstalmentinterest.toString(),
-                      style: AppStyles.smallLabelTextBlack),
-                ),
+              Center(
+                child: Text(data.pInstalmentinterest.toString(),
+                    style: AppStyles.smallLabelTextBlack),
               )),
           DataCell(
-              SizedBox(
-                width: double.infinity,
-                child: Text(data.pInstalmentamount.toString(),
-                    style: AppStyles.smallLabelTextBlack),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  getRuppeText(fontSize: 14),
+                  Text(data.pInstalmentamount.toString(),
+                      style: AppStyles.smallLabelTextBlack),
+                ],
               )),
         ]
         )
@@ -320,13 +365,12 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                                   flex: 4,
                                   child: CustomDropdown(context: context, selectedValue: _selectedLoanType,
                                       items:kvLoanTypeList, onChanged: (value) {
-                                        setState(() {
-                                          _selectedLoanType = value;
-                                        });
+                                        _selectedLoanType = value;
+                                        _currentRangeValues = minInterestRate;
                                         clearDataFunction();
                                         Navigator.pop(context);
                                         context.read<LoanCalculatorBloc>().add(GetLoanNameEvent(_selectedLoanType.id));
-                                        context.read<LoanCalculatorBloc>().add(GetLoanInstalmentModeEvent(_selectedLoanType.id));
+
                                       }, hint: ""),
                                 )
                               ],
@@ -339,16 +383,14 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                                     child: Text('Loan Name',style: AppStyles.boldTextBlack)),
                                 Expanded(
                                   flex: 4,
-                                  child: CustomDropdown(context: context, selectedValue: _selectedNameType,
+                                  child: CustomDropdown(context: context, selectedValue: _selectedLoanName,
                                       items:kvLoanNameList, onChanged: (value) {
-                                        setState(() {
-                                          _selectedNameType = value;
-                                          _selectedPayIn = KeyValueModel(id: "0", name: "Select");
-                                        });
+                                        _selectedLoanName = value;
+                                        _selectedPayIn = KeyValueModel(id: "0", name: "Select");
                                         Navigator.pop(context);
-                                        log("loan id===== ${_selectedNameType.id}");
                                         schemeId = "0"; //because initially we r not getting schemeid
-                                        context.read<LoanCalculatorBloc>().add(GetLoanPayInEvent(_selectedNameType.id,schemeId));
+                                        context.read<LoanCalculatorBloc>().add(GetLoanPayInEvent(_selectedLoanName.id,schemeId));
+                                        context.read<LoanCalculatorBloc>().add(GetLoanInstalmentModeEvent(_selectedLoanName.id));
                                       }, hint: ""),
                                 )
                               ],
@@ -368,8 +410,25 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                                         schemeId=  _selectedPayIn.id;
                                         });
                                         Navigator.pop(context);
-                                        context.read<LoanCalculatorBloc>().add(GetLoanInterestTypeEvent(_selectedNameType.id, schemeId,_selectedPayIn.name));
+                                        context.read<LoanCalculatorBloc>().add(GetLoanInterestTypeEvent(_selectedLoanName.id, schemeId,_selectedPayIn.name));
                                       }, hint: ""),
+                                )
+                              ],
+                            ),
+                            SizedBox(height: gapHeight),
+                            Row(
+                              children: [
+                                Expanded(
+                                    flex: 2,
+                                    child: Text('Interest Type',style: AppStyles.boldTextBlack)),
+                                Expanded(
+                                  flex: 4,
+                                  child: CustomDropdown(context: context, selectedValue: _selectedInterestType,
+                                      items:kvInterestTypeList, onChanged: (value) {
+                                        _selectedInterestType = value;
+                                        Navigator.pop(context);
+                                        context.read<LoanCalculatorBloc>().add(GetMinMaxLoanEvent(_selectedLoanName.id,schemeId,_selectedPayIn.name,_selectedInterestType.name));
+                                        }, hint: ""),
                                 )
                               ],
                             ),
@@ -381,14 +440,41 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                                     child: Text('Loan Amount',style: AppStyles.boldTextBlack)),
                                 Expanded(
                                   flex: 4,
-                                  child: CustomTextFieldAmount(
-                                      boxHeight: 45,
-                                      context: context, controller: amountController,
-                                      onChanged: (value) {
-                                        // if(amountTextController.text != ""){
-                                        //   context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,rdAmountController.text));
-                                        // }
-                                      }, hint: "Enter Loan Amount", textInputType: TextInputType.number),
+                                  child: FocusScope(
+                                    onFocusChange: (value) {
+                                      if (!value) {
+                                        DateTime dateTime=DateTime.now();
+                                        context.read<LoanCalculatorBloc>().add(GetLoanInterestRateEvent(_selectedLoanName.id, schemeId,_selectedPayIn.name,_selectedInterestType.name,enterAmount,dateTime.toString()));
+                                      }
+                                    },
+                                    child: CustomTextFieldAmount(
+                                        boxHeight: 45,
+                                        context: context, controller: amountController,
+                                        onChanged: (value) {
+                                          enterAmount =  removeCommasFromNumber(value).toString();
+                                        },
+                                        hint: "Enter Loan Amount", textInputType: TextInputType.number),
+                                  ),
+                                )
+                              ],
+                            ),
+                            const SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Expanded(
+                                    flex: 2,
+                                    child: Text('',style: AppStyles.boldTextBlack)),
+                                const SizedBox(width: 10,),
+                                Expanded(
+                                  flex: 4,
+                                  child:Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(' Min: ${convertToCurrencyFormat2(minAmount)??"0"}',style: AppStyles.smallLabelTextBlack),
+                                      Text('Max: ${convertToCurrencyFormat2(maxAmount)??"0"}  ',style: AppStyles.smallLabelTextBlack)
+                                    ],
+                                  ),
                                 )
                               ],
                             ),
@@ -404,30 +490,32 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                                       boxHeight: 45,
                                       context: context, controller: tenureTxtController,
                                       onChanged: (value) {
+                                        // context.read<LoanCalculatorBloc>().add(GetLoanInterestRateEvent(_selectedLoanName.id, schemeId,_selectedPayIn.name,_selectedInterestType.name,enterAmount,dateTime.toString(), tenureTxtController.text));
                                       }, hint: "Enter Tenure", textInputType: TextInputType.number),
                                 )
                               ],
-                          ),
-                            SizedBox(height: gapHeight),
+                            ),
+                            const SizedBox(height: 5),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 Expanded(
                                     flex: 2,
-                                    child: Text('Interest Type',style: AppStyles.boldTextBlack)),
+                                    child: Text('',style: AppStyles.boldTextBlack)),
+                                const SizedBox(width: 10,),
                                 Expanded(
                                   flex: 4,
-                                  child: CustomDropdown(context: context, selectedValue: _selectedInterestType,
-                                      items:kvInterestTypeList, onChanged: (value) {
-                                        DateTime dateTime=DateTime.now();
-                                        setState(() {
-                                          _selectedInterestType = value;
-                                        });
-                                        Navigator.pop(context);
-                                        context.read<LoanCalculatorBloc>().add(GetLoanInterestRateEvent(_selectedNameType.id, schemeId,_selectedPayIn.name,_selectedInterestType.name,amountController.text,dateTime.toString(), tenureTxtController.text));
-                                      }, hint: ""),
+                                  child:Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(' From: ${tenureFrom.toStringAsFixed(0)}',style: AppStyles.smallLabelTextBlack),
+                                      Text('To: ${tenureTo.toStringAsFixed(0)}',style: AppStyles.smallLabelTextBlack)
+                                    ],
+                                  ),
                                 )
                               ],
                             ),
+
                             SizedBox(height: gapHeight),
                             Row(
                               children: [
@@ -439,9 +527,8 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                                   flex: 4,
                                   child: CustomDropdown(context: context, selectedValue: _selectedInstalmentMode,
                                       items:kvInstalmentModeList, onChanged: (value) {
-                                        setState(() {
-                                          _selectedInstalmentMode = value;
-                                        });
+                                        _selectedInstalmentMode = value;
+                                       setState(() {});
                                         Navigator.pop(context);
                                       }, hint: ""),
                                 )
@@ -460,17 +547,16 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                                   child: Column(
                                     children: [
                                       Slider(
-                                        value: _currentRangeValues,
+                                        value:  double.parse(_currentRangeValues.toStringAsFixed(2)),
                                         divisions: 100,
                                         activeColor: AppStyles.btnColor,
                                         inactiveColor: AppStyles.bgColor3,
-                                        min: minInterestRate,
-                                        max: maxInterestRate,
+                                        min: double.parse(minInterestRate.toStringAsFixed(2)),
+                                        max: double.parse(maxInterestRate.toStringAsFixed(2)),
                                         label: '${_currentRangeValues.toStringAsFixed(2)}%',
                                         onChanged: (value) {
-                                          setState(() {
                                             _currentRangeValues = value;
-                                          });
+                                            setState(() {});
                                         },),
                                       Text("(${_currentRangeValues.toStringAsFixed(2)} %)" ,style: AppStyles.smallLabelTextBold),
                                     ],
@@ -486,13 +572,13 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                     payButton(() {
                       if(validate()){
                         context.read<LoanCalculatorBloc>().add(GetLoanFinalLoanViewEvent(
-                            loanamount: amountController.text,
+                            loanamount: enterAmount,
                             interesttype: _selectedInterestType.name,
                             loanpayin: _selectedPayIn.name,
                             interestrate: _currentRangeValues.toString(),
                             tenureofloan: tenureTxtController.text,
                             loaninstalmentmode: _selectedInstalmentMode.name,
-                            loanId: _selectedNameType.id
+                            loanId: _selectedLoanName.id
                         ));
                       }
                     },"Calculate"),

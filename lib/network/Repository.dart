@@ -431,7 +431,7 @@ class Repository{
     }
   }
 
- //LOANS
+ //LOAN EMI Calculator
   Future<List<LoanTypeModel>> getLoanTypeRepo() async{
     TAG = 'getLoanTypeRepo';
     try{
@@ -510,7 +510,34 @@ class Repository{
     }
   }
 
-  Future<List<LoanInterestRatesModel>> getLoanInterestRateRepo(String loanId,schemeId,loanPayIn,interestType,requestAmount,dateTimeNow,tenure) async {
+  Future<List<LoanInterestRatesModel>> getMinMaxLoanAmountRepo(String loanId,schemeId,loanPayIn,interestType) async{
+    TAG = 'getMinMaxLoanAmountRepo';
+    String applicantType="";
+    List<MemberDetailsResponse> data = await memberData();
+    applicantType= data[0].papplicanttype;
+    try{
+      String url = ApiURL.getLoanMinMaxAmountApi(
+        loanId: loanId,
+        schemeId: schemeId,
+        applicantType:applicantType,
+        loanPayIn:  loanPayIn,
+          interestType: interestType);
+      Uri apiUrl = Uri.parse(url);
+      log("URL $TAG  --------$apiUrl");
+      var response = await http.get(apiUrl,headers: loginHeader);
+      log('RESPONSE $TAG >>>> ${jsonDecode(response.body)}');
+
+      List body= json.decode(response.body);
+      return body.map((e) => LoanInterestRatesModel.fromJson(e)).toList();
+    }
+    catch(e){
+      log("$TAG error $e");
+      throw Exception(e);
+    }
+  }
+
+
+  Future<List<LoanInterestRatesModel>> getLoanInterestRateRepo(String loanId,schemeId,loanPayIn,interestType,requestAmount,dateTimeNow) async {
     TAG = 'getLoanInterestRateRepo';
     String applicantType="";
     String memberType="";
@@ -531,7 +558,7 @@ class Repository{
       "pInteresttype": interestType, //"Diminishing"
       "pAmountrequested": requestAmount,
       "pDateofapplication": dateTimeNow, //"2025-04-11T05:17:56.551Z
-      "pTenureofloan": tenure
+      "pTenureofloan": "0"
     };
     log("URL $TAG --------$apiUrl ${jsonEncode(requestBody)}");
     var response = await http.post(apiUrl,headers: loginHeader,body: jsonEncode(requestBody));

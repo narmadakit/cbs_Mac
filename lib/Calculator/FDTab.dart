@@ -13,6 +13,7 @@ import '../components/KeyValueModel.dart';
 import '../network/Repository.dart';
 import '../utils/AppStyles.dart';
 import '../utils/CustomTextFieldAmount.dart';
+import '../utils/GlobalFunctions.dart';
 import 'bloc/FD/FDBloc.dart';
 import 'bloc/FD/FDEvent.dart';
 import 'model/FDDescriptionModel.dart';
@@ -50,6 +51,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
   bool isInterestRate=false;
   bool isDescriptionVisible=false;
   FDInterestDetailsModel interestDetailsModel=FDInterestDetailsModel();
+  var enterAmount;
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +124,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
     );
   }
 
-  Column buildBody(BuildContext context, List<SchemaDetailsModel> responseModel) {
+  Widget buildBody(BuildContext context, List<SchemaDetailsModel> responseModel) {
     double gapHeight=20.0;
     return Column(
       children: [
@@ -165,12 +167,11 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                       child: CustomDropdown(context: context,selectedValue: _selectedFDNameValue,
                         onChanged: (value) {
                           _selectedFDNameValue = value;
-                          setState(() {
-                          });
                           Navigator.pop(context);
                           context.read<FDBloc>().add(FDGetTenureEvent(_selectedFDNameValue.name));
                           context.read<FDBloc>().add(GetFDSchemeDescrEvent(_selectedFDNameValue.name));
                           isDescriptionVisible =true;
+                          clearDataFunction();
                         },
                         hint: "",items:fdKVList,icon: Icons.arrow_downward,labelText: '', ),
                     )
@@ -190,8 +191,9 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                           boxHeight: 45,
                           context: context, controller: fdAmountController,
                           onChanged: (value) {
+                            enterAmount =  removeCommasFromNumber(value).toString();
                             if(tenureTxtController.text != "" && fdAmountController.text != ""){
-                              context.read<FDBloc>().add(GetFDInterestDetailsEvent(_selectedFDNameValue.id,_selectedFDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,fdAmountController.text));
+                              context.read<FDBloc>().add(GetFDInterestDetailsEvent(_selectedFDNameValue.id,_selectedFDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,enterAmount));
                             }
                           }, hint: "Enter FD Amount", textInputType: TextInputType.number),
                     )
@@ -308,7 +310,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                            inactiveColor: AppStyles.bgColor3,
                            min: double.parse(minInterestRate.toStringAsFixed(2)),
                            max: double.parse(maxInterestRate.toStringAsFixed(2)),
-                           label: '${_currentRangeValues.toStringAsFixed(1)}%',
+                           label: '${_currentRangeValues.toStringAsFixed(2)}%',
                            onChanged: (value) {
                              setState(() {
                                _currentRangeValues = value;
@@ -343,7 +345,12 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                                 children: [
                                   Text('Interest Amount',style: AppStyles.boldTextBlack,),
                                   SizedBox(height: 10,),
-                                  Text(maturityList[i].pInterestamount.toString(),style: AppStyles.smallLabelTextBold),
+                                  Row(
+                                    children: [
+                                      getRuppeText(fontSize: 15,color: AppStyles.btnColor),
+                                      Text(maturityList[i].pInterestamount.toString(),style: AppStyles.highLightText),
+                                    ],
+                                  ),
                                 ],
                               ),
                               Column(
@@ -351,7 +358,12 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                                 children: [
                                   Text('Maturity Amount',style: AppStyles.boldTextBlack),
                                   SizedBox(height: 10,),
-                                  Text(maturityList[i].pMatueritytAmount.toString(),style: AppStyles.smallLabelTextBold),
+                                  Row(
+                                    children: [
+                                      getRuppeText(fontSize: 15,color: AppStyles.btnColor),
+                                      Text(maturityList[i].pMatueritytAmount.toString(),style: AppStyles.highLightText),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ],
@@ -423,7 +435,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                               ),
                             ),
                             DataColumn(
-                              label: SizedBox(
+                              label: Expanded(
                                 child: Center(
                                   child: Text(
                                     "Deposit Amount",
@@ -432,25 +444,25 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                               ),
                             ),
                             DataColumn(
-                              label: SizedBox(
+                              label: Expanded(
                                 child: Center(
                                   child: Text(
-                                    "Investment Period",
+                                    "Tenure",
                                   ),
                                 ),
                               ),
                             ),
                             DataColumn(
-                              label: SizedBox(
+                              label: Expanded(
                                 child: Center(
                                   child: Text(
-                                    "Interest Rate/Value Per 100",
+                                    "Interest Rate\nValue Per 100",
                                   ),
                                 ),
                               ),
                             ),
                             DataColumn(
-                              label: SizedBox(
+                              label: Expanded(
                                 child: Center(
                                   child: Text(
                                     "Interest Type",
@@ -459,7 +471,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                               ),
                             ),
                             DataColumn(
-                              label: SizedBox(
+                              label: Expanded(
                                 child: Center(
                                   child: Text(
                                     "Compound Type",
@@ -468,24 +480,23 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                               ),
                             ),
                             DataColumn(
-                              label: SizedBox(
+                              label: Expanded(
                                 child: Center(
                                   child: Text(
-                                    "Interest PayOut",
-
+                                    "Interest PayOut"
                                   ),
                                 ),
                               ),
                             ),
                       DataColumn(
-                        label: SizedBox(
+                        label: Expanded(
                           child: Center(
                             child: Text(
                                 "Applicant Type"
                             ),
                           ),
                         ),
-                                  ),
+                      ),
                           ],
                           rows: addressRows(fdSchemeDescList)
                       ),
@@ -498,6 +509,18 @@ class _FDTabWidgetState extends State<FDTabWidget> {
         );
       },
     );
+  }
+
+  clearDataFunction(){
+    _selectedTenureValue = KeyValueModel(id: "0", name: "Select");
+    _selectedInterestTypeValue = KeyValueModel(id: "0", name: "Select");
+    fdAmountController.text ="";
+    tenureTxtController.text="";
+    _selectedPayOutValue = KeyValueModel(id: "0", name: "Select");
+    _currentRangeValues=0;
+    minInterestRate=0;
+    maxInterestRate=0;
+    maturityList=[];
   }
 
   bool validate(){
@@ -548,10 +571,15 @@ addressRows(List<FDDescriptionModel> descList){
                   style: AppStyles.smallLabelTextBlack)),
         )),
         DataCell(SizedBox(
-          child: Center(
-              child: Text(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              getRuppeText(fontSize: 14),
+              Text(
                   data.pMinDepositAmount.toString(),
-                  style: AppStyles.smallLabelTextBlack)),
+                  style: AppStyles.smallLabelTextBlack),
+            ],
+          ),
         )),
         DataCell(SizedBox(
           child: Center(

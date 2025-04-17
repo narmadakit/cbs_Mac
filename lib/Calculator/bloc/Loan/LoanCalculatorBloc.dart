@@ -22,6 +22,7 @@ class LoanCalculatorBloc extends Bloc<LoanEvent,LoanCalculatorState>{
     on<GetLoanInterestRateEvent>(getLoanInterestRateBloc);
     on<GetLoanInstalmentModeEvent>(getLoanInstalmentModeBloc);
     on<GetLoanFinalLoanViewEvent>(getFinalLoanViewBloc);
+    on<GetMinMaxLoanEvent>(getMinMaxLoanAmountBloc);
   }
 
   getLoanTypeBloc(LoanInitEvent event, Emitter<LoanCalculatorState> emit) async {
@@ -68,10 +69,21 @@ class LoanCalculatorBloc extends Bloc<LoanEvent,LoanCalculatorState>{
     }
   }
 
+  getMinMaxLoanAmountBloc(GetMinMaxLoanEvent event, Emitter<LoanCalculatorState> emit) async {
+    emit(LoanLoadingState());
+    try{
+      List<LoanInterestRatesModel> listData = await repo.getMinMaxLoanAmountRepo(event.loanId,event.schemeId,event.loanPayIn,event.interestType);
+      emit(GetMinMaxLoanAmountSuccessState(listData));
+    }
+    catch(e){
+      emit(LoanErrorState(e.toString()));
+    }
+  }
+
   getLoanInterestRateBloc(GetLoanInterestRateEvent event, Emitter<LoanCalculatorState> emit) async {
     emit(LoanLoadingState());
     try{
-      List<LoanInterestRatesModel> listData = await repo.getLoanInterestRateRepo(event.loanId,event.schemeId,event.loanPayIn,event.interestType,event.requestAmount,event.dateTimeNow,event.tenure);
+      List<LoanInterestRatesModel> listData = await repo.getLoanInterestRateRepo(event.loanId,event.schemeId,event.loanPayIn,event.interestType,event.requestAmount,event.dateTimeNow);
       emit(GetLoanInterestRateSuccessState(listData));
     }
     catch(e){

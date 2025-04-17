@@ -52,6 +52,13 @@ class GetLoanInterestTypeSuccessState extends LoanCalculatorState{
   List<Object?> get props => [responseModel];
 }
 
+class GetMinMaxLoanAmountSuccessState extends LoanCalculatorState{
+  final List<LoanInterestRatesModel> responseModel;
+  GetMinMaxLoanAmountSuccessState(this.responseModel);
+  @override
+  List<Object?> get props => [responseModel];
+}
+
 class GetLoanInterestRateSuccessState extends LoanCalculatorState{
   final List<LoanInterestRatesModel> responseModel;
   GetLoanInterestRateSuccessState(this.responseModel);

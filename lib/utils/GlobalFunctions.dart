@@ -119,4 +119,14 @@ double parseLocalizedNumber(String input) {
  return double.parse(input.replaceAll(',', ''));
 }
 
+double? removeCommasFromNumber(value){
+ String cleaned = value.replaceAll(',', '');
+ double? number = double.tryParse(cleaned);
+ if (number != null) {
+ return number;// Output: 855522.0
+ } else {
+ return 0;// This won't happen here
+ }
+}
+
 
