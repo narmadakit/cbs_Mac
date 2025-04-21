@@ -10,6 +10,7 @@ import 'package:finsta_mac/utils/AppStyles.dart';
 import 'package:finsta_mac/utils/SharedPrefs.dart';
 import 'package:finsta_mac/view/DashboardScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../Home/model/MemberDetailsResponse.dart';
 import '../Profile/bloc/ProfileBloc.dart';
@@ -35,41 +36,48 @@ class _MembersScreenState extends State<MembersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("$TAG, build---- $mobileNo");
     double gapHeight=12.0;
-    return CustomMainBackground(
-        title: '',
-        toolbarHeight: 40,
-        isBackButton: false,
-        body:
-      MultiBlocProvider(
-        providers: [
-          BlocProvider<ProfileBloc>(create: (context) => ProfileBloc(Repository())..add(ProfileInitEvent()))
-        ],
-        child: BlocConsumer<ProfileBloc,ProfileState>(
-          listener: (context,state){
-            if(state is ProfileLoadingState){
-              loadingVisibility = true;
-            }
-            else if(state is ProfileSuccessState){
-              listResponnseData =state.responseData;
-              loadingVisibility = false;
-            }
-          },
-          builder: (context, state) {
-            if(state is ProfileLoadingState){
-              return Center(child: CircularProgressIndicator(color: AppStyles.btnColor));
-            }
-            else if(state is ProfileSuccessState){
-              listResponnseData =state.responseData;
-              return buildBody(context,state);
-            }
-           else{
-              return Center(child: CircularProgressIndicator(color: AppStyles.btnColor));
-            }
-          },
-        ),
-      )
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if(Navigator.of(context).canPop()){
+          SystemNavigator.pop();
+        }
+      },
+      child: CustomMainBackground(
+          title: '',
+          toolbarHeight: 40,
+          isBackButton: false,
+          body:
+        MultiBlocProvider(
+          providers: [
+            BlocProvider<ProfileBloc>(create: (context) => ProfileBloc(Repository())..add(ProfileInitEvent()))
+          ],
+          child: BlocConsumer<ProfileBloc,ProfileState>(
+            listener: (context,state){
+              if(state is ProfileLoadingState){
+                loadingVisibility = true;
+              }
+              else if(state is ProfileSuccessState){
+                listResponnseData =state.responseData;
+                loadingVisibility = false;
+              }
+            },
+            builder: (context, state) {
+              if(state is ProfileLoadingState){
+                return Center(child: CircularProgressIndicator(color: AppStyles.btnColor));
+              }
+              else if(state is ProfileSuccessState){
+                listResponnseData =state.responseData;
+                return buildBody(context,state);
+              }
+             else{
+                return Center(child: CircularProgressIndicator(color: AppStyles.btnColor));
+              }
+            },
+          ),
+        )
+      ),
     );
 
   }
@@ -137,7 +145,7 @@ class _MembersScreenState extends State<MembersScreen> {
       onTap: () {
         SharedPrefs.saveString(SharedPrefs.memberId,listData.pmemberid.toString());
         SharedPrefs.saveString(SharedPrefs.memberName,listData.pContactName.toString());
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const DashboardScreen()),
         );

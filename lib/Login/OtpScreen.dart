@@ -127,6 +127,7 @@ class _OtpScreenState extends State<OtpScreen> {
       //     MaterialPageRoute(
       //         builder: (context) => const UsePinScreen(
       //         )));
+      if (!mounted) return;
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -134,6 +135,7 @@ class _OtpScreenState extends State<OtpScreen> {
               )));
     }
     else{
+      if (!mounted) return;
       showSnackBar(context, 'Enter Correct OTP');
     }
 

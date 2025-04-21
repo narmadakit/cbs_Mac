@@ -2,7 +2,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:finsta_mac/Home/model/BanneImageModel.dart';
 import 'package:finsta_mac/Home/model/LoanDataResponse.dart';
-import 'package:finsta_mac/Home/model/MemberDetailsResponse.dart';
 
 import '../model/MembersAllDuesModel.dart';
 

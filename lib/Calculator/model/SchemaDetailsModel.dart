@@ -1,4 +1,4 @@
-import '../../Home/model/MemberDetailsResponse.dart';
+
 import '../../components/KeyValueModel.dart';
 
 class SchemaDetailsModel {

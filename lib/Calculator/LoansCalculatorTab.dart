@@ -109,9 +109,7 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
 
                 tenureFrom = interestRateList[0].pTenorfrom;
                 tenureTo = interestRateList[0].pTenorto;
-
               }
-
             }
             else if(state is GetInstalmentModeSuccessState){
               kvInstalmentModeList = LoanInstalmentModel.kVInstalmentModeList(state.responseModel);
@@ -138,10 +136,6 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
       showSnackBar(context, 'Enter Loan Pay-In');
       return false;
     }
-    else if(tenureTxtController.text == ""){
-      showSnackBar(context, 'Enter Tenure');
-      return false;
-    }
     else if(_selectedInterestType.name == "Select"){
       showSnackBar(context, 'Enter Interest Type');
       return false;
@@ -152,6 +146,10 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
     }
     else if((double.parse(enterAmount) < minAmount) || (double.parse(enterAmount) > maxAmount)) {
       showSnackBar(context, 'Enter Valid Amount');
+      return false;
+    }
+    else if(tenureTxtController.text == ""){
+      showSnackBar(context, 'Enter Tenure');
       return false;
     }
     else if((double.parse(tenureTxtController.text) < tenureFrom) || (double.parse(tenureTxtController.text) > tenureTo)) {
@@ -471,8 +469,8 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                                   child:Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(' Min: ${convertToCurrencyFormat2(minAmount)??"0"}',style: AppStyles.smallLabelTextBlack),
-                                      Text('Max: ${convertToCurrencyFormat2(maxAmount)??"0"}  ',style: AppStyles.smallLabelTextBlack)
+                                      Text(' Min: ${convertToCurrencyFormat(minAmount)??"0"}',style: AppStyles.smallLabelTextBlack),
+                                      Text('Max: ${convertToCurrencyFormat(maxAmount)??"0"}  ',style: AppStyles.smallLabelTextBlack)
                                     ],
                                   ),
                                 )

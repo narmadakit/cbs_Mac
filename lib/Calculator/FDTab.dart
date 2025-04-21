@@ -41,6 +41,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
   List<FDDescriptionModel> fdSchemeDescList =[];
   List<DepositMaturityModel> maturityList =[];
   bool isTenureLoader=false;
+  bool isMaturityLoader=false;
   var tenureTxtController = TextEditingController();
   var fdAmountController = TextEditingController();
   var interestRateController = TextEditingController();
@@ -52,12 +53,25 @@ class _FDTabWidgetState extends State<FDTabWidget> {
   bool isDescriptionVisible=false;
   FDInterestDetailsModel interestDetailsModel=FDInterestDetailsModel();
   var enterAmount;
+  double minAmount =0.0;
+  double maxAmount =0.0;
+  FocusScopeNode _fdAmountFocusNode = FocusScopeNode();
+
+  @override
+  void dispose() {
+    _fdAmountFocusNode.dispose();  // Don't forget to dispose of the FocusNode
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<FDBloc>(create: (context) => FDBloc(Repository())..add(FDInitEvent('FIXED DEPOSIT')))
+        //FDInitEvent
+        //FDGetTenureEvent
+        //GetFDSchemeDescrEvent
+        //GetFDInterestDetailsEvent
       ],
       child: BlocConsumer<FDBloc,FDStates>(
         builder: (context, state) {
@@ -76,29 +90,47 @@ class _FDTabWidgetState extends State<FDTabWidget> {
         },
         listener: (context, state) {
           if(state is GetTransactionSuccessState){
+            ///Get pSchemename
             fdKVList =SchemaDetailsModel.keyValueList(state.responseModel);
           }
           else if(state is FDTenureLoadingState){
             isTenureLoader = true;
             isInterestRate=false;
+            isMaturityLoader = false;
+          }
+          else if(state is FDSchemeDescrSuccessState){
+            //Get Min-max amount,tenure,Interest rate
+            isTenureLoader = false;
+            fdSchemeDescList = state.responseModel;
+            if(fdSchemeDescList.isNotEmpty){
+              minAmount = double.parse(fdSchemeDescList[0].pMinDepositAmount.toString());
+              maxAmount = double.parse(fdSchemeDescList[0].pMaxdepositAmount.toString());
+            }
           }
           else if(state is FDGetTenureSuccessState){
+            // Get Tenures
             isTenureLoader = false;
             // _selectedTenureValue ="Select";
             tenureKVList =DepositeTenureModel.keyValueList(state.responseModel);
           }
           else if(state is FDInterestDetailsSuccessState){
+            //Get pInteresttype
             isTenureLoader = false;
+            interestDetailsModel = state.responseModel;
             if(state.responseModel.fdInteresttype?.isNotEmpty ?? false) {
               interestTypeKVList = FdInteresttype.keyValueList(state.responseModel.fdInteresttype!);
               interestPayOutList = state.responseModel.fdInteresttype![0].fdInterestPayoutList!;
               interestPayOutKVList  =  FdInterestPayoutList.keyValueList(interestPayOutList);
             }
             else{
-              isTenureLoader = false;
-              showSnackBar(context, 'Enter Valid Tenure');
+              if((double.parse(enterAmount) < minAmount) || (double.parse(enterAmount) > maxAmount)) {
+                showSnackBar(context, 'Enter valid amount\nTo know more see the Description');
+              }
+              else{
+                isTenureLoader = false;
+                showSnackBar(context, 'Enter Valid Tenure');
+              }
             }
-            interestDetailsModel = state.responseModel;
           }
           else if(state is FDInterestRateSuccessState){
             isTenureLoader = false;
@@ -107,12 +139,11 @@ class _FDTabWidgetState extends State<FDTabWidget> {
             _currentRangeValues = minInterestRate;
             isInterestRate=true;
           }
-          else if(state is FDSchemeDescrSuccessState){
-            isTenureLoader = false;
-            fdSchemeDescList = state.responseModel;
-          }
+
           else if(state is FDMaturitySuccessState){
+            //Get MaturityData
             isTenureLoader = false;
+            isMaturityLoader = false;
             maturityList = state.responseModel;
           }
           else{
@@ -187,15 +218,28 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                     const SizedBox(width: 10,),
                     Expanded(
                       flex: 4,
-                      child:CustomTextFieldAmount(
-                          boxHeight: 45,
-                          context: context, controller: fdAmountController,
-                          onChanged: (value) {
-                            enterAmount =  removeCommasFromNumber(value).toString();
-                            if(tenureTxtController.text != "" && fdAmountController.text != ""){
+                      child:FocusScope(
+                        node: _fdAmountFocusNode,
+                        onFocusChange: (value) {
+                          if (!value) {
+                            if(tenureTxtController.text != ""){
                               context.read<FDBloc>().add(GetFDInterestDetailsEvent(_selectedFDNameValue.id,_selectedFDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,enterAmount));
                             }
-                          }, hint: "Enter FD Amount", textInputType: TextInputType.number),
+                           else if((double.parse(enterAmount) < minAmount) || (double.parse(enterAmount) > maxAmount)) {
+                              showSnackBar(context, 'Enter Valid Amount To Know More See The Description');
+                            }
+                            _selectedInterestTypeValue = KeyValueModel(id: "0", name: "Select");
+                            _selectedPayOutValue = KeyValueModel(id: "0", name: "Select");
+                            FocusScope.of(context).nextFocus();
+                          }
+                        },
+                        child: CustomTextFieldAmount(
+                            boxHeight: 45,
+                            context: context, controller: fdAmountController,
+                            onChanged: (value) {
+                              enterAmount =  removeCommasFromNumber(value).toString();
+                            }, hint: "Enter FD Amount", textInputType: TextInputType.number),
+                      ),
                     )
                   ],
                 ),
@@ -218,10 +262,15 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                             child: CustomTextField(
                                 boxHeight: 50,
                                 context: context, controller: tenureTxtController,
+                                onTap: () {
+                                  setState(() {
+                                    _selectedTenureValue = KeyValueModel(id: "0", name: "Select");
+                                  });
+                                },
                                 onChanged: (value) {
-                                  if(tenureTxtController.text != "" && fdAmountController.text != ""){
-                                    context.read<FDBloc>().add(GetFDInterestDetailsEvent(_selectedFDNameValue.id,_selectedFDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,fdAmountController.text));
-                                  }
+                                  setState(() {
+                                    _selectedTenureValue = KeyValueModel(id: "0", name: "Select");
+                                  });
                                 }, hint: "Enter Tenure", textInputType: TextInputType.number),
                           ),
                           const SizedBox(width: 5,),
@@ -233,8 +282,6 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                                 if(tenureTxtController.text != "" && fdAmountController.text != ""){
                                   context.read<FDBloc>().add(GetFDInterestDetailsEvent(_selectedFDNameValue.id,_selectedFDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,fdAmountController.text));
                                 }
-                                setState(() {
-                                });
                                 Navigator.pop(context);
                               },
                               hint: "",items:tenureKVList,icon: Icons.arrow_downward,labelText: '', ),
@@ -260,7 +307,6 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                           setState(() {
                           });
                           Navigator.pop(context);
-                          // context.read<FDBloc>().add(FDGetTenureEvent(_selectedFDNameValue.name));
                         },
                         hint: "",items:interestTypeKVList,icon: Icons.arrow_downward,labelText: '', ),
                     )
@@ -324,8 +370,8 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                   ],
                 ),
                 SizedBox(height: gapHeight),
-                SizedBox(height: gapHeight),
                 (maturityList.isNotEmpty)?
+                isMaturityLoader==true?CircularProgressIndicator(color: AppStyles.btnColor):
                 ListView.builder(
                   shrinkWrap: true,
                   itemCount: maturityList.length,
@@ -344,7 +390,7 @@ class _FDTabWidgetState extends State<FDTabWidget> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text('Interest Amount',style: AppStyles.boldTextBlack,),
-                                  SizedBox(height: 10,),
+                                  const SizedBox(height: 10),
                                   Row(
                                     children: [
                                       getRuppeText(fontSize: 15,color: AppStyles.btnColor),
@@ -379,9 +425,10 @@ class _FDTabWidgetState extends State<FDTabWidget> {
             ),
         payButton(() {
     if(validate()){
-      context.read<FDBloc>().add(GetFDMaturityEvent(_selectedTenureValue.name,tenureTxtController.text,fdAmountController.text,
+      isMaturityLoader = true;
+      context.read<FDBloc>().add(GetFDMaturityEvent(_selectedTenureValue.name,tenureTxtController.text,enterAmount.toString(),
           _selectedPayOutValue.name,_selectedInterestTypeValue.name,
-          interestRateController.text,interestDetailsModel.pCaltype.toString(),interestDetailsModel.pCompoundInterestType.toString()
+          _currentRangeValues.toString(),interestDetailsModel.pCaltype.toString(),interestDetailsModel.pCompoundInterestType.toString()
       ));
     }
         },"Calculate")
@@ -532,8 +579,12 @@ class _FDTabWidgetState extends State<FDTabWidget> {
       showSnackBar(context, 'Enter FD Amount');
       return false;
     }
+    else if((double.parse(enterAmount) < minAmount) || (double.parse(enterAmount) > maxAmount)) {
+      showSnackBar(context, 'Enter Valid Amount To Know More See The Description');
+      return false;
+    }
     else if(tenureTxtController.text == ""){
-      showSnackBar(context, 'Enter Tenure');
+      showSnackBar(context, 'Enter Tenure To Know More See The Description');
       return false;
     }
     else if(_selectedTenureValue.name == "Select"){
@@ -556,7 +607,6 @@ class _FDTabWidgetState extends State<FDTabWidget> {
       return true;
     }
   }
-
 }
 
 addressRows(List<FDDescriptionModel> descList){
@@ -607,7 +657,7 @@ addressRows(List<FDDescriptionModel> descList){
         DataCell(SizedBox(
           child: Center(
               child: Text(
-                  data.pschemeMaturiytype ?? "N/A",
+                  data.pInterestPayOut ?? "N/A",
                   style: AppStyles.smallLabelTextBlack)),
         )),
         DataCell(SizedBox(

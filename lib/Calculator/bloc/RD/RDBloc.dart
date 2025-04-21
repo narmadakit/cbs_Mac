@@ -26,6 +26,7 @@ class RDBloc extends Bloc<RDEvent,RDStates>{
     emit(RDLoadingState());
     try{
       List<SchemaDetailsModel> listData= await repo.getAllTransactionsSchemesRepo(event.formName);
+      listData.removeWhere((element) => element.pSchemename == "DAILY DEPOSITS");
       emit(GetTransactionSuccessState(listData));
     }
     catch(e){

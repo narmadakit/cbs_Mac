@@ -22,7 +22,9 @@ class ApiURL{
 
   //RD
   static String getRdTenureModesApi(String rdName,applicantType,memberType) => "${BASE_URL}api/Banking/GetRdSchemeTenureModes?Rdname=$rdName&ApplicantType=$applicantType&MemberType=$memberType";
+
   static String getRdInterestDetailsApi(String applicantType,memberType,configID,rdName,tenure,tenureMode,instalmentAmount) => "${BASE_URL}api/Banking/GetRdSchemeDetails?ApplicantType=$applicantType&MemberType=$memberType&RdconfigID=$configID&Rdname=$rdName&Tenure=$tenure&Tenuremode=$tenureMode&instalmentamount=$instalmentAmount";
+
   static String getRdInterestRateApi(String rdName,installmentAmount,tenure,tenureMode,interestPayout,memberType,applicantType) => "${BASE_URL}api/Banking/GetRDTenureandMininterestRateofInterestRate?Rdname=$rdName&instalmentamount=$installmentAmount&Tenure=$tenure&TenureMode=$tenureMode&InterestPayout=$interestPayout&MemberType=$memberType&papplicanttype=$applicantType";
   static String getRdMaturityAmountApi({required String interestMode, tenure, enterAmount, interestPayOut, compoundSimpleInterestType, compoundType, interestRate, calType}) =>
       "${BASE_URL}api/Banking/GetRDMaturityamount?pInterestMode=$interestMode&pInterestTenure=$tenure&instalmentamount=$enterAmount&pInterestPayOut=$interestPayOut&pCompoundorSimpleInterestType=$compoundSimpleInterestType&pCompoundType=$compoundType&pInterestRate=$interestRate&pCalType=$calType";

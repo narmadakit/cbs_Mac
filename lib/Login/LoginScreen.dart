@@ -164,9 +164,11 @@ class _LoginScreenState extends State<LoginScreen> {
     data.mobileNumber = mobile;
     // data.bytesLogo = bytesLogo;
     if(data.pIsSaved == false){
+      if (!mounted) return;
       showSnackBar(context, 'Please Enter Registered Number!');
     }
     else if(data.pIsSaved == true){
+      if (!mounted) return;
       Navigator.push(
           context,
           MaterialPageRoute(
@@ -175,6 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
               )));
     }
     else{
+      if (!mounted) return;
       showSnackBar(context, 'Something went wrong, try again later!');
     }
    print("respose-----${data.pIsSaved}");

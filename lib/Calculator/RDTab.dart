@@ -42,10 +42,8 @@ class _RDTabWidgetState extends State<RDTabWidget> {
   List<KeyValueModel> interestTypeKVList =[];
   List<KeyValueModel> interestPayOutKVList =[];
   List<RDDescriptionModel> descriptionList =[];
-  String minAmount ="";
-  String maxAmount ="";
-  String tenureFrom ="";
-  String tenureTo ="";
+  double tenureFrom=0;
+  double tenureTo=0;
   bool isTenureLoader=false;
   var tenureTxtController = TextEditingController();
   var amountController = TextEditingController();
@@ -59,7 +57,16 @@ class _RDTabWidgetState extends State<RDTabWidget> {
   RDInterestDetailsModel interestDetailsModel=RDInterestDetailsModel();
   List<DepositMaturityModel> maturityList =[];
   bool isAmountVisible=false;
-  double enterAmount=0;
+  var enterAmount;
+  double minAmount =0.0;
+  double maxAmount=0.0;
+  FocusScopeNode _fdAmountFocusNode = FocusScopeNode();
+
+  @override
+  void dispose() {
+    _fdAmountFocusNode.dispose();  // Don't forget to dispose of the FocusNode
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +87,6 @@ class _RDTabWidgetState extends State<RDTabWidget> {
           else{
             return buildBody(context,schemaList);
           }
-
         },
         listener: (context, state) {
           if(state is GetTransactionSuccessState){
@@ -95,10 +101,10 @@ class _RDTabWidgetState extends State<RDTabWidget> {
             isTenureLoader = false;
             descriptionList = state.responseModel;
             if(descriptionList.isNotEmpty){
-              minAmount = descriptionList[0].pMinInstallmentAmount.toString();
-              maxAmount = descriptionList[0].pMaxInstallmentAmount.toString();
-              // tenureFrom = descriptionList[0].pInvestmentPeriodFrom.toString();
-              // tenureTo = descriptionList[0].pInvestmentPeriodTo.toString();
+              minAmount = double.parse(descriptionList[0].pMinInstallmentAmount.toString());
+              maxAmount = double.parse(descriptionList[0].pMaxInstallmentAmount.toString());
+              // tenureFrom = double.parse(descriptionList[0].pInvestmentPeriodFrom.toString());
+              // tenureTo = double.parse(descriptionList[0].pInvestmentPeriodTo.toString());
             }
           }
           else if(state is RDGetTenureSuccessState){
@@ -109,20 +115,16 @@ class _RDTabWidgetState extends State<RDTabWidget> {
           }
           else if(state is RDInterestDetailsSuccessState){
             isTenureLoader = false;
+            interestDetailsModel = state.responseModel;
             if(state.responseModel.rdInteresttype != null){
               interestTypeKVList = RdInteresttype.keyValueList(state.responseModel.rdInteresttype!);
               interestPayOutList = state.responseModel.rdInteresttype![0].rdInterestPayoutList!;
               interestPayOutKVList  =  RdInterestPayoutList.keyValueList(interestPayOutList);
               }
             else{
-              if(_selectedRDNameValue.name != "DAILY DEPOSITS") {
-                if (double.parse(amountController.text) < double.parse(minAmount)) {
+                if ((enterAmount < minAmount) || (enterAmount > maxAmount)) {
                   showSnackBar(context, 'Enter valid amount\nTo know more see the Description');
                 }
-                else if (double.parse(amountController.text) > double.parse(maxAmount)) {
-                  showSnackBar(context, 'Enter valid amount\nTo know more see the Description');
-                }
-              }
               else{
                 showSnackBar(context, 'Enter Valid Tenure');
                 tenureTxtController.text="";
@@ -175,6 +177,14 @@ class _RDTabWidgetState extends State<RDTabWidget> {
       showSnackBar(context, 'Enter RD Installment Amount');
       return false;
     }
+    else if((enterAmount < minAmount) || (enterAmount > maxAmount)) {
+      showSnackBar(context, 'Enter Valid Amount To Know More See The Description');
+      return false;
+    }
+    // else if((double.parse(tenureTxtController.text) < tenureFrom) || (double.parse(tenureTxtController.text) > tenureTo)) {
+    //   showSnackBar(context, 'Enter Valid Tenure');
+    //   return false;
+    // }
     else if(tenureTxtController.text == ""){
       showSnackBar(context, 'Enter Tenure');
       return false;
@@ -245,17 +255,12 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                 const SizedBox(width: 10,),
                 Expanded(
                   flex: 4,
-                  child: CustomDropdown(context: context,selectedValue: _selectedRDNameValue,
+                  child: CustomDropdown(context: context,
+                    selectedValue: _selectedRDNameValue,
                     onChanged: (value) {
                       _selectedRDNameValue = value;
-                      if(_selectedRDNameValue.name == "DAILY DEPOSITS"){
-                        isAmountVisible = false;
-                        clearDataFunction();
-                      }
-                      else{
                         isAmountVisible=true;
                         clearDataFunction();
-                      }
                       setState(() {
                       });
                       Navigator.pop(context);
@@ -284,19 +289,19 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                       Expanded(
                         flex: 4,
                         child:FocusScope(
+                          node: _fdAmountFocusNode,
                           onFocusChange: (value) {
                             if (!value) {
-                              if(enterAmount < double.parse(minAmount)){
-                                showSnackBar(context, 'Enter valid amount\nTo know more see the Description');
-                              }
-                              else if(enterAmount > double.parse(maxAmount)){
+                              if((enterAmount < minAmount) ||(enterAmount > maxAmount)){
                                 showSnackBar(context, 'Enter valid amount\nTo know more see the Description');
                               }
                               else{
                                 if(tenureTxtController.text != "" && amountController.text != ""){
                                   context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedTenureValue.id,enterAmount.toString()));
                                 }
-                              }  }
+                              }
+                              FocusScope.of(context).nextFocus();
+                            }
                           },
                           child: CustomTextFieldAmount(
                               boxHeight: 45,
@@ -304,7 +309,10 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                               controller: amountController,
                               onChanged: (value) {
                                 enterAmount =  double.parse(removeCommasFromNumber(value).toString());
+                                log("=====enterAmount $enterAmount");
                                 _selectedInterestTypeValue = KeyValueModel(id: "0", name: "Select");
+                                _selectedPayOutValue = KeyValueModel(id: "0", name: "Select");
+                                _selectedPayOutValue = KeyValueModel(id: "0", name: "Select");
                                 setState(() {});
                               }, hint: "Enter RD Installment Amount", textInputType: TextInputType.number),
                         ),
@@ -354,17 +362,12 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                         child: CustomTextField(
                             boxHeight: 45,
                             context: context, controller: tenureTxtController,
-                            onChanged: (value){
-                          if(_selectedRDNameValue.name != "DAILY DEPOSITS"){
-                            if(tenureTxtController.text != "" && amountController.text != ""){
-                              context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name, tenureTxtController.text,_selectedTenureValue.name,amountController.text));
-                            }
-                          }
-                          else{
-                            context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name,tenureTxtController.text,_selectedTenureValue.name,minAmount));
-                          }
-                          setState(() {});
+                            onTap: () {
+                              setState(() {
+                                _selectedTenureValue = KeyValueModel(id: "0", name: "Select");
+                              });
                             },
+                            onChanged: (value){ },
                              hint: "Enter Tenure", textInputType: TextInputType.number),
                       ),
                       const SizedBox(width: 5,),
@@ -373,17 +376,13 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                         child: CustomDropdown(context: context,selectedValue: _selectedTenureValue,
                           onChanged: (value) {
                             _selectedTenureValue = value;
-                            if(_selectedRDNameValue.name != "DAILY DEPOSITS"){
                               if(tenureTxtController.text != "" && amountController.text != ""){
-                                context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name,tenureTxtController.text,_selectedTenureValue.id,amountController.text));
+                                context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name,tenureTxtController.text,_selectedTenureValue.id,enterAmount.toString()));
                               }
-                            }
                             else{
-                              print("=====${tenureTxtController.text}");
-                                context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name,tenureTxtController.text,_selectedTenureValue.id,minAmount));
+                                context.read<RDBloc>().add(GetRDInterestDetailsEvent(_selectedRDNameValue.id,_selectedRDNameValue.name,tenureTxtController.text,_selectedTenureValue.id,minAmount.toString()));
                             }
-                            setState(() {
-                            });
+                            setState(() {});
                             Navigator.pop(context);
                           },
                           hint: "",items:tenureKVList,icon: Icons.arrow_downward,labelText: '', ),
@@ -474,13 +473,11 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                   child: CustomDropdown(context: context,selectedValue: _selectedPayOutValue,
                     onChanged: (value) {
                       _selectedPayOutValue = value;
-                      if(_selectedRDNameValue.name != "DAILY DEPOSITS"){
                         if(tenureTxtController.text != "" && amountController.text != ""){
-                          context.read<RDBloc>().add(GetRDInterestRateEvent(_selectedRDNameValue.name, amountController.text, tenureTxtController.text, _selectedTenureValue.id, _selectedPayOutValue.name));
+                          context.read<RDBloc>().add(GetRDInterestRateEvent(_selectedRDNameValue.name, enterAmount.toString(), tenureTxtController.text, _selectedTenureValue.id, _selectedPayOutValue.name));
                         }
-                      }
                       else{
-                        context.read<RDBloc>().add(GetRDInterestRateEvent(_selectedRDNameValue.name, minAmount,tenureTxtController.text, _selectedTenureValue.id, _selectedPayOutValue.name));
+                        context.read<RDBloc>().add(GetRDInterestRateEvent(_selectedRDNameValue.name, minAmount.toString(),tenureTxtController.text, _selectedTenureValue.id, _selectedPayOutValue.name));
                       }
 
                       setState(() {
@@ -514,7 +511,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                         onChanged: (value) {
                           setState(() {
                             _currentRangeValues = value;
-                            interestRateController.text = value.toString();
+                            interestRateController.text = _currentRangeValues.toString();
                           });
                         },),
                       Text("(${_currentRangeValues.toStringAsFixed(2)} %)" ,style: AppStyles.smallLabelTextBold),
@@ -581,9 +578,9 @@ class _RDTabWidgetState extends State<RDTabWidget> {
           visible: isAmountVisible,
           child: payButton(() {
             if(validate()){
-              context.read<RDBloc>().add(GetRDMaturityEvent(_selectedPayInValue.name,tenureTxtController.text, amountController.text,
+              context.read<RDBloc>().add(GetRDMaturityEvent(_selectedPayInValue.name,tenureTxtController.text, enterAmount.toString(),
                   _selectedPayOutValue.name,_selectedInterestTypeValue.name,
-                  interestRateController.text,interestDetailsModel.pCaltype.toString(),interestDetailsModel.pCompoundInterestType.toString()
+                  _currentRangeValues.toString(),interestDetailsModel.pCaltype.toString(),interestDetailsModel.pCompoundInterestType.toString()
               ));
             }
           },"Calculate"),
