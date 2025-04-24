@@ -31,7 +31,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  late int _selectedIndex = 0;
+  int _selectedIndex = 0;
   int _current = 0;
   final CarouselSliderController _controller = CarouselSliderController();
   LoanDataResponse loanData=LoanDataResponse();
@@ -52,6 +52,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   getMemberDetails() async {
     memberName = await SharedPrefs.getString(SharedPrefs.memberName);
+    _selectedIndex =0;
   }
 
   Future<void> refresh() async {
@@ -138,7 +139,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     isBackButton: false,
     bottomNavBar: bottomNavBar(
       context: context,
-      selectedIndex: 0,
+      selectedIndex: _selectedIndex,
     ),
       body:
       RefreshIndicator(

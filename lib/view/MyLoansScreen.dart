@@ -45,7 +45,7 @@ class _MyLoansScreenState extends State<MyLoansScreen> {
         title: myLoans,
         bottomNavBar: bottomNavBar(
           context: context,
-          selectedIndex: 1,
+          selectedIndex: null,
         ),
         body: (widget.loansList!.isEmpty)?Center(child: Text('No Data',style: AppStyles.headerTextBlack,)):
         Padding(
@@ -137,7 +137,7 @@ class _MyLoansScreenState extends State<MyLoansScreen> {
                   children: [
                     Text(listData.pVchapplicationID.toString(),style: const TextStyle(color: Colors.black,letterSpacing: 6, fontWeight: FontWeight.bold),),
                     Container(
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                           color: Colors.transparent,
                           borderRadius: BorderRadius.all(Radius.circular(18))
                       ),

@@ -66,7 +66,7 @@ class _MyDepositsScreenState extends State<MyDepositsScreen> {
           ),
         bottomNavBar: bottomNavBar(
           context: context,
-          selectedIndex: 1,
+          selectedIndex: null,
         ),
           body:TabBarView(
             children: [
@@ -145,7 +145,22 @@ class _MyDepositsScreenState extends State<MyDepositsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(listData.pFdAccountNo.toString(),style: const TextStyle(color: Colors.black,letterSpacing: 6, fontWeight: FontWeight.bold),),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(listData.pFdAccountNo.toString(),style: const TextStyle(color: Colors.black,letterSpacing: 6, fontWeight: FontWeight.bold),),
+                Container(
+                  decoration: const BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.all(Radius.circular(18))
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 3),
+                    child: Text('(${listData.pAccountStatus.toString().toUpperCase()})',style: AppStyles.statusTextStyle(fontSize: 14),),
+                  ),
+                ),
+              ],
+            ),
             // const SizedBox(height: 2,),
             // Text('₹${listData.pDepositAmount}',style: const TextStyle(fontSize: 14,color: Colors.black)),
             SizedBox(height: gapHeight,),
@@ -250,7 +265,22 @@ class _MyDepositsScreenState extends State<MyDepositsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(listData.paccountno.toString(),style: const TextStyle(color: Colors.black,letterSpacing: 6, fontWeight: FontWeight.bold),),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(listData.paccountno.toString(),style: const TextStyle(color: Colors.black,letterSpacing: 6, fontWeight: FontWeight.bold),),
+                Container(
+                  decoration: const BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.all(Radius.circular(18))
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 3),
+                    child: Text('(${listData.pAccountstatus.toString().toUpperCase()})',style: AppStyles.statusTextStyle(fontSize: 14),),
+                  ),
+                ),
+              ],
+            ),
             // const SizedBox(height: 2,),
             // Text(listData.pbranchname.toString(),style: const TextStyle(fontSize: 14,color: Colors.black)),
             SizedBox(height: gapHeight,),

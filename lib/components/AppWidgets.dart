@@ -16,7 +16,7 @@ Widget bottomNavBar({required BuildContext context, int? selectedIndex}) {
     // margin: const EdgeInsets.only(bottom: 5,left: 0,right: 0),
     // padding: const EdgeInsets.only(top: 3),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
             topRight: Radius.circular(25.0),
             topLeft: Radius.circular(25.0),
         ),
@@ -25,14 +25,14 @@ Widget bottomNavBar({required BuildContext context, int? selectedIndex}) {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topRight: Radius.circular(25.0),
           topLeft: Radius.circular(25.0),
         ),
         child: BottomNavigationBar(
           backgroundColor: AppStyles.btnColor,
           type: BottomNavigationBarType.fixed,
-          currentIndex: selectedIndex??0,
+          currentIndex: selectedIndex!,
           unselectedLabelStyle: const TextStyle(color: Colors.grey,fontSize: 11),
           unselectedItemColor: Colors.grey,
           selectedItemColor: Colors.white,
