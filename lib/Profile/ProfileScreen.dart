@@ -24,20 +24,14 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   MemberDetailsResponse responseData = MemberDetailsResponse();
-  List<MemberDetailsResponse> listData=[];
-  List<KeyValueModel> listDataKyValue=[];
-  String _selectedValue = "";
   String memberId="";
 
   getMemberDetails() async {
   var data = await SharedPrefs.readData(SharedPrefs.memberDetails);
-  memberId = await SharedPrefs.getString(SharedPrefs.memberId);
-  listData=MemberDetailsResponse.fromJsonList(data);
-  listDataKyValue=MemberDetailsResponse.memberDetailsToKeyValueList(listData);
-  List<MemberDetailsResponse> filteredList = listData.where((item) => item.pmemberid.toString() == memberId).toList();
-  setState(() {
-   responseData = filteredList[0];
-  });
+  responseData=MemberDetailsResponse.fromJson(data);
+  memberId = responseData.pmemberid.toString();
+  log("===pContactName ${responseData.pContactName} ");
+  setState(() {});
   }
 
   @override
@@ -50,7 +44,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return CustomMainBackground(
         title: profile,
-        isBackButton: true,
+        isBackButton: false,
+        bottomNavBar: bottomNavBar(
+          context: context,
+          selectedIndex: 2,
+        ),
         body:buildBody(context)
     );
   }

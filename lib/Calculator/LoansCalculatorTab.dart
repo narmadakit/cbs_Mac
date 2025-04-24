@@ -263,7 +263,7 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                             children: [
                               getRuppeText(fontSize: 14,color: AppStyles.btnColor),
                               Text(
-                               (sumPrincipal == 0.00)?sumPrincipal.toStringAsFixed(0):sumPrincipal.toStringAsFixed(2),
+                                convertToCurrencyFormat2(sumPrincipal),
                                 style: AppStyles.highLightText,
                               ),
                             ],
@@ -275,7 +275,7 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                             children: [
                               getRuppeText(fontSize: 14,color: AppStyles.btnColor),
                               Text(
-                                (sumInterest == 0.00)?sumInterest.toStringAsFixed(0):sumInterest.toStringAsFixed(2),
+                                convertToCurrencyFormat2(sumInterest),
                                 style: AppStyles.highLightText,
                               ),
                             ],
@@ -287,7 +287,7 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                             children: [
                               getRuppeText(fontSize: 14,color: AppStyles.btnColor),
                               Text(
-                                (sumAmount == 0.00)?sumAmount.toStringAsFixed(0):sumAmount.toStringAsFixed(2),
+                                convertToCurrencyFormat2(sumAmount),
                                 style: AppStyles.highLightText,
                               ),
                             ],
@@ -320,20 +320,20 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
                 style: AppStyles.smallLabelTextBlack),
           )),
           DataCell(Center(
-            child: Text( data.pInstalmentprinciple.toString(),
+            child: Text(convertToCurrencyFormat2(data.pInstalmentprinciple),
                 style: AppStyles.smallLabelTextBlack),
           )),
           DataCell(
               Center(
-                child: Text(data.pInstalmentinterest.toString(),
+                child: Text(convertToCurrencyFormat2(data.pInstalmentinterest),
                     style: AppStyles.smallLabelTextBlack),
               )),
           DataCell(
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  getRuppeText(fontSize: 14),
-                  Text(data.pInstalmentamount.toString(),
+                  // getRuppeText(fontSize: 14),
+                  Text(convertToCurrencyFormat2(data.pInstalmentamount),
                       style: AppStyles.smallLabelTextBlack),
                 ],
               )),
@@ -344,245 +344,248 @@ class _LoansCalculatorTabState extends State<LoansCalculatorTab> {
 
   Widget buildBody(BuildContext context) {
     double gapHeight=20.0;
-    return Padding(
-                padding: const EdgeInsets.all(15.0),
-                child:  Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: gapHeight),
-                            Row(
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Text('Loan Type',style: AppStyles.boldTextBlack)),
-                                Expanded(
-                                  flex: 4,
-                                  child: CustomDropdown(context: context, selectedValue: _selectedLoanType,
-                                      items:kvLoanTypeList, onChanged: (value) {
-                                        _selectedLoanType = value;
-                                        _currentRangeValues = minInterestRate;
-                                        clearDataFunction();
-                                        Navigator.pop(context);
-                                        context.read<LoanCalculatorBloc>().add(GetLoanNameEvent(_selectedLoanType.id));
-
-                                      }, hint: ""),
-                                )
-                              ],
-                            ),
-                            SizedBox(height: gapHeight),
-                            Row(
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Text('Loan Name',style: AppStyles.boldTextBlack)),
-                                Expanded(
-                                  flex: 4,
-                                  child: CustomDropdown(context: context, selectedValue: _selectedLoanName,
-                                      items:kvLoanNameList, onChanged: (value) {
-                                        _selectedLoanName = value;
-                                        _selectedPayIn = KeyValueModel(id: "0", name: "Select");
-                                        Navigator.pop(context);
-                                        schemeId = "0"; //because initially we r not getting schemeid
-                                        context.read<LoanCalculatorBloc>().add(GetLoanPayInEvent(_selectedLoanName.id,schemeId));
-                                        context.read<LoanCalculatorBloc>().add(GetLoanInstalmentModeEvent(_selectedLoanName.id));
-                                      }, hint: ""),
-                                )
-                              ],
-                            ),
-                            SizedBox(height: gapHeight),
-                            Row(
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Text('Loan Pay-in',style: AppStyles.boldTextBlack)),
-                                Expanded(
-                                  flex: 4,
-                                  child: CustomDropdown(context: context, selectedValue: _selectedPayIn,
-                                      items:kvPayInList, onChanged: (value) {
-                                        setState(() {
-                                          _selectedPayIn = value;
-                                        schemeId=  _selectedPayIn.id;
-                                        });
-                                        Navigator.pop(context);
-                                        context.read<LoanCalculatorBloc>().add(GetLoanInterestTypeEvent(_selectedLoanName.id, schemeId,_selectedPayIn.name));
-                                      }, hint: ""),
-                                )
-                              ],
-                            ),
-                            SizedBox(height: gapHeight),
-                            Row(
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Text('Interest Type',style: AppStyles.boldTextBlack)),
-                                Expanded(
-                                  flex: 4,
-                                  child: CustomDropdown(context: context, selectedValue: _selectedInterestType,
-                                      items:kvInterestTypeList, onChanged: (value) {
-                                        _selectedInterestType = value;
-                                        Navigator.pop(context);
-                                        context.read<LoanCalculatorBloc>().add(GetMinMaxLoanEvent(_selectedLoanName.id,schemeId,_selectedPayIn.name,_selectedInterestType.name));
+    return GestureDetector(
+     onTap: () => FocusScope.of(context).unfocus(),
+      child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child:  Column(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: gapHeight),
+                              Row(
+                                children: [
+                                  Expanded(
+                                      flex: 2,
+                                      child: Text('Loan Type',style: AppStyles.boldTextBlack)),
+                                  Expanded(
+                                    flex: 4,
+                                    child: CustomDropdown(context: context, selectedValue: _selectedLoanType,
+                                        items:kvLoanTypeList, onChanged: (value) {
+                                          _selectedLoanType = value;
+                                          _currentRangeValues = minInterestRate;
+                                          clearDataFunction();
+                                          Navigator.pop(context);
+                                          context.read<LoanCalculatorBloc>().add(GetLoanNameEvent(_selectedLoanType.id));
+      
                                         }, hint: ""),
-                                )
-                              ],
-                            ),
-                            SizedBox(height: gapHeight),
-                            Row(
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Text('Loan Amount',style: AppStyles.boldTextBlack)),
-                                Expanded(
-                                  flex: 4,
-                                  child: FocusScope(
-                                    onFocusChange: (value) {
-                                      if (!value) {
-                                        DateTime dateTime=DateTime.now();
-                                        context.read<LoanCalculatorBloc>().add(GetLoanInterestRateEvent(_selectedLoanName.id, schemeId,_selectedPayIn.name,_selectedInterestType.name,enterAmount,dateTime.toString()));
-                                      }
-                                    },
-                                    child: CustomTextFieldAmount(
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: gapHeight),
+                              Row(
+                                children: [
+                                  Expanded(
+                                      flex: 2,
+                                      child: Text('Loan Name',style: AppStyles.boldTextBlack)),
+                                  Expanded(
+                                    flex: 4,
+                                    child: CustomDropdown(context: context, selectedValue: _selectedLoanName,
+                                        items:kvLoanNameList, onChanged: (value) {
+                                          _selectedLoanName = value;
+                                          _selectedPayIn = KeyValueModel(id: "0", name: "Select");
+                                          Navigator.pop(context);
+                                          schemeId = "0"; //because initially we r not getting schemeid
+                                          context.read<LoanCalculatorBloc>().add(GetLoanPayInEvent(_selectedLoanName.id,schemeId));
+                                          context.read<LoanCalculatorBloc>().add(GetLoanInstalmentModeEvent(_selectedLoanName.id));
+                                        }, hint: ""),
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: gapHeight),
+                              Row(
+                                children: [
+                                  Expanded(
+                                      flex: 2,
+                                      child: Text('Loan Pay-in',style: AppStyles.boldTextBlack)),
+                                  Expanded(
+                                    flex: 4,
+                                    child: CustomDropdown(context: context, selectedValue: _selectedPayIn,
+                                        items:kvPayInList, onChanged: (value) {
+                                          setState(() {
+                                            _selectedPayIn = value;
+                                          schemeId=  _selectedPayIn.id;
+                                          });
+                                          Navigator.pop(context);
+                                          context.read<LoanCalculatorBloc>().add(GetLoanInterestTypeEvent(_selectedLoanName.id, schemeId,_selectedPayIn.name));
+                                        }, hint: ""),
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: gapHeight),
+                              Row(
+                                children: [
+                                  Expanded(
+                                      flex: 2,
+                                      child: Text('Interest Type',style: AppStyles.boldTextBlack)),
+                                  Expanded(
+                                    flex: 4,
+                                    child: CustomDropdown(context: context, selectedValue: _selectedInterestType,
+                                        items:kvInterestTypeList, onChanged: (value) {
+                                          _selectedInterestType = value;
+                                          Navigator.pop(context);
+                                          context.read<LoanCalculatorBloc>().add(GetMinMaxLoanEvent(_selectedLoanName.id,schemeId,_selectedPayIn.name,_selectedInterestType.name));
+                                          }, hint: ""),
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: gapHeight),
+                              Row(
+                                children: [
+                                  Expanded(
+                                      flex: 2,
+                                      child: Text('Loan Amount',style: AppStyles.boldTextBlack)),
+                                  Expanded(
+                                    flex: 4,
+                                    child: FocusScope(
+                                      onFocusChange: (value) {
+                                        if (!value) {
+                                          DateTime dateTime=DateTime.now();
+                                          context.read<LoanCalculatorBloc>().add(GetLoanInterestRateEvent(_selectedLoanName.id, schemeId,_selectedPayIn.name,_selectedInterestType.name,enterAmount,dateTime.toString()));
+                                        }
+                                      },
+                                      child: CustomTextFieldAmount(
+                                          boxHeight: 45,
+                                          context: context, controller: amountController,
+                                          onChanged: (value) {
+                                            enterAmount =  removeCommasFromNumber(value).toString();
+                                          },
+                                          hint: "Enter Loan Amount", textInputType: TextInputType.number),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Expanded(
+                                      flex: 2,
+                                      child: Text('',style: AppStyles.boldTextBlack)),
+                                  const SizedBox(width: 10,),
+                                  Expanded(
+                                    flex: 4,
+                                    child:Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(' Min: ${convertToCurrencyFormat2(minAmount)}',style: AppStyles.smallLabelTextBlack),
+                                        Text('Max: ${convertToCurrencyFormat2(maxAmount)}  ',style: AppStyles.smallLabelTextBlack)
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: gapHeight),
+                              Row(
+                                children: [
+                                  Expanded(
+                                      flex: 2,
+                                      child: Text('Tenure',style: AppStyles.boldTextBlack)),
+                                  Expanded(
+                                    flex: 4,
+                                    child: CustomTextField(
                                         boxHeight: 45,
-                                        context: context, controller: amountController,
+                                        context: context, controller: tenureTxtController,
                                         onChanged: (value) {
-                                          enterAmount =  removeCommasFromNumber(value).toString();
-                                        },
-                                        hint: "Enter Loan Amount", textInputType: TextInputType.number),
+                                          // context.read<LoanCalculatorBloc>().add(GetLoanInterestRateEvent(_selectedLoanName.id, schemeId,_selectedPayIn.name,_selectedInterestType.name,enterAmount,dateTime.toString(), tenureTxtController.text));
+                                        }, hint: "Enter Tenure", textInputType: TextInputType.number),
+                                  )
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Expanded(
+                                      flex: 2,
+                                      child: Text('',style: AppStyles.boldTextBlack)),
+                                  const SizedBox(width: 10,),
+                                  Expanded(
+                                    flex: 4,
+                                    child:Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(' From: ${tenureFrom.toStringAsFixed(0)}',style: AppStyles.smallLabelTextBlack),
+                                        Text('To: ${tenureTo.toStringAsFixed(0)}',style: AppStyles.smallLabelTextBlack)
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+      
+                              SizedBox(height: gapHeight),
+                              Row(
+                                children: [
+                                  Expanded(
+                                      flex: 2,
+                                      child: Text('Loan Installment Mode',style: AppStyles.boldTextBlack)),
+                                const SizedBox(width: 5),
+                                  Expanded(
+                                    flex: 4,
+                                    child: CustomDropdown(context: context, selectedValue: _selectedInstalmentMode,
+                                        items:kvInstalmentModeList, onChanged: (value) {
+                                          _selectedInstalmentMode = value;
+                                         setState(() {});
+                                          Navigator.pop(context);
+                                        }, hint: ""),
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: gapHeight),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Expanded(
+                                      flex: 2,
+                                      child: Text('Interest Rate\n(Per annum)',style: AppStyles.boldTextBlack)),
+                                  const SizedBox(width: 10,),
+                                  Expanded(
+                                    flex: 5,
+                                    child: Column(
+                                      children: [
+                                        Slider(
+                                          value:  double.parse(_currentRangeValues.toStringAsFixed(2)),
+                                          divisions: 100,
+                                          activeColor: AppStyles.btnColor,
+                                          inactiveColor: AppStyles.bgColor3,
+                                          min: double.parse(minInterestRate.toStringAsFixed(2)),
+                                          max: double.parse(maxInterestRate.toStringAsFixed(2)),
+                                          label: '${_currentRangeValues.toStringAsFixed(2)}%',
+                                          onChanged: (value) {
+                                              _currentRangeValues = value;
+                                              setState(() {});
+                                          },),
+                                        Text("(${_currentRangeValues.toStringAsFixed(2)} %)" ,style: AppStyles.smallLabelTextBold),
+                                      ],
+                                    ),
                                   ),
-                                )
-                              ],
-                            ),
-                            const SizedBox(height: 5),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Text('',style: AppStyles.boldTextBlack)),
-                                const SizedBox(width: 10,),
-                                Expanded(
-                                  flex: 4,
-                                  child:Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(' Min: ${convertToCurrencyFormat(minAmount)??"0"}',style: AppStyles.smallLabelTextBlack),
-                                      Text('Max: ${convertToCurrencyFormat(maxAmount)??"0"}  ',style: AppStyles.smallLabelTextBlack)
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                            SizedBox(height: gapHeight),
-                            Row(
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Text('Tenure',style: AppStyles.boldTextBlack)),
-                                Expanded(
-                                  flex: 4,
-                                  child: CustomTextField(
-                                      boxHeight: 45,
-                                      context: context, controller: tenureTxtController,
-                                      onChanged: (value) {
-                                        // context.read<LoanCalculatorBloc>().add(GetLoanInterestRateEvent(_selectedLoanName.id, schemeId,_selectedPayIn.name,_selectedInterestType.name,enterAmount,dateTime.toString(), tenureTxtController.text));
-                                      }, hint: "Enter Tenure", textInputType: TextInputType.number),
-                                )
-                              ],
-                            ),
-                            const SizedBox(height: 5),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Text('',style: AppStyles.boldTextBlack)),
-                                const SizedBox(width: 10,),
-                                Expanded(
-                                  flex: 4,
-                                  child:Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(' From: ${tenureFrom.toStringAsFixed(0)}',style: AppStyles.smallLabelTextBlack),
-                                      Text('To: ${tenureTo.toStringAsFixed(0)}',style: AppStyles.smallLabelTextBlack)
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-
-                            SizedBox(height: gapHeight),
-                            Row(
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Text('Loan Installment Mode',style: AppStyles.boldTextBlack)),
-                              const SizedBox(width: 5),
-                                Expanded(
-                                  flex: 4,
-                                  child: CustomDropdown(context: context, selectedValue: _selectedInstalmentMode,
-                                      items:kvInstalmentModeList, onChanged: (value) {
-                                        _selectedInstalmentMode = value;
-                                       setState(() {});
-                                        Navigator.pop(context);
-                                      }, hint: ""),
-                                )
-                              ],
-                            ),
-                            SizedBox(height: gapHeight),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Text('Interest Rate\n(Per annum)',style: AppStyles.boldTextBlack)),
-                                const SizedBox(width: 10,),
-                                Expanded(
-                                  flex: 5,
-                                  child: Column(
-                                    children: [
-                                      Slider(
-                                        value:  double.parse(_currentRangeValues.toStringAsFixed(2)),
-                                        divisions: 100,
-                                        activeColor: AppStyles.btnColor,
-                                        inactiveColor: AppStyles.bgColor3,
-                                        min: double.parse(minInterestRate.toStringAsFixed(2)),
-                                        max: double.parse(maxInterestRate.toStringAsFixed(2)),
-                                        label: '${_currentRangeValues.toStringAsFixed(2)}%',
-                                        onChanged: (value) {
-                                            _currentRangeValues = value;
-                                            setState(() {});
-                                        },),
-                                      Text("(${_currentRangeValues.toStringAsFixed(2)} %)" ,style: AppStyles.smallLabelTextBold),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-
-                    payButton(() {
-                      if(validate()){
-                        context.read<LoanCalculatorBloc>().add(GetLoanFinalLoanViewEvent(
-                            loanamount: enterAmount,
-                            interesttype: _selectedInterestType.name,
-                            loanpayin: _selectedPayIn.name,
-                            interestrate: _currentRangeValues.toString(),
-                            tenureofloan: tenureTxtController.text,
-                            loaninstalmentmode: _selectedInstalmentMode.name,
-                            loanId: _selectedLoanName.id
-                        ));
-                      }
-                    },"Calculate"),
-                  ],
-                )
-            );
+      
+                      payButton(() {
+                        if(validate()){
+                          context.read<LoanCalculatorBloc>().add(GetLoanFinalLoanViewEvent(
+                              loanamount: enterAmount,
+                              interesttype: _selectedInterestType.name,
+                              loanpayin: _selectedPayIn.name,
+                              interestrate: _currentRangeValues.toString(),
+                              tenureofloan: tenureTxtController.text,
+                              loaninstalmentmode: _selectedInstalmentMode.name,
+                              loanId: _selectedLoanName.id
+                          ));
+                        }
+                      },"Calculate"),
+                    ],
+                  )
+              ),
+    );
   }
 }
 

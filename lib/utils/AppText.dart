@@ -1,6 +1,6 @@
 const String dashBoard = "Dashboard";
 const String myLoans = "My Loans";
-const String myDeposits = "My Deposits";
+const String myDepositsText = "My Deposits";
 const String applyLoan = "Apply Loan";
 const String myShares = "My Shares";
 const String totalDuesText = "Total Dues";

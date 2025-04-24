@@ -19,11 +19,16 @@ convertToCurrencyFormat(dynamic amount) {
  return currencyFormat.format(amount);
 }
 
-convertToCurrencyFormat2(dynamic amount) {
- amount = removeCurrencyFormat(amount);
- double parsedAmount = double.tryParse(amount.toString()) ?? 0.0;
- dynamic amt = parsedAmount.toStringAsFixed(0);
- return amt;
+final NumberFormat currencyFormat2 = NumberFormat('#,##0');
+
+String removeCurrencyFormat2(dynamic value) {
+ return value.toString().replaceAll(RegExp(r'[^\d.-]'), '');
+}
+
+String convertToCurrencyFormat2(dynamic amount) {
+ amount = removeCurrencyFormat2(amount);
+ double parsed = double.tryParse(amount.toString()) ?? 0.0;
+ return currencyFormat2.format(parsed); // Applies formatting with no decimals
 }
 
 String convertDateFormat(String input){
@@ -127,6 +132,11 @@ double? removeCommasFromNumber(value){
  } else {
  return 0;// This won't happen here
  }
+}
+
+String capitalize(String value) {
+ if (value.isEmpty) return value;
+ return value[0].toUpperCase() + value.substring(1).toLowerCase();
 }
 
 

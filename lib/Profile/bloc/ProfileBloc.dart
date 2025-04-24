@@ -20,7 +20,7 @@ class ProfileBloc extends Bloc<ProfileEvent,ProfileState>{
     try{
       List<MemberDetailsResponse> listData= await repo.getMemberDetailsRepo(mobileNo);
       emit(ProfileSuccessState(listData));
-      SharedPrefs.saveData(SharedPrefs.memberDetails, listData);
+      // SharedPrefs.saveData(SharedPrefs.memberDetails, listData);
     }
     catch(e){
      emit(ProfileErrorState(e.toString()));

@@ -30,27 +30,24 @@ class CustomMainBackground extends StatelessWidget{
         backgroundColor: Colors.transparent,
       ),
       bottomNavigationBar:
-      SafeArea(
-        child: Container(
-            margin: const EdgeInsets.only(bottom: 15,left: 15,right: 10),
-            padding: const EdgeInsets.only(top: 3),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              boxShadow:  [
-                BoxShadow(color: AppStyles.shadowColor, spreadRadius: 0, blurRadius: 10),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: bottomNavBar
-            )
-        ),
+      Container(
+          // margin: const EdgeInsets.only(bottom: 15,left: 15,right: 10),
+          // padding: const EdgeInsets.only(top: 8),
+          decoration: BoxDecoration(
+            // borderRadius: BorderRadius.circular(30),
+            boxShadow:  [
+              BoxShadow(color: AppStyles.shadowColor, spreadRadius: 0, blurRadius: 10),
+            ],
+          ),
+          child: ClipRRect(
+            // borderRadius: BorderRadius.circular(30),
+            child: bottomNavBar
+          )
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              // Color(0xffd8b9fb),
               AppStyles.bgColor1,
               AppStyles.bgColor2,
               AppStyles.bgColor3,

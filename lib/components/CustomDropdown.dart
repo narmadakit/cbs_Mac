@@ -86,7 +86,7 @@ class CustomDropdownBottomSheet extends StatelessWidget {
             Column(
               children: [
                 ListTile(
-                title: Text(items[index].name),
+                title: Text(items[index].name,style: AppStyles.highLightText,),
                 onTap: () {
                   onItemSelected(items[index]);
                 },

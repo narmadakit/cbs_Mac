@@ -70,13 +70,12 @@ class _TotalDuesScreenState extends State<TotalDuesScreen> {
   }
 
   Widget blocBuilderBody(List<MembersAllDuesModel> allDuesList){
-    print("==== ${allDuesList[0].paccounttype} ${widget.accountType}");
     if(widget.accountType != ""){
       List<MembersAllDuesModel> filteredList = allDuesList.where((item) => item.paccounttype == widget.accountType).toList();
       allDuesList = filteredList;
     }
 
-    return (allDuesList.isEmpty)?const Center(child: Text("No Data")):
+    return (allDuesList.isEmpty)? Center(child: Text("No Data",style: AppStyles.headerTextBlack)):
       Padding(
       padding: const EdgeInsets.all(15.0),
       child: ListView.builder(
@@ -156,7 +155,7 @@ class _TotalDuesScreenState extends State<TotalDuesScreen> {
                       flex: flex,
                       child:getRowText(
                           rupeeSymbol: "",
-                          text:listData.pbranchname??""
+                          text: capitalize(listData.pbranchname??"")
                       )),
                 ],
               ),

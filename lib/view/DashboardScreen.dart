@@ -3,12 +3,10 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:finsta_mac/Calculator/EmiCalculatorScreen.dart';
 import 'package:finsta_mac/Home/bloc/HomeBloc.dart';
 import 'package:finsta_mac/Home/bloc/HomeEvent.dart';
 import 'package:finsta_mac/Home/model/BanneImageModel.dart';
 import 'package:finsta_mac/Home/model/LoanDataResponse.dart';
-import 'package:finsta_mac/Profile/ProfileScreen.dart';
 import 'package:finsta_mac/network/Repository.dart';
 import 'package:finsta_mac/utils/AppStyles.dart';
 import 'package:finsta_mac/view/MyDepositeScreen.dart';
@@ -38,6 +36,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final CarouselSliderController _controller = CarouselSliderController();
   LoanDataResponse loanData=LoanDataResponse();
   bool loadingVisibility = false;
+  bool bannerVisibility = true;
   bool duesLoadingVisibility = true;
   List<Savingslist>? savingLoan=[];
   List<BannerImageModel> bannerImageList=[];
@@ -89,6 +88,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           listener: (context, state) {
             if(state is HomeLoadingState){
               loadingVisibility = true;
+              bannerVisibility = true;
             }
             else if(state is HomeSuccessState){
               loanData = state.responseData;
@@ -98,7 +98,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             }
             else if(state is BannerImageSuccessState){
               bannerImageList=state.responseData;
-              loadingVisibility = false;
+              bannerVisibility = false;
             }
             else if(state is AllDuesSuccessState){
               duesLoanList = state.responseData;
@@ -136,85 +136,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       title1: ', ${memberName}',
     title: 'Hi',
     isBackButton: false,
-    bottomNavBar: Container(
-    margin: const EdgeInsets.only(bottom: 5,left: 0,right: 0),
-    padding: const EdgeInsets.only(top: 3),
-    decoration: BoxDecoration(
-    borderRadius: BorderRadius.circular(30),
-    boxShadow:  [
-    BoxShadow(color: AppStyles.shadowColor, spreadRadius: 0, blurRadius: 10),
-    ],
-    ),
-    child: ClipRRect(
-    borderRadius: BorderRadius.circular(30),
-    child: BottomNavigationBar(
-    backgroundColor: AppStyles.btnColor,
-    type: BottomNavigationBarType.fixed,
-    currentIndex: _selectedIndex,
-    unselectedLabelStyle: const TextStyle(color: Colors.grey,fontSize: 11),
-    unselectedItemColor: Colors.white,
-    selectedItemColor: Colors.white,
-    showUnselectedLabels: true,
-    showSelectedLabels: true,
-    onTap: (index) {
-    setState(() {
-    _selectedIndex = index;
-
-    if(_selectedIndex == 1){
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const EmiCalculatorScreen(
-              )));
-    }
-    if(_selectedIndex == 2){
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const ProfileScreen(
-              )));
-    }
-    // if(_selectedIndex == 3){
-    // Navigator.push(
-    // context,
-    // MaterialPageRoute(
-    // builder: (context) => const EmiCalculatorScreen(
-    // )));
-    // }
-    // if(_selectedIndex == 4){
-    //   Navigator.push(
-    //       context,
-    //       MaterialPageRoute(
-    //           builder: (context) => const ProfileScreen(
-    //           )));
-    // }
-    });
-    },
-    selectedLabelStyle: const TextStyle(color: Colors.grey,fontSize: 11),
-    items: const [
-    BottomNavigationBarItem(
-    icon: Icon(Icons.home_outlined,size: 20,),
-    label: home,
-    ),
-    // BottomNavigationBarItem(
-    // icon: Icon(Icons.home_repair_service_outlined,size: 20),
-    // label: loans,
-    // ),
-    // BottomNavigationBarItem(
-    // icon: Icon(Icons.savings_outlined,size: 20),
-    // label: deposits,
-    // ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.calculate_outlined,size: 20),
-        label: calculator,
-      ),
-    BottomNavigationBarItem(
-    icon: Icon(Icons.account_circle_outlined,size: 20),
-    label: profile,
-    ),
-    ],
-    ),
-    )
+    bottomNavBar: bottomNavBar(
+      context: context,
+      selectedIndex: 0,
     ),
       body:
       RefreshIndicator(
@@ -223,6 +147,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 0.0,vertical: 5),
           child: ListView(
               children: [
+                (bannerVisibility)?
+                Center(child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(color: AppStyles.btnColor),
+                )):
                 CarouselSlider.builder(
                   carouselController: _controller,
                   itemCount: bannerImageList.length,
@@ -236,7 +165,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   options: CarouselOptions(
                       autoPlay: true,
                       enlargeCenterPage: true,
-                      aspectRatio: 2.2,
+                      aspectRatio: 16 / 9,
                       viewportFraction: 1.0,
                       enableInfiniteScroll: false,
                       onPageChanged: (index, reason) {
@@ -256,7 +185,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            color:(_current == entry.key)? Colors.black : AppStyles.shadowColor ),
+                            color:(_current == entry.key)? AppStyles.btnColor : AppStyles.shadowColor ),
                       ),
                     );
                   }).toList(),
@@ -296,8 +225,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               decoration: BoxDecoration(
                                   shape: BoxShape.rectangle,
                                   color: (_current == entry.key
-                                      ? Colors.grey
-                                      : AppStyles.carouselCardColor)
+                                      ? AppStyles.btnColor
+                                      : AppStyles.shadowColor)
                                       .withOpacity(_current == entry.key ? 0.9 : 0.4)),
                             ),
                           );
@@ -322,7 +251,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                                 const SizedBox(width: 20,),
                                 Expanded(
-                                  child: buildGrids(myDeposits,"assets/images/deposit1.png",(){
+                                  child: buildGrids(myDepositsText,"assets/images/deposit1.png",(){
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -369,6 +298,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+
   Widget totalDueContainer() {
     totalDuesListAmt=0;
     for(var i =0;i<duesLoanList!.length;i++){
@@ -402,6 +332,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             const SizedBox(width: 10,),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(totalDuesText,style: AppStyles.smallLabelTextBlack,),
                                 const SizedBox(height: 2),
@@ -502,20 +433,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget buildCaruselBanner(int index, Uint8List? bytesLogo) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
+        borderRadius: BorderRadius.circular(2),
+        color: AppStyles.bgColor1,
       ),
 
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(5.0),
         child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(2),
             // child: Image.asset("assets/images/banner.jpeg",fit: BoxFit.cover,
             //   width: double.infinity)
             child:
             Image.memory(bytesLogo!,
               width: double.infinity,
-              fit: BoxFit.cover,)
+              fit: BoxFit.contain,)
 
         ),
       ),

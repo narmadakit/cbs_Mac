@@ -1,8 +1,89 @@
+import 'dart:developer';
+
+import 'package:finsta_mac/view/DashboardScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../Calculator/EmiCalculatorScreen.dart';
+import '../Profile/ProfileScreen.dart';
 import '../utils/AppStyles.dart';
+import '../utils/AppText.dart';
+
+
+Widget bottomNavBar({required BuildContext context, int? selectedIndex}) {
+  return Container(
+    // margin: const EdgeInsets.only(bottom: 5,left: 0,right: 0),
+    // padding: const EdgeInsets.only(top: 3),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+            topRight: Radius.circular(25.0),
+            topLeft: Radius.circular(25.0),
+        ),
+        boxShadow:  [
+          BoxShadow(color: AppStyles.shadowColor, spreadRadius: 0, blurRadius: 10),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(25.0),
+          topLeft: Radius.circular(25.0),
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: AppStyles.btnColor,
+          type: BottomNavigationBarType.fixed,
+          currentIndex: selectedIndex??0,
+          unselectedLabelStyle: const TextStyle(color: Colors.grey,fontSize: 11),
+          unselectedItemColor: Colors.grey,
+          selectedItemColor: Colors.white,
+          showUnselectedLabels: true,
+          showSelectedLabels: true,
+          onTap: (value) {
+            log("selectedIndex  $value $selectedIndex");
+            if(selectedIndex != value){
+              selectedIndex = value;
+              if(selectedIndex == 0){
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const DashboardScreen(
+                        )));
+              }
+              if(selectedIndex == 1){
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const EmiCalculatorScreen(
+                        )));
+              }
+              if(selectedIndex == 2){
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ProfileScreen(
+                        )));
+              }
+            }
+          },
+          selectedLabelStyle: const TextStyle(color: Colors.grey,fontSize: 11),
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined,size: 20,),
+              label: home,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calculate_outlined,size: 20),
+              label: calculator,
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle_outlined,size: 20),
+              label: profile,
+            ),
+          ],
+        ),
+      )
+  );
+}
 
 Widget buildGrids(String title, String icon, Function() onTap) {
   return GestureDetector(
@@ -24,6 +105,7 @@ Widget buildGrids(String title, String icon, Function() onTap) {
     ),
   );
 }
+
 
 Widget circularBorderImage(String icon){
   return Container(

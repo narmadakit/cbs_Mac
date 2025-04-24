@@ -42,7 +42,7 @@ class _MyDepositsScreenState extends State<MyDepositsScreen> {
     return DefaultTabController(
       length: 2,
       child: CustomMainBackground(
-          title: myDeposits,
+          title: myDepositsText,
           tabBar: TabBar(
             splashBorderRadius: BorderRadius.circular(
               25.0,
@@ -64,10 +64,16 @@ class _MyDepositsScreenState extends State<MyDepositsScreen> {
                   child: Tab( text: "FD")),
             ],
           ),
+        bottomNavBar: bottomNavBar(
+          context: context,
+          selectedIndex: 1,
+        ),
           body:TabBarView(
             children: [
-              rdTab(),
-              fdTab(),
+              widget.rdList!.isNotEmpty?rdTab()
+              :Center(child: Text("No Data",style: AppStyles.headerTextBlack)),
+              widget.fdList!.isNotEmpty?fdTab()
+              :Center(child: Text("No Data",style: AppStyles.headerTextBlack)),
             ],
           ),
 

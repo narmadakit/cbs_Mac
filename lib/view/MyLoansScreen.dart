@@ -43,30 +43,42 @@ class _MyLoansScreenState extends State<MyLoansScreen> {
   Widget build(BuildContext context) {
     return CustomMainBackground(
         title: myLoans,
-        bottomNavBar: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: (isVisiblePayBtn == false)?null:
-          payButton((){
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const TotalDuesScreen(
-                       accountType: "LOANS DUES",
-                    )));
-          }, payNowText),
+        bottomNavBar: bottomNavBar(
+          context: context,
+          selectedIndex: 1,
         ),
         body: (widget.loansList!.isEmpty)?Center(child: Text('No Data',style: AppStyles.headerTextBlack,)):
         Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: ListView.builder(
-            itemCount: widget.loansList?.length,
-            itemBuilder: (context, index) {
-              Loanslist listData=widget.loansList![index];
-              return Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: buildCaruselCard(listData,index),
-              );
-            },
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: widget.loansList?.length,
+                  itemBuilder: (context, index) {
+                    Loanslist listData=widget.loansList![index];
+                    return Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: buildCaruselCard(listData,index),
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child:
+                (isVisiblePayBtn == false)?null:
+                payButton((){
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const TotalDuesScreen(
+                            accountType: "LOANS DUES",
+                          )));
+                }, payNowText),
+              ),
+            ],
           ),
         )
     );

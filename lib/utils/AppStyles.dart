@@ -25,7 +25,7 @@ class AppStyles{
  static TextStyle smallLabelTextBlack=const TextStyle(fontSize: 11,color: Colors.black);
  static TextStyle hintTextStyleBlack= TextStyle(fontSize: 11,color:bgColor1 );
  static TextStyle smallLabelTextBold=const TextStyle(fontSize: 11,color: Colors.black,fontWeight: FontWeight.w600);
- static TextStyle headerTextBlack=const TextStyle(color: Colors.black,fontWeight: FontWeight.bold);
+ static TextStyle headerTextBlack=const TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 15);
  static TextStyle highLightText= TextStyle(color: AppStyles.btnColor,fontWeight: FontWeight.bold,fontSize: 13);
  static TextStyle boldTextBlack= TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 12);
  static TextStyle headerTextWhite=const TextStyle(color: Colors.white,fontWeight: FontWeight.bold);

@@ -32,9 +32,9 @@ class Repository{
     'schema-name': 'public'
   };
 
-  Future<List<MemberDetailsResponse>> memberData() async {
+  Future<MemberDetailsResponse> memberData() async {
     var data = await SharedPrefs.readData(SharedPrefs.memberDetails);
-   List<MemberDetailsResponse> listData=MemberDetailsResponse.fromJsonList(data);
+    MemberDetailsResponse listData=MemberDetailsResponse.fromJson(data);
     return listData;
   }
 
@@ -150,7 +150,7 @@ class Repository{
       Uri apiUrl = Uri.parse(url);
       log("URL $TAG  --------$apiUrl");
       var response = await http.get(apiUrl,headers: loginHeader);
-      log('RESPONSE $TAG >>>> ${jsonDecode(response.body)}');
+      // log('RESPONSE $TAG >>>> ${jsonDecode(response.body)}');
 
       List body= json.decode(response.body);
       return body.map((e) => BannerImageModel.fromJson(e)).toList();
@@ -167,9 +167,9 @@ class Repository{
    String applicantType="";
    String memberType="";
    List<SchemaDetailsModel> listData=[];
-    List<MemberDetailsResponse> data = await memberData();
-    applicantType= data[0].papplicanttype;
-    memberType = data[0].pmembertype;
+   MemberDetailsResponse data = await memberData();
+    applicantType= data.papplicanttype;
+    memberType = data.pmembertype;
     try{
         String url = ApiURL.getAllTransactionsSchemes(formName, applicantType, memberType);
         Uri apiUrl = Uri.parse(url);
@@ -191,9 +191,9 @@ class Repository{
     TAG = 'getTenureTypeRepo';
     String applicantType="";
     String memberType="";
-    List<MemberDetailsResponse> data = await memberData();
-    applicantType= data[0].papplicanttype;
-    memberType = data[0].pmembertype;
+    MemberDetailsResponse data = await memberData();
+    applicantType= data.papplicanttype;
+    memberType = data.pmembertype;
     List<DepositeTenureModel> listData=[];
     try{
       String url = ApiURL.getFdTenureModesApi(fdName, applicantType, memberType);
@@ -215,9 +215,9 @@ class Repository{
     TAG = 'getFDInterestDetailsRepo';
     String applicantType="";
     String memberType="";
-    List<MemberDetailsResponse> data = await memberData();
-    applicantType= data[0].papplicanttype;
-    memberType = data[0].pmembertype;
+    MemberDetailsResponse data = await memberData();
+    applicantType= data.papplicanttype;
+    memberType = data.pmembertype;
     try{
       String url = ApiURL.getFdInterestDetailsApi(applicantType, memberType,fdConfigID,fdName,tenure,tenureMode,depositAmount);
       Uri apiUrl = Uri.parse(url);
@@ -238,9 +238,9 @@ class Repository{
     TAG = 'getFDInterestDetailsRepo';
     String applicantType="";
     String memberType="";
-    List<MemberDetailsResponse> data = await memberData();
-    applicantType= data[0].papplicanttype;
-    memberType = data[0].pmembertype;
+    MemberDetailsResponse data = await memberData();
+    applicantType= data.papplicanttype;
+    memberType = data.pmembertype;
     try{
       String url = ApiURL.getFdInterestRateApi(fdName,depositAmount,tenure,tenureMode,interestPayout,memberType,applicantType);
       Uri apiUrl = Uri.parse(url);
@@ -261,9 +261,9 @@ class Repository{
     TAG = 'getFDSchemeDescrRepo';
     String applicantType="";
     String memberType="";
-    List<MemberDetailsResponse> data = await memberData();
-    applicantType= data[0].papplicanttype;
-    memberType = data[0].pmembertype;
+    MemberDetailsResponse data = await memberData();
+    applicantType= data.papplicanttype;
+    memberType = data.pmembertype;
     try{
       String url = ApiURL.getFdSchemeDescriptionApi(fdName,memberType,applicantType);
       Uri apiUrl = Uri.parse(url);
@@ -313,9 +313,9 @@ class Repository{
     TAG = 'getRDTenureTypeRepo';
     String applicantType="";
     String memberType="";
-    List<MemberDetailsResponse> data = await memberData();
-    applicantType= data[0].papplicanttype;
-    memberType = data[0].pmembertype;
+    MemberDetailsResponse data = await memberData();
+    applicantType= data.papplicanttype;
+    memberType = data.pmembertype;
     List<DepositeTenureModel> listData=[];
     try{
       String url = ApiURL.getRdTenureModesApi(rdName, applicantType, memberType);
@@ -337,9 +337,9 @@ class Repository{
     TAG = 'getRDInterestDetailsRepo';
     String applicantType="";
     String memberType="";
-    List<MemberDetailsResponse> data = await memberData();
-    applicantType= data[0].papplicanttype;
-    memberType = data[0].pmembertype;
+    MemberDetailsResponse data = await memberData();
+    applicantType= data.papplicanttype;
+    memberType = data.pmembertype;
     try{
       String url = ApiURL.getRdInterestDetailsApi(applicantType, memberType,configID,rdName,tenure,tenureMode,installmentAmount);
       Uri apiUrl = Uri.parse(url);
@@ -360,9 +360,9 @@ class Repository{
     TAG = 'getRDInterestTRateRepo';
     String applicantType="";
     String memberType="";
-    List<MemberDetailsResponse> data = await memberData();
-    applicantType= data[0].papplicanttype;
-    memberType = data[0].pmembertype;
+    MemberDetailsResponse data = await memberData();
+    applicantType= data.papplicanttype;
+    memberType = data.pmembertype;
     try{
       String url = ApiURL.getRdInterestRateApi(rdName,instalmentAmount,tenure,tenureMode,interestPayout,memberType,applicantType);
       Uri apiUrl = Uri.parse(url);
@@ -383,9 +383,9 @@ class Repository{
     TAG = 'getRdDescriptionRepo';
     String applicantType="";
     String memberType="";
-    List<MemberDetailsResponse> data = await memberData();
-    applicantType= data[0].papplicanttype;
-    memberType = data[0].pmembertype;
+    MemberDetailsResponse data = await memberData();
+    applicantType= data.papplicanttype;
+    memberType = data.pmembertype;
     try{
       String url = ApiURL.getRdDescriptionApi(rdName,memberType,applicantType);
       Uri apiUrl = Uri.parse(url);
@@ -471,8 +471,8 @@ class Repository{
   Future<List<DepositLoanPayInModel>> getEmiLoanPayInRepo(String loanId,schemeId) async{
     TAG = 'getEmiLoanPayInRepo';
     String applicantType="";
-    List<MemberDetailsResponse> data = await memberData();
-    applicantType= data[0].papplicanttype;
+    MemberDetailsResponse data = await memberData();
+    applicantType= data.papplicanttype;
     try{
       String url = ApiURL.getLoanPayInApi(loanId,applicantType,schemeId);
       Uri apiUrl = Uri.parse(url);
@@ -492,8 +492,8 @@ class Repository{
   Future<List<LoanInterestRatesModel>> getLoanInterestTypeRepo(String loanId,schemeId,loanPayIn) async{
     TAG = 'getLoanInterestTypeRepo';
     String applicantType="";
-    List<MemberDetailsResponse> data = await memberData();
-    applicantType= data[0].papplicanttype;
+    MemberDetailsResponse data = await memberData();
+    applicantType= data.papplicanttype;
     try{
       String url = ApiURL.getLoanInterestTypeApi(loanId,schemeId,applicantType,loanPayIn);
       Uri apiUrl = Uri.parse(url);
@@ -513,8 +513,8 @@ class Repository{
   Future<List<LoanInterestRatesModel>> getMinMaxLoanAmountRepo(String loanId,schemeId,loanPayIn,interestType) async{
     TAG = 'getMinMaxLoanAmountRepo';
     String applicantType="";
-    List<MemberDetailsResponse> data = await memberData();
-    applicantType= data[0].papplicanttype;
+    MemberDetailsResponse data = await memberData();
+    applicantType= data.papplicanttype;
     try{
       String url = ApiURL.getLoanMinMaxAmountApi(
         loanId: loanId,
@@ -542,9 +542,9 @@ class Repository{
     String applicantType="";
     String memberType="";
     List<SchemaDetailsModel> listData=[];
-    List<MemberDetailsResponse> data = await memberData();
-    applicantType= data[0].papplicanttype;
-    memberType = data[0].pmembertype;
+    MemberDetailsResponse data = await memberData();
+    applicantType= data.papplicanttype;
+    memberType = data.pmembertype;
 
     String url = ApiURL.getLoanInterestRatePostApi;
     Uri apiUrl=Uri.parse(url);

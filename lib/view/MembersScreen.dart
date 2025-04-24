@@ -1,8 +1,6 @@
 
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:typed_data';
-
 import 'package:finsta_mac/Login/LoginScreen.dart';
 import 'package:finsta_mac/Login/model/CompanyDetailsModel.dart';
 import 'package:finsta_mac/components/CustomMainBackground.dart';
@@ -46,7 +44,7 @@ class _MembersScreenState extends State<MembersScreen> {
       },
       child: CustomMainBackground(
           title: '',
-          toolbarHeight: 40,
+          // toolbarHeight: 40,
           isBackButton: false,
           body:
         MultiBlocProvider(
@@ -79,7 +77,6 @@ class _MembersScreenState extends State<MembersScreen> {
         )
       ),
     );
-
   }
 
   Widget buildBody(BuildContext context, ProfileState state) {
@@ -143,6 +140,7 @@ class _MembersScreenState extends State<MembersScreen> {
 
     return GestureDetector(
       onTap: () {
+        SharedPrefs.saveData(SharedPrefs.memberDetails, listData);
         SharedPrefs.saveString(SharedPrefs.memberId,listData.pmemberid.toString());
         SharedPrefs.saveString(SharedPrefs.memberName,listData.pContactName.toString());
         Navigator.push(

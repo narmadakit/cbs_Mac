@@ -20,7 +20,7 @@ class _EmiCalculatorScreenState extends State<EmiCalculatorScreen> {
       length: 2,
       child: CustomMainBackground(
           title: 'Emi Calculator',
-          isBackButton: true,
+          isBackButton: false,
           tabBar: TabBar(
             splashBorderRadius: BorderRadius.circular(
               25.0,
@@ -43,6 +43,10 @@ class _EmiCalculatorScreenState extends State<EmiCalculatorScreen> {
                   decoration: borderButtonDecoration(AppStyles.cardColor),
                   child: const Tab( text: "DEPOSITS")),
             ],
+          ),
+          bottomNavBar: bottomNavBar(
+            context: context,
+            selectedIndex: 1,
           ),
           body:buildBody(context)
       ),

@@ -555,7 +555,7 @@ class _RDTabWidgetState extends State<RDTabWidget> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Maturity Amount',style: AppStyles.boldTextBlack),
-                            SizedBox(height: 8,),
+                            const SizedBox(height: 8,),
                             Row(
                               children: [
                                 getRuppeText(fontSize: 15,color: AppStyles.btnColor),

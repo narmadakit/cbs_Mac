@@ -37,6 +37,7 @@ class CustomTextField<T> extends StatelessWidget {
           style:  AppStyles.boldTextBlack,
           onTap: onTap,
           onFieldSubmitted: onChanged,
+          autofocus: false,
           textAlignVertical: TextAlignVertical.center,
           controller: controller,
           decoration: InputDecoration(
