@@ -43,10 +43,10 @@ class _MyLoansScreenState extends State<MyLoansScreen> {
   Widget build(BuildContext context) {
     return CustomMainBackground(
         title: myLoans,
-        bottomNavBar: bottomNavBar(
-          context: context,
-          selectedIndex: null,
-        ),
+        // bottomNavBar: bottomNavBar(
+        //   context: context,
+        //   selectedIndex: null,
+        // ),
         body: (widget.loansList!.isEmpty)?Center(child: Text('No Data',style: AppStyles.headerTextBlack,)):
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),

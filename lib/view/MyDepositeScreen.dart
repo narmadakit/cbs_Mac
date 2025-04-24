@@ -64,10 +64,10 @@ class _MyDepositsScreenState extends State<MyDepositsScreen> {
                   child: Tab( text: "FD")),
             ],
           ),
-        bottomNavBar: bottomNavBar(
-          context: context,
-          selectedIndex: null,
-        ),
+        // bottomNavBar: bottomNavBar(
+        //   context: context,
+        //   selectedIndex: 0,
+        // ),
           body:TabBarView(
             children: [
               widget.rdList!.isNotEmpty?rdTab()
