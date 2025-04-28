@@ -176,7 +176,7 @@ showSnackBar(BuildContext context, String content, {int duration = 4}) {
 Future<String> getVersionName() async {
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
   String version = packageInfo.version;
-  return "version $version";
+  return "$version";
 }
 
 Widget getTextField({TextEditingController? controller, String? hintTxt, TextInputType? inputType, int? maxLength, Function? onChanged}){

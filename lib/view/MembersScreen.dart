@@ -31,6 +31,17 @@ class _MembersScreenState extends State<MembersScreen> {
   bool loadingVisibility =true;
   List<MemberDetailsResponse> listResponnseData=[];
   List<CompanyDetailsModel> companyResponseData=[];
+  String versionName = "Version NO";
+
+  @override
+  void initState() {
+    getVersionName().then((value) {
+      setState(() {
+        versionName = value;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,49 +92,66 @@ class _MembersScreenState extends State<MembersScreen> {
 
   Widget buildBody(BuildContext context, ProfileState state) {
     double gapHeight=MediaQuery.of(context).size.height * 0.03;
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: AppStyles.gridColor,
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        children: [
+         Expanded(
+           child: Column(
+             children: [
+               Container(
+                 decoration: BoxDecoration(
+                   borderRadius: BorderRadius.circular(20),
+                   color: AppStyles.gridColor,
+                 ),
+           
+                 child: Padding(
+                   padding: const EdgeInsets.all(8.0),
+                   child: ClipRRect(
+                       borderRadius: BorderRadius.circular(60),
+                       child: Image.asset('assets/images/app_icon.png', height: 95.0)),
+                 ),
+               ),
+               SizedBox(height: gapHeight),
+               Text('Select Member',style: AppStyles.headerTextBlack),
+               SizedBox(height: gapHeight),
+               GridView.builder(
+                 shrinkWrap: true,
+                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                   crossAxisCount: 2,  // Number of columns
+                   crossAxisSpacing: 3,  // Space between columns
+                   mainAxisSpacing: 2,   // Space between rows
+                 ),
+                 itemCount: listResponnseData.length,
+                 itemBuilder: (context, index) {
+                   MemberDetailsResponse listData=listResponnseData[index];
+                   return buildCaruselCard(context,listData);
+                 },
+               ),
+             ],
+           ),
+         ),
+          Column(
+            children: [
+              GestureDetector(
+                  onTap: () => logoutAlert(context),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.power_settings_new_outlined,color: AppStyles.colorOrange),
+                        Text(' Logout',style: AppStyles.headerTextBlack),
+                      ],
+                    ),
+                  )),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Text("V $versionName",style: const TextStyle(color: Colors.black54),),
               ),
-
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(60),
-                    child: Image.asset('assets/images/app_icon.png', height: 95.0)),
-              ),
-            ),
-            SizedBox(height: gapHeight),
-            Text('Select Member',style: AppStyles.headerTextBlack),
-            SizedBox(height: gapHeight),
-            SizedBox(
-              height: 500,
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,  // Number of columns
-                  crossAxisSpacing: 3,  // Space between columns
-                  mainAxisSpacing: 2,   // Space between rows
-                ),
-                itemCount: listResponnseData.length,
-                itemBuilder: (context, index) {
-                  MemberDetailsResponse listData=listResponnseData[index];
-                  return buildCaruselCard(context,listData);
-                },
-              ),
-            ),
-            GestureDetector(
-              onTap: () => logoutAlert(context),
-                child: Text('Logout',style: AppStyles.headerTextBlack,))
-          ],
-        ),
+            ],
+          )
+        ],
       ),
     );
 
@@ -162,7 +190,7 @@ class _MembersScreenState extends State<MembersScreen> {
                 ClipRRect(
                     borderRadius: BorderRadius.circular(30),
                     child: Image.memory(bytesLogo!,height: 60,width: 60,fit: BoxFit.fill,))
-               : Image.asset("assets/images/profile.png",height: 50,),
+               : Image.asset("assets/images/profile.png",height: 50),
                 SizedBox(height: gapHeight,),
                 Text(listData.pmembercode??"" ,
                   textAlign: TextAlign.center,
@@ -184,17 +212,17 @@ class _MembersScreenState extends State<MembersScreen> {
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: AlertDialog(
-              alignment: Alignment.bottomCenter,
-              backgroundColor:  Colors.black,
+              alignment: Alignment.center,
+              backgroundColor: AppStyles.gridColor,
               shape: const RoundedRectangleBorder(
-                side: BorderSide(color: Colors.white, width: 0.4),
+                // side: BorderSide(color: Colors.white, width: 0.4),
                 borderRadius: BorderRadius.all(Radius.circular(5)),
               ),
               // elevation: 5,
               insetPadding: const EdgeInsets.all(2.0),
-              title: const Text(
+              title: Text(
                 'Are you sure you want to logout?',
-                style: TextStyle(color: Colors.white,fontSize: 15),
+                style: AppStyles.customTextStyle(fontSize: 16),
               ),
               actions: [
                 InkWell(
@@ -207,16 +235,22 @@ class _MembersScreenState extends State<MembersScreen> {
                           (Route<dynamic> route) => false,
                     );
                   },
-                  child: Text('Yes', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Text('Yes', style: AppStyles.customTextStyle(fontSize: 16,color: AppStyles.colorGreen)),
+                  ),
                 ),
                 const SizedBox(
-                  width: 10,
+                  width: 20,
                 ),
                 InkWell(
                     onTap: () {
                       Navigator.pop(context);
                     },
-                    child: Text(' No ', style: TextStyle( color: Colors.red, fontWeight: FontWeight.bold))
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Text(' No ', style: AppStyles.statusTextStyle(fontSize: 15)),
+                    )
                 ),
               ],
             ),

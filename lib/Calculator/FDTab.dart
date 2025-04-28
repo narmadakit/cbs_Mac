@@ -139,7 +139,6 @@ class _FDTabWidgetState extends State<FDTabWidget> {
             _currentRangeValues = minInterestRate;
             isInterestRate=true;
           }
-
           else if(state is FDMaturitySuccessState){
             //Get MaturityData
             isTenureLoader = false;

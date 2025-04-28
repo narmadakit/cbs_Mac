@@ -195,6 +195,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               //   ),
               // ),
               SizedBox(height: gapHeight,),
+              SizedBox(height: gapHeight,),
               GestureDetector(
                 onTap: () {
                   Navigator.pushReplacement(
@@ -216,7 +217,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onTap: () {
                     logoutAlert(context);
                   },
-                  child: Text('LOGOUT',style: AppStyles.highLightText))
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.power_settings_new_outlined,color: AppStyles.colorOrange),
+                        Text('  Logout',style: AppStyles.headerTextBlack),
+                      ],
+                    ),
+                  ))
             ],
           ),
         ),
@@ -231,17 +241,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: AlertDialog(
-              alignment: Alignment.bottomCenter,
-              backgroundColor:  Colors.black,
+              alignment: Alignment.center,
+              backgroundColor: AppStyles.gridColor,
                 shape: const RoundedRectangleBorder(
-                side: BorderSide(color: Colors.white, width: 0.4),
+                // side: BorderSide(color: Colors.white, width: 0.4),
                 borderRadius: BorderRadius.all(Radius.circular(5)),
               ),
               // elevation: 5,
               insetPadding: const EdgeInsets.all(2.0),
-              title: const Text(
+              title: Text(
                 'Are you sure you want to logout?',
-                style: TextStyle(color: Colors.white,fontSize: 15),
+                style:  AppStyles.customTextStyle(fontSize: 16),
               ),
               actions: [
                 InkWell(
@@ -254,16 +264,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           (Route<dynamic> route) => false,
                     );
                   },
-                  child: Text('Yes', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Text('Yes', style: AppStyles.customTextStyle(fontSize: 16,color: AppStyles.colorGreen)),
+                  ),
                 ),
                 const SizedBox(
-                  width: 10,
+                  width: 20,
                 ),
                 InkWell(
                     onTap: () {
                       Navigator.pop(context);
                     },
-                    child: Text(' No ', style: TextStyle( color: Colors.red, fontWeight: FontWeight.bold))
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Text(' No ', style: AppStyles.statusTextStyle(fontSize: 15)),
+                    )
                 ),
               ],
             ),

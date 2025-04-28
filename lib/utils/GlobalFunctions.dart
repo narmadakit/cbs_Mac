@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
+Future<String> getVersionName() async {
+PackageInfo packageInfo = await PackageInfo.fromPlatform();
+String version = packageInfo.version;
+return "version $version";
+}
 
  themeNotifier(String memberId) => ValueNotifier<String>(memberId);
 var dateOutputFormat = DateFormat('yyyy-MM-dd');
