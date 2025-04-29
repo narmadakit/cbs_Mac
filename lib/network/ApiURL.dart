@@ -1,5 +1,6 @@
 class ApiURL{
   static String BASE_URL ="http://13.201.200.0:8386/";
+  // static String BASE_URL ="https://godavarimac-api.finsta.co.in/";
   static String getMemberDataByMobile(String mobile) => "${BASE_URL}api/MobileAPP/Getmemberdatabymobileno?pmobileno=$mobile";
   static String getMembersSummaryByMemberId(String memberId) => "${BASE_URL}api/MobileAPP/GetMembersummarybymemberid?pmemberid=$memberId";
   static String getLoginOtp ="${BASE_URL}api/MobileAPP/SaveLoginOTPDetails";
@@ -7,7 +8,6 @@ class ApiURL{
   static String getMemberAllDues(String memberId,String date) => "${BASE_URL}api/MobileAPP/GetMemberaganist_allDues?pmemberid=$memberId&ptransdate=$date";
   static String getCompanyDetails= "${BASE_URL}api/Settings/GetcompanyNameandaddressDetails";
   static String getBannerImages= "${BASE_URL}api/MobileAPP/GetClientSchemes?prequestfrom=mobile";
-
 
   //Emi calculator
   //FD
@@ -36,7 +36,7 @@ class ApiURL{
 
   static String getLoanPayInApi(String loanId,applicantType,schemeId) => "${BASE_URL}api/loans/Transactions/Firstinformation/GetLoanpayin?Loanid=$loanId&Contacttype=Individual&Applicanttype=$applicantType&schemeid=$schemeId";
 
-    static String getLoanMinMaxAmountApi({required String loanId, applicantType, loanPayIn, schemeId, interestType}) => "${BASE_URL}api/loans/Transactions/Firstinformation/GetLoanMinandmaxAmounts?Loanid=$loanId&Contacttype=Individual&Applicanttype=$applicantType&Loanpayin=$loanPayIn&schemeid=$schemeId&interesttype=$interestType";
+  static String getLoanMinMaxAmountApi({required String loanId, applicantType, loanPayIn, schemeId, interestType}) => "${BASE_URL}api/loans/Transactions/Firstinformation/GetLoanMinandmaxAmounts?Loanid=$loanId&Contacttype=Individual&Applicanttype=$applicantType&Loanpayin=$loanPayIn&schemeid=$schemeId&interesttype=$interestType";
 
   static String getLoanInterestRatePostApi  = "${BASE_URL}api/loans/Transactions/Firstinformation/GetInterestRates";
 
