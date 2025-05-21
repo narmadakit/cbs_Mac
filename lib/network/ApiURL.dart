@@ -1,5 +1,6 @@
 class ApiURL{
-  static String BASE_URL ="http://13.201.200.0:8386/";
+  // static String BASE_URL ="http://13.201.200.0:8386/";
+  static String BASE_URL ="https://democbs-api.finsta.co.in/";
   // static String BASE_URL ="https://godavarimac-api.finsta.co.in/";
   static String getMemberDataByMobile(String mobile) => "${BASE_URL}api/MobileAPP/Getmemberdatabymobileno?pmobileno=$mobile";
   static String getMembersSummaryByMemberId(String memberId) => "${BASE_URL}api/MobileAPP/GetMembersummarybymemberid?pmemberid=$memberId";
